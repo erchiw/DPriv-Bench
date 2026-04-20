@@ -1,0 +1,117 @@
+[
+  {"theorem_id": 1,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1802.08908",
+   "location": "Theorem 6"
+  },
+  {"theorem_id": 2,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1802.08908",
+   "location": "Proposition 8"
+  },
+  {"theorem_id": 3,
+   "is_definition": false,
+   "reference": "https://proceedings.mlr.press/v23/kifer12/kifer12.pdf",
+   "location": "Lemma 14"
+  },
+  {"theorem_id": 4,
+   "is_definition": true,
+   "reference": "https://arxiv.org/pdf/2102.04704",
+   "location": "Definition 1"
+  },
+  {"theorem_id": 5,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1507.00056",
+   "location": "Theorem B.1"
+  },
+  {"theorem_id": 6,
+   "is_definition": false,
+   "reference": "https://salil.seas.harvard.edu/sites/g/files/omnuum4266/files/salil/files/the_complexity_of_differential_privacy.pdf",
+   "location": "Proposition 7.3.2",
+   "description": "the stated theorem follows standard privacy analysis of Propose-test-release"
+  },
+  {"theorem_id": 7,
+   "is_definition": false,
+   "reference": "https://dl.acm.org/doi/10.1145/1810891.1810916",
+   "location": "2.4.2"
+  },
+  {"theorem_id": 8,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/2004.00010",
+   "location": "Proposition 12"
+  },
+  {"theorem_id": 9,
+   "is_definition": false,
+   "reference": "https://differentialprivacy.org/exponential-mechanism-bounded-range/",
+   "location": "Corollary 7"
+  },
+  {"theorem_id": 10,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1807.01647",
+   "location": "Theorem 9"
+  },
+  {"theorem_id": 11,
+   "is_definition": false,
+   "reference": "https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf",
+   "location": "Theorem 3.23"
+  },
+  {"theorem_id": 12,
+   "is_definition": false,
+   "reference": "https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf",
+   "location": "Theorem 3.10"
+  },
+  {"theorem_id": 13,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1905.02383",
+   "location": "Corollary 3.3"
+  },
+  {"theorem_id": 14,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/2110.03620",
+   "location": "Theorem 2"
+  },
+  {"theorem_id": 15,
+   "is_definition": false,
+   "reference": "https://differentialprivacy.org/pdp-to-zcdp/",
+   "location": "Proposition 6",
+   "description": "Kearns-Saul inequality "
+  },
+  {"theorem_id": 16,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/2204.13650",
+   "location": "",
+   "description": "DP-SGD with poisson sampling"
+  },
+  {"theorem_id": 17,
+   "is_definition": false,
+   "reference": "https://differentialprivacy.org/exponential-mechanism-bounded-range/",
+   "location": "Definition 1, Theorenm 5",
+   "description": "This is the definition of bounded range property and its zCDP guarantee. The definition of bounded range originally appeared in https://arxiv.org/pdf/1905.04273, its connection to tighter zCDP bound is analyzed in https://arxiv.org/abs/1905.04273"
+  },
+  {"theorem_id": 18,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1906.02830",
+   "location": "Lemma 50"
+  },
+  {"theorem_id": 19,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1906.02830",
+   "location": "Proposition 5."
+  },
+  {"theorem_id": 20,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/1906.02830",
+   "location": "Proposition 3."
+  },
+  {"theorem_id": 21,
+   "is_definition": false,
+   "reference": "https://arxiv.org/pdf/2301.00301",
+   "location": "Theorem 4.3"
+  },
+  {"theorem_id": 22,
+   "is_definition": false,
+   "reference": "Folklore",
+   "location": null,
+   "description": "This is a folklore result of the l1 sensitivity of the mean estimator under the add/remove notion of neighboring datasets."
+  }
+]

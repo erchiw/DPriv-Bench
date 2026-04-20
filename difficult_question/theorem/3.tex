@@ -1,0 +1,26 @@
+Let $\lambda$ be an upper bound on the eigenvalues of $\nabla^2\ell(\theta;d)$, for all $d$ and for all $\theta\in\mathbb{F}$. Further assume the convex regularizer $r$ is twice-continuously differentiable, and $\mathbb{F}=\mathbb{R}^p$. Then the following algorithm satisfies $(\varepsilon,\delta)$-DP.
+\begin{algorithm}[t]
+\caption{Generalized Objective Perturbation Mechanism (Obj-Pert)}
+\KwIn{
+dataset $D=\{d_1,\dots,d_n\}$; privacy parameters $\varepsilon$ and $\delta$;
+convex regularizer $r$; convex domain $\mathcal{F}\subseteq\mathbb{R}^p$;
+convex loss $\widehat{L}(\theta;D)=\frac{1}{n}\sum_{i=1}^n \ell(\theta;d_i)$ with continuous Hessian;
+$\|\nabla \ell(\theta;d)\|_2\le \zeta$ for all $d$ and $\theta\in\mathcal{F}$;
+and an upper bound $\lambda$ on the eigenvalues of $\nabla^2 \ell(\theta;d)$ for all $d$ and $\theta\in\mathcal{F}$.
+}
+\KwOut{$\theta^{\mathrm{priv}}$}
+
+Set $\Delta \ge \frac{2\lambda}{\varepsilon}$\;
+
+Sample $b\in\mathbb{R}^p$ from
+\[
+\nu_2(b;\varepsilon,\delta,\zeta)
+=\mathcal{N}\!\left(0,\ \frac{\zeta^2\bigl(8\log(2/\delta)+4\varepsilon\bigr)}{\varepsilon^2}\,I_{p\times p}\right)
+\]
+
+\Return $\displaystyle
+\theta^{\mathrm{priv}}
+\in \arg\min_{\theta\in\mathcal{F}}
+\widehat{L}(\theta;D)+\frac{1}{n}r(\theta)+\frac{\Delta}{2n}\|\theta\|_2^2+\frac{b^\top \theta}{n}
+$\;
+\end{algorithm}

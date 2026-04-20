@@ -1,0 +1,20 @@
+Let $f:\mathcal{X}^n\to\mathbb{R}$.
+  
+\paragraph{Laplace log-normal distribution.}
+For $\sigma>0$, let $X\sim \mathrm{Lap}(0,1)$ be a standard Laplace random variable and let
+$Y\sim\mathcal{N}(0,1)$ be a standard Gaussian, independent of $X$.
+Define
+\[
+Z \;=\; X\cdot e^{\sigma Y},
+\]
+and denote the distribution of $Z$ by $\mathrm{LLN}(\sigma)$ (the \emph{Laplace log-normal} distribution).
+
+Let $Z\sim \mathrm{LLN}(\sigma)$ for some $\sigma>0$. Then, for all $s,t>0$, the randomized algorithm
+$M:\mathcal{X}^n\to\mathbb{R}$ given by
+\[
+M(x) \;=\; f(x) \;+\; \frac{1}{s}\, S_f^{t}(x)\cdot Z
+\]
+guarantees $\tfrac{1}{2}\varepsilon^{2}$-zCDP for
+\[
+\varepsilon \;=\; \frac{t}{\sigma} \;+\; e^{3\sigma^{2}/2}\,s.
+\]

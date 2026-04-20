@@ -1,0 +1,19 @@
+The following AboveThreshold algorithm is $\varepsilon$-DP.
+\begin{algorithm}[H]
+\caption{AboveThreshold}
+\KwIn{Dataset $D$, sensitivity-$1$ queries $\{f_i\}$, threshold $T$, privacy parameter $\varepsilon$}
+\KwOut{Sequence of answers $a_i \in \{\top,\bot\}$}
+
+Sample $\widehat{T} \leftarrow T + \mathrm{Lap}\!\left(\tfrac{2}{\varepsilon}\right)$\;
+
+\For{$i = 1,2,\ldots$}{
+    Sample $v_i \leftarrow \mathrm{Lap}\!\left(\tfrac{4}{\varepsilon}\right)$\;
+    \If{$f_i(D) + v_i \ge \widehat{T}$}{
+        Output $a_i = \top$\;
+        \textbf{halt}
+    }
+    \Else{
+        Output $a_i = \bot$\;
+    }
+}
+\end{algorithm}

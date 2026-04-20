@@ -1,0 +1,24 @@
+Given a privacy accountant $\mathcal{O}$ such that, given target privacy parameters $(\varepsilon,\delta)$, the Poisson sampling rate $q$, and the number of DP-SGD iterations $T$ (i.e., the number of compositions), returns the calibrated noise multiplier $\sigma$ for the subsampled Gaussian mechanism used in DP-SGD under the replace-one neighbouring relation. Then the following algorithm satisfies $(\varepsilon,\delta)$-DP.
+\begin{algorithm}[H]
+\caption{DP-SGD}
+\DontPrintSemicolon
+\SetKwInput{KwIn}{Input}
+\KwIn{iterations $T$, dataset $D=\{x_1,\ldots,x_N\}$, per-example loss $\ell(\theta;x)$, clipping bound $C$, initial weights $\theta_0$, sampling rate $q\in(0,1]$, step size $\eta$, target privacy $(\varepsilon,\delta)$, accountant $\mathcal{O}$}
+\BlankLine
+\textbf{Set:} $\sigma \leftarrow \mathcal{O}(\varepsilon,\delta,q,T)$ \tcp*{noise multiplier}
+\For{$t=0,\ldots,T-1$}{
+  $L_t \sim \mathrm{PoissonSample}(D,q)$ \tcp*{include each $x_i$ independently w.p. $q$}
+  $S_t \leftarrow 0 \in \mathbb{R}^d$ 
+  \For{$x_i \in L_t$}{
+    $g_i \leftarrow \nabla_{\theta_t}\ell(\theta_t;x_i)$ \tcp*{per-example gradient}
+    $\bar g_i \leftarrow g_i \cdot \min\!\left(1,\frac{C}{\lVert g_i\rVert_2}\right)$ \tcp*{$\lVert \bar g_i\rVert_2\le C$}
+    $S_t \leftarrow S_t + \bar g_i$
+  }
+  $Z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_d)$ 
+  
+  $\tilde g_t \leftarrow \frac{1}{qN}\left(S_t + Z_t\right)$ 
+  
+  $\theta_{t+1} \leftarrow \theta_t - \eta \tilde g_t$
+}
+\KwRet{$\theta_T$}
+\end{algorithm}

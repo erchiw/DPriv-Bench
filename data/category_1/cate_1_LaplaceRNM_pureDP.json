@@ -1,0 +1,786 @@
+[
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 1,
+        "function": "f(X) = \\sum_{i=1}^n x_i",
+        "function_sens": "1",
+        "question_id": 1
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 1,
+        "function": "f(X) = \\sum_{i=1}^n x_i",
+        "function_sens": "1",
+        "question_id": 2
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\prod_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 2,
+        "function": "f(X) = \\prod_{i=1}^n x_i",
+        "function_sens": "1",
+        "question_id": 3
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\prod_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 2,
+        "function": "f(X) = \\prod_{i=1}^n x_i",
+        "function_sens": "1",
+        "question_id": 4
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\max_{1 \\le i \\le n} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 3,
+        "function": "f(X) = \\max_{1 \\le i \\le n} x_i",
+        "function_sens": "1",
+        "question_id": 5
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\max_{1 \\le i \\le n} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 3,
+        "function": "f(X) = \\max_{1 \\le i \\le n} x_i",
+        "function_sens": "1",
+        "question_id": 6
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\min_{1 \\le i \\le n} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 4,
+        "function": "f(X) = \\min_{1 \\le i \\le n} x_i",
+        "function_sens": "1",
+        "question_id": 7
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\min_{1 \\le i \\le n} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 4,
+        "function": "f(X) = \\min_{1 \\le i \\le n} x_i",
+        "function_sens": "1",
+        "question_id": 8
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\frac{1}{n} \\sum_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{n})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 5,
+        "function": "f(X) = \\frac{1}{n} \\sum_{i=1}^n x_i",
+        "function_sens": "\\frac{1}{n}",
+        "question_id": 9
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\frac{1}{n} \\sum_{i=1}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{n})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 5,
+        "function": "f(X) = \\frac{1}{n} \\sum_{i=1}^n x_i",
+        "function_sens": "\\frac{1}{n}",
+        "question_id": 10
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sqrt{\\sum_{i=1}^n x_i^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 6,
+        "function": "f(X) = \\sqrt{\\sum_{i=1}^n x_i^2}",
+        "function_sens": "1",
+        "question_id": 11
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sqrt{\\sum_{i=1}^n x_i^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 6,
+        "function": "f(X) = \\sqrt{\\sum_{i=1}^n x_i^2}",
+        "function_sens": "1",
+        "question_id": 12
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} |x_i - x_{i+1}|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 7,
+        "function": "f(X) = \\sum_{i=1}^{n-1} |x_i - x_{i+1}|",
+        "function_sens": "2",
+        "question_id": 13
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} |x_i - x_{i+1}|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 7,
+        "function": "f(X) = \\sum_{i=1}^{n-1} |x_i - x_{i+1}|",
+        "function_sens": "2",
+        "question_id": 14
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n |x_i - \\bar{x}|, \\quad \\bar{x} = \\frac{1}{n} \\sum_{j=1}^n x_j$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{2(n-1)}{n})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 8,
+        "function": "f(X) = \\sum_{i=1}^n |x_i - \\bar{x}|, \\quad \\bar{x} = \\frac{1}{n} \\sum_{j=1}^n x_j",
+        "function_sens": "\\frac{2(n-1)}{n}",
+        "question_id": 15
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n |x_i - \\bar{x}|, \\quad \\bar{x} = \\frac{1}{n} \\sum_{j=1}^n x_j$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{2(n-1)}{n})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 8,
+        "function": "f(X) = \\sum_{i=1}^n |x_i - \\bar{x}|, \\quad \\bar{x} = \\frac{1}{n} \\sum_{j=1}^n x_j",
+        "function_sens": "\\frac{2(n-1)}{n}",
+        "question_id": 16
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n (x_i - \\bar{x})^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{n-1}{n})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 9,
+        "function": "f(X) = \\sum_{i=1}^n (x_i - \\bar{x})^2",
+        "function_sens": "\\frac{n-1}{n}",
+        "question_id": 17
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n (x_i - \\bar{x})^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{n-1}{n})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 9,
+        "function": "f(X) = \\sum_{i=1}^n (x_i - \\bar{x})^2",
+        "function_sens": "\\frac{n-1}{n}",
+        "question_id": 18
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n (x_i - \\mu)^2, \\quad \\mu \\in [0,1]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 10,
+        "function": "f(X) = \\sum_{i=1}^n (x_i - \\mu)^2, \\quad \\mu \\in [0,1]",
+        "function_sens": "1",
+        "question_id": 19
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n (x_i - \\mu)^2, \\quad \\mu \\in [0,1]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 10,
+        "function": "f(X) = \\sum_{i=1}^n (x_i - \\mu)^2, \\quad \\mu \\in [0,1]",
+        "function_sens": "1",
+        "question_id": 20
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 11,
+        "function": "f(X) = \\sum_{i=1}^n x_i^2",
+        "function_sens": "1",
+        "question_id": 21
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 11,
+        "function": "f(X) = \\sum_{i=1}^n x_i^2",
+        "function_sens": "1",
+        "question_id": 22
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^3$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 12,
+        "function": "f(X) = \\sum_{i=1}^n x_i^3",
+        "function_sens": "1",
+        "question_id": 23
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^3$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 12,
+        "function": "f(X) = \\sum_{i=1}^n x_i^3",
+        "function_sens": "1",
+        "question_id": 24
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sqrt{x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 13,
+        "function": "f(X) = \\sum_{i=1}^n \\sqrt{x_i}",
+        "function_sens": "1",
+        "question_id": 25
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sqrt{x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 13,
+        "function": "f(X) = \\sum_{i=1}^n \\sqrt{x_i}",
+        "function_sens": "1",
+        "question_id": 26
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\log(x_i + 1)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(2))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 14,
+        "function": "f(X) = \\sum_{i=1}^n \\log(x_i + 1)",
+        "function_sens": "\\log(2)",
+        "question_id": 27
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\log(x_i + 1)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(2))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 14,
+        "function": "f(X) = \\sum_{i=1}^n \\log(x_i + 1)",
+        "function_sens": "\\log(2)",
+        "question_id": 28
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n e^{x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(e-1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 15,
+        "function": "f(X) = \\sum_{i=1}^n e^{x_i}",
+        "function_sens": "e-1",
+        "question_id": 29
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n e^{x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(e-1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 15,
+        "function": "f(X) = \\sum_{i=1}^n e^{x_i}",
+        "function_sens": "e-1",
+        "question_id": 30
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sin(\\pi x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 16,
+        "function": "f(X) = \\sum_{i=1}^n \\sin(\\pi x_i)",
+        "function_sens": "1",
+        "question_id": 31
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sin(\\pi x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 16,
+        "function": "f(X) = \\sum_{i=1}^n \\sin(\\pi x_i)",
+        "function_sens": "1",
+        "question_id": 32
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\cos(\\pi x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 17,
+        "function": "f(X) = \\sum_{i=1}^n \\cos(\\pi x_i)",
+        "function_sens": "2",
+        "question_id": 33
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\cos(\\pi x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 17,
+        "function": "f(X) = \\sum_{i=1}^n \\cos(\\pi x_i)",
+        "function_sens": "2",
+        "question_id": 34
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\tan^{-1}(x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{\\pi}{4})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 18,
+        "function": "f(X) = \\sum_{i=1}^n \\tan^{-1}(x_i)",
+        "function_sens": "\\frac{\\pi}{4}",
+        "question_id": 35
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\tan^{-1}(x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{\\pi}{4})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 18,
+        "function": "f(X) = \\sum_{i=1}^n \\tan^{-1}(x_i)",
+        "function_sens": "\\frac{\\pi}{4}",
+        "question_id": 36
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i (1 - x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{4})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 19,
+        "function": "f(X) = \\sum_{i=1}^n x_i (1 - x_i)",
+        "function_sens": "\\frac{1}{4}",
+        "question_id": 37
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i (1 - x_i)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{4})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 19,
+        "function": "f(X) = \\sum_{i=1}^n x_i (1 - x_i)",
+        "function_sens": "\\frac{1}{4}",
+        "question_id": 38
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^2 (1 - x_i)^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{16})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 20,
+        "function": "f(X) = \\sum_{i=1}^n x_i^2 (1 - x_i)^2",
+        "function_sens": "\\frac{1}{16}",
+        "question_id": 39
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_i^2 (1 - x_i)^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{16})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 20,
+        "function": "f(X) = \\sum_{i=1}^n x_i^2 (1 - x_i)^2",
+        "function_sens": "\\frac{1}{16}",
+        "question_id": 40
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\text{median}(x_1, \\dots, x_n)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 21,
+        "function": "f(X) = \\text{median}(x_1, \\dots, x_n)",
+        "function_sens": "1",
+        "question_id": 41
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\text{median}(x_1, \\dots, x_n)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 21,
+        "function": "f(X) = \\text{median}(x_1, \\dots, x_n)",
+        "function_sens": "1",
+        "question_id": 42
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = Q_3 - Q_1  \\quad \\text{(interquartile range)}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 22,
+        "function": "f(X) = Q_3 - Q_1  \\quad \\text{(interquartile range)}",
+        "function_sens": "1",
+        "question_id": 43
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = Q_3 - Q_1  \\quad \\text{(interquartile range)}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 22,
+        "function": "f(X) = Q_3 - Q_1  \\quad \\text{(interquartile range)}",
+        "function_sens": "1",
+        "question_id": 44
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\#\\{ i : x_i > 0.5 \\}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 23,
+        "function": "f(X) = \\#\\{ i : x_i > 0.5 \\}",
+        "function_sens": "1",
+        "question_id": 45
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\#\\{ i : x_i > 0.5 \\}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 23,
+        "function": "f(X) = \\#\\{ i : x_i > 0.5 \\}",
+        "function_sens": "1",
+        "question_id": 46
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\#\\{ i : x_i \\in [a, b] \\}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 24,
+        "function": "f(X) = \\#\\{ i : x_i \\in [a, b] \\}",
+        "function_sens": "1",
+        "question_id": 47
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\#\\{ i : x_i \\in [a, b] \\}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 24,
+        "function": "f(X) = \\#\\{ i : x_i \\in [a, b] \\}",
+        "function_sens": "1",
+        "question_id": 48
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} x_i x_{i+1}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 25,
+        "function": "f(X) = \\sum_{i=1}^{n-1} x_i x_{i+1}",
+        "function_sens": "2",
+        "question_id": 49
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} x_i x_{i+1}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 25,
+        "function": "f(X) = \\sum_{i=1}^{n-1} x_i x_{i+1}",
+        "function_sens": "2",
+        "question_id": 50
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{1 \\le i < j \\le n} x_i x_j$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((n-1))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 26,
+        "function": "f(X) = \\sum_{1 \\le i < j \\le n} x_i x_j",
+        "function_sens": "(n-1)",
+        "question_id": 51
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{1 \\le i < j \\le n} x_i x_j$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((n-1))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 26,
+        "function": "f(X) = \\sum_{1 \\le i < j \\le n} x_i x_j",
+        "function_sens": "(n-1)",
+        "question_id": 52
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{\\lfloor n/2 \\rfloor} (x_{2i-1} - x_{2i})$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 27,
+        "function": "f(X) = \\sum_{i=1}^{\\lfloor n/2 \\rfloor} (x_{2i-1} - x_{2i})",
+        "function_sens": "1",
+        "question_id": 53
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{\\lfloor n/2 \\rfloor} (x_{2i-1} - x_{2i})$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 27,
+        "function": "f(X) = \\sum_{i=1}^{\\lfloor n/2 \\rfloor} (x_{2i-1} - x_{2i})",
+        "function_sens": "1",
+        "question_id": 54
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\left( \\sum_{i=1}^n x_i \\right)^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((2n-1))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 28,
+        "function": "f(X) = \\left( \\sum_{i=1}^n x_i \\right)^2",
+        "function_sens": "(2n-1)",
+        "question_id": 55
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\left( \\sum_{i=1}^n x_i \\right)^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((2n-1))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 28,
+        "function": "f(X) = \\left( \\sum_{i=1}^n x_i \\right)^2",
+        "function_sens": "(2n-1)",
+        "question_id": 56
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n i x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(n)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 29,
+        "function": "f(X) = \\sum_{i=1}^n i x_i",
+        "function_sens": "n",
+        "question_id": 57
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n i x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(n)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 29,
+        "function": "f(X) = \\sum_{i=1}^n i x_i",
+        "function_sens": "n",
+        "question_id": 58
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\mathbb{1} \\left[ \\sum_{i=1}^n x_i > \\frac{n}{2} \\right]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 30,
+        "function": "f(X) = \\mathbb{1} \\left[ \\sum_{i=1}^n x_i > \\frac{n}{2} \\right]",
+        "function_sens": "1",
+        "question_id": 59
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\mathbb{1} \\left[ \\sum_{i=1}^n x_i > \\frac{n}{2} \\right]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 30,
+        "function": "f(X) = \\mathbb{1} \\left[ \\sum_{i=1}^n x_i > \\frac{n}{2} \\right]",
+        "function_sens": "1",
+        "question_id": 60
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.7]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 31,
+        "function": "f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.7]",
+        "function_sens": "1",
+        "question_id": 61
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.7]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 31,
+        "function": "f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.7]",
+        "function_sens": "1",
+        "question_id": 62
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\prod_{i=1}^n \\mathbb{1}[x_i > \\tau]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 32,
+        "function": "f(X) = \\prod_{i=1}^n \\mathbb{1}[x_i > \\tau]",
+        "function_sens": "1",
+        "question_id": 63
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\prod_{i=1}^n \\mathbb{1}[x_i > \\tau]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 32,
+        "function": "f(X) = \\prod_{i=1}^n \\mathbb{1}[x_i > \\tau]",
+        "function_sens": "1",
+        "question_id": 64
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\mathbb{1}[x_1 > x_2]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 33,
+        "function": "f(X) = \\mathbb{1}[x_1 > x_2]",
+        "function_sens": "1",
+        "question_id": 65
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\mathbb{1}[x_1 > x_2]$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 33,
+        "function": "f(X) = \\mathbb{1}[x_1 > x_2]",
+        "function_sens": "1",
+        "question_id": 66
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.5] \\bmod 2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 34,
+        "function": "f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.5] \\bmod 2",
+        "function_sens": "1",
+        "question_id": 67
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.5] \\bmod 2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 34,
+        "function": "f(X) = \\sum_{i=1}^n \\mathbb{1}[x_i > 0.5] \\bmod 2",
+        "function_sens": "1",
+        "question_id": 68
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\log\\left(1 + \\sum_{i=1}^n x_i^2\\right)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(2))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 35,
+        "function": "f(X) = \\log\\left(1 + \\sum_{i=1}^n x_i^2\\right)",
+        "function_sens": "\\log(2)",
+        "question_id": 69
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\log\\left(1 + \\sum_{i=1}^n x_i^2\\right)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(2))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 35,
+        "function": "f(X) = \\log\\left(1 + \\sum_{i=1}^n x_i^2\\right)",
+        "function_sens": "\\log(2)",
+        "question_id": 70
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sqrt{\\sum_{i=1}^n (x_i - x_{i+1 \\bmod n})^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\sqrt{2})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 36,
+        "function": "f(X) = \\sqrt{\\sum_{i=1}^n (x_i - x_{i+1 \\bmod n})^2}",
+        "function_sens": "\\sqrt{2}",
+        "question_id": 71
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sqrt{\\sum_{i=1}^n (x_i - x_{i+1 \\bmod n})^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\sqrt{2})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 36,
+        "function": "f(X) = \\sqrt{\\sum_{i=1}^n (x_i - x_{i+1 \\bmod n})^2}",
+        "function_sens": "\\sqrt{2}",
+        "question_id": 72
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\frac{\\sum_{i=1}^n x_i^2}{1 + \\sum_{i=1}^n x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 37,
+        "function": "f(X) = \\frac{\\sum_{i=1}^n x_i^2}{1 + \\sum_{i=1}^n x_i}",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 73
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\frac{\\sum_{i=1}^n x_i^2}{1 + \\sum_{i=1}^n x_i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 37,
+        "function": "f(X) = \\frac{\\sum_{i=1}^n x_i^2}{1 + \\sum_{i=1}^n x_i}",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 74
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\exp\\left(-\\sum_{i=1}^n x_i^2\\right)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((1-e^{-1}))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 38,
+        "function": "f(X) = \\exp\\left(-\\sum_{i=1}^n x_i^2\\right)",
+        "function_sens": "(1-e^{-1})",
+        "question_id": 75
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\exp\\left(-\\sum_{i=1}^n x_i^2\\right)$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2((1-e^{-1}))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 38,
+        "function": "f(X) = \\exp\\left(-\\sum_{i=1}^n x_i^2\\right)",
+        "function_sens": "(1-e^{-1})",
+        "question_id": 76
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{1}{1 + x_i^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 39,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{1}{1 + x_i^2}",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 77
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{1}{1 + x_i^2}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 39,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{1}{1 + x_i^2}",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 78
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sigma(x_i), \\quad \\sigma(x) = \\frac{1}{1 + e^{-x}}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1-e^{-1}}{2(1 + e^{-1})})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 40,
+        "function": "f(X) = \\sum_{i=1}^n \\sigma(x_i), \\quad \\sigma(x) = \\frac{1}{1 + e^{-x}}",
+        "function_sens": "\\frac{1-e^{-1}}{2(1 + e^{-1})}",
+        "question_id": 79
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\sigma(x_i), \\quad \\sigma(x) = \\frac{1}{1 + e^{-x}}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1-e^{-1}}{2(1 + e^{-1})})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 40,
+        "function": "f(X) = \\sum_{i=1}^n \\sigma(x_i), \\quad \\sigma(x) = \\frac{1}{1 + e^{-x}}",
+        "function_sens": "\\frac{1-e^{-1}}{2(1 + e^{-1})}",
+        "question_id": 80
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{e^{x_i}}{\\sum_{j=1}^n e^{x_j}} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{e}{e+n-1})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 41,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{e^{x_i}}{\\sum_{j=1}^n e^{x_j}} x_i",
+        "function_sens": "\\frac{e}{e+n-1}",
+        "question_id": 81
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{e^{x_i}}{\\sum_{j=1}^n e^{x_j}} x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{e}{e+n-1})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 41,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{e^{x_i}}{\\sum_{j=1}^n e^{x_j}} x_i",
+        "function_sens": "\\frac{e}{e+n-1}",
+        "question_id": 82
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{1}{2} \\right|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 42,
+        "function": "f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{1}{2} \\right|",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 83
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{1}{2} \\right|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\frac{1}{2})/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 42,
+        "function": "f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{1}{2} \\right|",
+        "function_sens": "\\frac{1}{2}",
+        "question_id": 84
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} (x_i - x_{i+1})^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 43,
+        "function": "f(X) = \\sum_{i=1}^{n-1} (x_i - x_{i+1})^2",
+        "function_sens": "2",
+        "question_id": 85
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^{n-1} (x_i - x_{i+1})^2$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(2)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 43,
+        "function": "f(X) = \\sum_{i=1}^{n-1} (x_i - x_{i+1})^2",
+        "function_sens": "2",
+        "question_id": 86
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_{\\pi(i)} \\quad \\text{for fixed permutation } \\pi$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 44,
+        "function": "f(X) = \\sum_{i=1}^n x_{\\pi(i)} \\quad \\text{for fixed permutation } \\pi",
+        "function_sens": "1",
+        "question_id": 87
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n x_{\\pi(i)} \\quad \\text{for fixed permutation } \\pi$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 44,
+        "function": "f(X) = \\sum_{i=1}^n x_{\\pi(i)} \\quad \\text{for fixed permutation } \\pi",
+        "function_sens": "1",
+        "question_id": 88
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\text{rank of } x_k$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(n-1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 45,
+        "function": "f(X) = \\text{rank of } x_k",
+        "function_sens": "n-1",
+        "question_id": 89
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\text{rank of } x_k$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(n-1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 45,
+        "function": "f(X) = \\text{rank of } x_k",
+        "function_sens": "n-1",
+        "question_id": 90
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{\\substack{i=1 \\\\ i \\text{ even}}}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 46,
+        "function": "f(X) = \\sum_{\\substack{i=1 \\\\ i \\text{ even}}}^n x_i",
+        "function_sens": "1",
+        "question_id": 91
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{\\substack{i=1 \\\\ i \\text{ even}}}^n x_i$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 46,
+        "function": "f(X) = \\sum_{\\substack{i=1 \\\\ i \\text{ even}}}^n x_i",
+        "function_sens": "1",
+        "question_id": 92
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{x_i}{i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 47,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{x_i}{i}",
+        "function_sens": "1",
+        "question_id": 93
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\frac{x_i}{i}$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 47,
+        "function": "f(X) = \\sum_{i=1}^n \\frac{x_i}{i}",
+        "function_sens": "1",
+        "question_id": 94
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = -\\sum_{i=1}^n x_i \\log(x_i + \\delta), \\quad \\delta > 1$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(1+\\delta))/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 48,
+        "function": "f(X) = -\\sum_{i=1}^n x_i \\log(x_i + \\delta), \\quad \\delta > 1",
+        "function_sens": "\\log(1+\\delta)",
+        "question_id": 95
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = -\\sum_{i=1}^n x_i \\log(x_i + \\delta), \\quad \\delta > 1$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(\\log(1+\\delta))/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 48,
+        "function": "f(X) = -\\sum_{i=1}^n x_i \\log(x_i + \\delta), \\quad \\delta > 1",
+        "function_sens": "\\log(1+\\delta)",
+        "question_id": 96
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{i}{n} \\right|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(\\varepsilon)))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 1,
+        "function_id": 49,
+        "function": "f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{i}{n} \\right|",
+        "function_sens": "1",
+        "question_id": 97
+    },
+    {
+        "question": "Given $D \\in [0, 1]^{n \\times d}$, where each row stands for a user and each column stands for their preference over $d$ items. Define score function $f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{i}{n} \\right|$, where $X=(x_1, \\cdots, x_n)\\in [0, 1]^d$. Sample $Z_1, Z_2, ..., Z_d$ i.i.d. from $Lap((2(1)/(2\\cdot(\\varepsilon))))$. $Lap(t)$ stands for the Laplace distribution with scale parameter $t$ and location parameter $0$. The neighbouring datasets $D \\in [0, 1]^{n \\times d}$ and $D' \\in [0, 1]^{n \\times d}$ differ at most one row. Return $\\tilde{f} = \\argmax_{j \\in \\{1,2,...,d\\}} (f(D_{*,j}) + Z_j)$. $D_{*,j}$ denotes the $j$-th column of matrix $D$. Does $\\tilde{f}$ satisfies $\\varepsilon$-differential privacy?",
+        "label": 0,
+        "function_id": 49,
+        "function": "f(X) = \\sum_{i=1}^n \\left| x_i - \\frac{i}{n} \\right|",
+        "function_sens": "1",
+        "question_id": 98
+    }
+]

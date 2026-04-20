@@ -1,0 +1,22 @@
+Let $f:\mathcal{X}^n\to\mathbb{R}$ and let $d(\cdot,\cdot)$ denote the Hamming distance on datasets.
+Define the \emph{local sensitivity} of $f$ at $x$ by
+\[
+\mathrm{LS}_f(x)
+\;=\;
+\max_{y\in\mathcal{X}^n:\ d(x,y)\le 1}\ \bigl|f(y)-f(x)\bigr|,
+\]
+and for a smoothing parameter $t>0$, define the \emph{$t$-smooth sensitivity} by
+\[
+S_f^{t}(x)
+\;=\;
+\max_{y\in\mathcal{X}^n}\ e^{-t\cdot d(x,y)}\,\mathrm{LS}_f(y).
+\]
+Let $Y\sim\mathcal{N}(0,1)$ be a standard Gaussian and set $Z=\sinh(Y)$.
+Then, for any $s,t\in(0,1)$, the algorithm
+\[
+M(x) \;=\; f(x) \;+\; \frac{1}{s}\, S_f^{t}(x)\cdot Z
+\]
+guarantees $\tfrac{1}{2}\varepsilon^{2}$-zCDP for
+\[
+\varepsilon \;=\; 2\bigl(\sqrt{t}+s\bigr).
+\]

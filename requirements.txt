@@ -1,0 +1,19 @@
+# Core (required for all evaluation scripts)
+openai>=1.109.1
+tqdm>=4.67.3
+
+# Anthropic models (optional — required only when using Claude models)
+anthropic>=0.96.0
+
+# Google models (optional — required only when using Gemini models)
+google-genai>=1.73.1
+
+# Local / vLLM inference (optional — required only when using vLLM-backed models)
+vllm>=0.19.1
+torch>=2.0.0
+
+# Data loading — Hugging Face Hub (optional — required when using --data_source hf)
+datasets>=4.8.4
+
+# Data loading — local files (optional — required when using --data_source local)
+pandas>=3.0.2

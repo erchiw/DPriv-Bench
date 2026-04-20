@@ -1,0 +1,74 @@
+[
+  {
+    "question_id": 109,
+    "theorem_id": "1,2"
+  },
+  {
+    "question_id": 110,
+    "theorem_id": "1,2"
+  },
+  {
+    "question_id": 91,
+    "theorem_id": "4"
+  },
+  {
+    "question_id": 92,
+    "theorem_id": "4"
+  },
+  {
+    "question_id": 39,
+    "theorem_id": "5,6"
+  },
+  {
+    "question_id": 106,
+    "theorem_id": "7"
+  },
+  {
+    "question_id": 124,
+    "theorem_id": "8"
+  },
+  {
+    "question_id": 125,
+    "theorem_id": "8,9"
+  },
+  {
+    "question_id": 15,
+    "theorem_id": "10"
+  },
+  {
+    "question_id": 131,
+    "theorem_id": "11"
+  },
+  {
+    "question_id": 74,
+    "theorem_id": "22"
+  },
+  {
+    "question_id": 28,
+    "theorem_id": "13"
+  },
+  {
+    "question_id": 66,
+    "theorem_id": "14"
+  },
+  {
+    "question_id": 47,
+    "theorem_id": "16"
+  },
+  {
+    "question_id": 6,
+    "theorem_id": "17"
+  },
+  {
+    "question_id": 127,
+    "theorem_id": "18,19"
+  },
+  {
+    "question_id": 129,
+    "theorem_id": "18,20"
+  },
+  {
+    "question_id": 113,
+    "theorem_id": "21"
+  }
+]

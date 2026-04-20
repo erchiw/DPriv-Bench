@@ -1,0 +1,7 @@
+A randomized algorithm $M:\mathcal{X}^n \to \mathcal{Y}$ is said to have $\eta$-bounded range if for any two neighboring datasets $x,x'\in\mathcal{X}^*$, there exists a real value $t(x,x')$ such that for every output $y\in\mathcal{Y}$,
+\[
+\log\!\left(\frac{\Pr[M(x)=y]}{\Pr[M(x')=y]}\right)
+\in [t,\; t+\eta].
+\]
+
+If a mechanism $M$ is $\eta$-bounded range, then it is $\tfrac{1}{8}\eta^2$-concentrated differentially private.

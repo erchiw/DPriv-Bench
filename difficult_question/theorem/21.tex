@@ -1,0 +1,25 @@
+\begin{algorithm}[t]
+    \caption{Algorithm}\label{algo:1}
+    \KwIn{Dataset $X$; mechanism $M_\phi:\mathcal{X}\to\mathbb{R}$ and its privacy budget $(\epsilon,\delta)$; 
+    $(\hat\epsilon,\hat\delta)$-DP test $T:\mathcal{X}\to\{0,1\}$; false positive rate $\le \delta'$; 
+    data-dependent DP function $\epsilon_\phi(\cdot)$ w.r.t.\ $\delta$.}
+    \If(\tcp*[f]{test fails}){$T(X)=0$}{
+      \Return $\bot$
+    }
+    \Else{
+      \Return $\theta = M_\phi(X)$
+    }
+\end{algorithm}
+    
+Consider a proposal $\phi$ and a data-dependent DP function $\epsilon_\phi(X)$ w.r.t.\ $\delta$.
+Suppose we have an $(\hat{\epsilon},\hat{\delta})$-DP test
+$T:\mathcal{X}\to\{0,1\}$ such that, whenever $\epsilon_\phi(X)>\epsilon$,
+\[
+T(X)=
+\begin{cases}
+0 & \text{with probability } 1-\delta',\\
+1 & \text{with probability } \delta'.
+\end{cases}
+\]
+Then Algorithm~\ref{algo:1} satisfies
+$(\epsilon+\hat{\epsilon},\ \delta+\hat{\delta}+\delta')$-DP.
