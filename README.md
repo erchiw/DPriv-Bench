@@ -138,7 +138,7 @@ If you use DPriv-Bench in your research, please cite:
 ```bibtex
 @misc{dprivbenchauthors,
   title        = {DPrivBench: Benchmarking LLMs' Reasoning for Differential Privacy},
-  author       = {Wang, Erchi and Huang, Erchi and Chien, Eli and Thakkar, Om and Chaudhuri, Kamalika and Wang, Yu-Xiang and Wu, Ruihan},
+  author       = {Wang, Erchi and Huang, Pengrun and Chien, Eli and Thakkar, Om and Chaudhuri, Kamalika and Wang, Yu-Xiang and Wu, Ruihan},
   year         = {2026},
   eprint       = {2604.15851},
   archivePrefix = {arXiv},
