@@ -127,7 +127,7 @@ Predictions use `pred = 1` (yes), `pred = 0` (no), `pred = -1` (unparseable).
 ---
 
 
-## How to Contribute
+## How to Contribute / Collaborate
 
 Details will be available soon! In the meantime, please contact: erw011@ucsd.edu and ruihan.wu14@gmail.com or open a GitHub issue.
 
