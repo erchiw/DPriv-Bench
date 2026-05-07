@@ -5,7 +5,7 @@
 ![DPriv-Bench overview](overview.png)
 
 - **Category 1** tests fundamental mechanism reasoning (Laplace, Gaussian, and selection mechanisms under several DP formalisms).
-- **Category 2** tests algorithm-level claims drawn from the research literature across 18 topics. **Metadata** is rendered in cate_2_metadata.pdf for readbility.
+- **Category 2** tests algorithm-level claims drawn from the research literature across 18 topics. **Metadata** is rendered in ![cate_2_metadata.pdf](cate_2_metadata.pdf) for readbility.
 - The **Hard track** augments a subset of Category 2 items with **related theorems and definitions** in the prompt.
 
 ---
