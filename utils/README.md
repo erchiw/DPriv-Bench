@@ -66,7 +66,7 @@ The `on_response` parameter in `get_responses` and the per-backend functions is 
 
 | Name | Description |
 |---|---|
-| `DEFAULT_HF_REPO_ID` | Default Hub repo (`"erchiw/DPriv-Bench"`) |
+| `DEFAULT_HF_REPO_ID` | Default Hub repo (`""`) |
 | `CATEGORY_1_SCRIPT_TOPIC_TO_HF_CONFIG` | Maps `--topic` argument values to Hub config names and local file stems |
 
 ### Public API — Hugging Face (requires `datasets`)
