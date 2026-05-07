@@ -62,10 +62,6 @@ The `on_response` parameter in `get_responses` and the per-backend functions is 
 
 ---
 
-## `dpriv_data.py`
-
-Helper module for loading DPriv-Bench data from the [Hugging Face Hub](https://huggingface.co/datasets/erchiw/DPriv-Bench) or from local pandas-format JSON files under `data/`.
-
 ### Constants
 
 | Name | Description |
