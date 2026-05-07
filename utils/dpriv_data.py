@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 # Default matches the public dataset card (hyphenated repo id).
-DEFAULT_HF_REPO_ID = "erchiw/DPriv-Bench"
+DEFAULT_HF_REPO_ID = ""
 
 # Map ``run_category_1.py --topic`` values to Hub subset (config) names.
 CATEGORY_1_SCRIPT_TOPIC_TO_HF_CONFIG: Dict[str, str] = {
