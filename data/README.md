@@ -1,6 +1,5 @@
 # data/
 
-Local copies of the DPriv-Bench dataset. The evaluation scripts load from [Hugging Face](https://huggingface.co/datasets/erchiw/DPriv-Bench) by default; use `--data_source local` to load from these files instead.
 
 All files are pandas-style JSON records arrays (`pd.read_json` compatible).
 
