@@ -1,7 +1,5 @@
 # DPriv-Bench: Benchmarking LLMs’ Reasoning for Differential Privacy
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2604.15851) | [![Huggingface Dataset](https://img.shields.io/badge/Dataset-HuggingFace-yellow)](https://huggingface.co/datasets/erchiw/DPriv-Bench) | Website coming soon!
-
 **DPriv-Bench** is a benchmark for evaluating whether language models can correctly reason about and verify claimed differential privacy (DP) guarantees from natural-language/LaTeX-format problem statements.
 
 ![DPriv-Bench overview](overview.png)
@@ -24,21 +22,7 @@
 
 ---
 
-## Loading the Dataset
-
-### From Hugging Face (recommended)
-
-```python
-from datasets import load_dataset
-
-# Category 1 — pick one config name from the six topics
-ds = load_dataset("erchiw/DPriv-Bench", "cate_1_Laplace_pureDP", split="test")
-
-# Category 2
-ds = load_dataset("erchiw/DPriv-Bench", "cate_2", split="test")
-```
-
-Available Category 1 config names:
+## Available Category 1 config names:
 
 | `--topic` argument | HuggingFace config |
 |---|---|
@@ -49,7 +33,7 @@ Available Category 1 config names:
 | `selection_mechanism_LaplaceRNM_pureDP` | `cate_1_LaplaceRNM_pureDP` |
 | `selection_mechanism_PF_pureDP` | `cate_1_PF_pureDP` |
 
-### From local files
+### Loading the Dataset From local files
 
 If you have the benchmark data on disk under `data/`, each file is a pandas-style JSON records array loadable with `pandas.read_json`:
 
@@ -127,22 +111,3 @@ Predictions use `pred = 1` (yes), `pred = 0` (no), `pred = -1` (unparseable).
 ---
 
 
-## How to Contribute / Collaborate
-
-Details will be available soon! In the meantime, please contact: erw011@ucsd.edu and ruihan.wu14@gmail.com or open a GitHub issue.
-
-## Citation
-
-If you use DPriv-Bench in your research, please cite:
-
-```bibtex
-@misc{dprivbenchauthors,
-  title        = {DPrivBench: Benchmarking LLMs' Reasoning for Differential Privacy},
-  author       = {Wang, Erchi and Huang, Pengrun and Chien, Eli and Thakkar, Om and Chaudhuri, Kamalika and Wang, Yu-Xiang and Wu, Ruihan},
-  year         = {2026},
-  eprint       = {2604.15851},
-  archivePrefix = {arXiv},
-  primaryClass = {cs.LG},
-  url          = {https://arxiv.org/abs/2604.15851},
-}
-```
