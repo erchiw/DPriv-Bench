@@ -655,7 +655,7 @@
     "section_number": "2",
     "subject": "DP-ML",
     "topic": "dp-sgd",
-    "comments": "Under the replace-one neighboring relation, $\\sum_{x_i \\in L_t} g_t^{\\text{clip}}(x_i)$ has $L_2$ sensitivity $\\sqrt{2}$. Therefore, by the oracle's guarantee, the added noise ensures $(\\varepsilon,\\delta)$-DP."
+    "comments": "Under the replace-one neighboring relation, $\\sum_{x_i \\in L_t} g_t^{\\text{clip}}(x_i)$ has $L_2$ sensitivity $2$. Therefore, by the oracle's guarantee, the added noise ensures $(\\varepsilon,\\delta)$-DP."
   },
   {
     "question_id": 48,

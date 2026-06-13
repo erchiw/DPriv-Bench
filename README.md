@@ -10,6 +10,36 @@
 - **Category 2** tests algorithm-level claims drawn from the research literature across 18 topics (Table 6 of the [paper](https://arxiv.org/abs/2604.15851)). Please refer to the [rendered pdf](cate_2_metadata.pdf) for a reader-friendly version.
 - The **Hard track** augments a subset of Category 2 items with **related theorems and definitions** in the prompt.
 
+
+
+## Changelog
+
+<details>
+<summary><b>2026-06-12</b> — <code>cate_2</code> corrections (questions 46, 47, 76)</summary>
+
+**Labels unchanged.**
+
+| `question_id` | Field | Change |
+| --- | --- | --- |
+| 46 | `question_tex` | Corrected added Gaussian noise variance from $\mathcal{N}(0, 2\sigma^2 C^2 I_d)$ to $\mathcal{N}(0, 4\sigma^2 C^2 I_d)$. |
+| 47 | `question_tex` | Corrected added Gaussian noise variance from $\mathcal{N}(0, 2\sigma^2 I_d)$ to $\mathcal{N}(0, 4\sigma^2 I_d)$. |
+| 47 | `comments` | Updated $L_2$ sensitivity of the clipped gradient sum from $\sqrt{2}$ to $2$. |
+| 76 | `comments` | Clarified that the query can induce sensitivity larger than $C$ (replacing the previous $2C$ wording) under the add/remove neighboring relation. |
+
+</details>
+
+<details>
+<summary><b>2026-04</b> — Initial release</summary>
+
+First public release of DPrivBench on Hugging Face, including:
+- **Category 1:** 6 mechanism tracks (`cate_1_*`), 98 questions each, plus the `cate_1_function_bank` auxiliary config.
+- **Category 2:** 125 algorithm-level DP questions (`cate_2`).
+
+</details>
+
+
+
+
 ---
 
 ## Dataset Overview
