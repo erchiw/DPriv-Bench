@@ -1,0 +1,1547 @@
+--- PAGE 1 ---
+Approximate Differential Privacy of the ℓ2 Mechanism
+Matthew Joseph * 1 Alex Kulesza * 1 Alexander Yu* 1
+Abstract
+We study the ℓ2 mechanism for computing a d-
+dimensional statistic with boundedℓ2 sensitivity
+under approximate differential privacy. Across a
+range of privacy parameters, we ﬁnd that the ℓ2
+mechanism obtains lower error than the Laplace
+and Gaussian mechanisms, matching the former
+atd = 1 and approaching the latter asd → ∞.
+1. Introduction
+Computing a d-dimensional statistic with bounded ℓ2
+sensitivity is a fundamental task in differential privacy
+(DP) (Dwork et al., 2006). It underlies standard algorithms
+like private stochastic gradient descent (Song et al., 2013;
+Abadi et al., 2016), the binary tree mechanism (Chan et al.,
+2011; Dwork et al., 2010), and the projection (Nikolov et al.,
+2013; Nikolov, 2023), matrix (Li et al., 2015; McKenna
+et al., 2018), and factorization mechanisms (Edmonds et al.,
+2020; Nikolov & Tang, 2023). The canonical approxi-
+mate DP algorithm for this problem is the Gaussian mech-
+anism (Dwork et al., 2006). To compute statistic T (X),
+the Gaussian mechanism samples an output according to
+gX(y) ∝ exp(−[∥y − T (X)∥2/σ]2) for an appropriate
+value of σ; in particular, the analytic Gaussian mecha-
+nism (Balle & Wang, 2018) chooses the smallest possibleσ
+sufﬁcient for the desired approximate DP guarantee.
+In this paper, we analyze the ℓ2 mechanism. Given a pa-
+rameter σ, this mechanism samples an output according
+to density fX(y) ∝ exp(−∥y −T (X)∥2/σ). As an in-
+stance of theK-norm mechanism (Hardt & Talwar, 2010)
+using theℓ2 norm, theℓ2 mechanism immediately satisﬁes
+1
+σ -(pure) DP and can be sampled efﬁciently. However, its
+approximate DP guarantees are not well understood.
+*Equal contribution 1Google Research New York. Correspon-
+dence to: Matthew Joseph.
+Proceedings of the 42 nd International Conference on Machine
+Learning, Vancouver, Canada. PMLR 267, 2025. Copyright 2025
+by the author(s).
+1.1. Contributions
+For arbitrary dimension d and privacy parameters ε and
+δ, we provide an algorithm for choosingσ to obtain anℓ2
+mechanism that satisﬁes (ε,δ )-DP. The resultingℓ2 mecha-
+nism can be efﬁciently sampled in parallel and empirically
+dominates both the Laplace mechanism and the analytic
+Gaussian mechanism in terms of mean squaredℓ2 error (left
+plot in Figure 1). Moreover, unlike the Gaussian mecha-
+nism, theℓ2 mechanism always satisﬁes a pure DP guarantee
+(right plot in Figure 1).
+Our algorithms bound relevant quantities of the privacy loss
+random variable for theℓ2 mechanism. Balle & Wang (2018)
+showed that mechanismM is (ε,δ )-DP if and only if
+P [ℓM,X,X′ ≥ε] −eεP [ℓM,X′,X ≤ −ε] ≤δ (1)
+whereℓM,X,X′ is the privacy loss associated withM on arbi-
+trary neighboring databasesX andX′ (Section 2). Proving
+(ε,δ )-DP therefore reduces to upper bounding the ﬁrst term
+and lower bounding the second. We show that the ﬁrst term
+is deﬁned by the mass that M(X) places on a region of
+Rd determined by certain spherical caps, while the second
+term is deﬁned by the mass thatM(X′) places on the same
+region. We then provide algorithms to approximate the ﬁrst
+term from above and the second term from below. Because
+these approximations are provably upper and lower bounds,
+they yield a formal differential privacy guarantee. Exper-
+iments suggest that, for reasonable algorithm parameter
+values, these approximations are tight (Section 4.1).
+1.2. Related Work
+Ganesh & Zhao (2021) also use spherical caps to analyze
+what they call “generalized Gaussians”, which have densi-
+ties proportional to exp(−[∥y −T (X)∥p/σ]p) for integers
+p ≥ 1. A few features separate their work from ours: they
+study a statistic with boundedℓ∞ sensitivity; their results
+do not cover theℓ2 mechanism, which uses normp = 2 but
+exponentp′ = 1; they work with a sufﬁcient condition for
+(ε,δ )-DP, which only bounds the ﬁrst term in Equation (1)
+byδ, leading to looser results; and since their goal is an
+asymptotic utility guarantee, their results rely on asymp-
+totic concentration inequalities that are less precise than the
+approach used here.
+A few authors have studied theℓ2 mechanism, primarily in
+1
+
+--- PAGE 2 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+0 20 40 60 80 100
+dimension d
+0.2
+0.4
+0.6
+0.8
+1.0normalized mean squared 2 error
+normalized error
+laplace
+gaussian
+2
+0 20 40 60 80 100
+dimension d
+1.00
+1.25
+1.50
+1.75
+2.00
+2.25
+2.50
+2.75pure DP parameter
+2 mechanism pure DP guarantees
+Figure 1. Left: normalized mean squaredℓ2 error. At eachd, we compute mean squaredℓ2 error for the (1, 10−5)-DP Laplace, analytic
+Gaussian (Balle & Wang, 2018), andℓ2 mechanisms. Quantities are normalized so that the analytic Gaussian mechanism error is always 1.
+Note that we truncate the Laplace mechanism atd = 8, after which its error relative to the analytic Gaussian mechanism continues to
+grow. See Section 4.2 for details. Right: the pure DP guarantee of the (1, 10−5)-DPℓ2 mechanism asd grows.
+the context of objective perturbation (Chaudhuri et al., 2011;
+Kifer et al., 2012; Yu et al., 2014). However, they all use
+pure DP rather than approximate DP.
+2. Preliminaries
+We use the formulation of(ε,δ )-DP given by Balle & Wang
+(2018). It is deﬁned in terms of the privacy loss random
+variable. Our results apply for either the add-remove or
+swap notions of neighboring databases.
+Deﬁnition 2.1. LetM be a mechanism whose output den-
+sity given input database X is fX. Then for neighbor-
+ing databases X,X′, the privacy loss ofM at point y is
+ℓM,X,X′(y) = ln
+(
+fX(y)
+fX′(y)
+)
+. Its privacy loss random vari-
+able isℓM,X,X′(Y ) whereY ∼fX.
+The following results relate the privacy loss random variable
+to differential privacy.
+Lemma 2.2. MechanismM isε-DP if and only if, for any
+neighboringX ∼X′, |ℓM,X,X′(Y )| ≤ ε.
+Lemma 2.3 (Balle & Wang (2018)) . Mechanism M is
+(ε,δ )-DP if and only if, for any neighboringX ∼X′,
+P [ℓM,X,X′ ≥ε] −eεP [ℓM,X′,X ≤ −ε] ≤δ.
+Since the ℓ2 mechanism can be viewed as an instance of
+theK-norm mechanism (Hardt & Talwar, 2010), we recall
+some relevant results about theK-norm mechanism.
+Lemma 2.4 (Hardt & Talwar (2010)) . Given norm ∥ · ∥ ,
+scale parameter σ, statistic T with ∥ · ∥ -sensitivity ∆,
+and databaseX, theK-norm mechanism has output den-
+sityfX(y) ∝ exp (−∥y −T (X)∥/σ) and satisﬁes ∆
+σ -DP .
+Moreover, lettingBd denote the unit ball for ∥ · ∥, the follow-
+ing procedure samples this mechanism: 1) sample radius
+r ∼ Gamma (d + 1,σ ), the Gamma distribution with shape
+d + 1 and scale σ; 2) uniformly sample z ∼ Bd; and 3)
+outputT (X) +rz.
+3. ℓ2 Mechanism
+This section provides an algorithm for computing σ to
+achieve an (ε,δ )-DPℓ2 mechanism (Section 3.1) and then
+describes a simple method for sampling theℓ2 mechanism
+in parallel (Section 3.2). Without loss of generality, we
+assume that our statistic T hasℓ2 sensitivity ∆2 = 1 . If
+∆2 ̸= 1, we can run the algorithm onT/∆2 and rescale.
+3.1. Privacy Analysis
+The overall goal is to translate an (ε,δ )-DP privacy budget
+to the minimum σ such that the ℓ2 mechanism M with
+parameterσ satisﬁes (ε,δ )-DP. To do this, we focus on a
+subroutine that determines whether or notM satisﬁes (ε,δ )-
+DP and then binary search overσ.
+Recall from Lemma 2.3 that M is (ε,δ )-DP if and only
+if P [ℓM,X,X′ ≥ε] −eεP [ℓM,X′,X ≤ −ε] ≤ δ. The next
+subsections will provide algorithms that upper bound the
+ﬁrst term and lower bound the second term, and thus err on
+the side of a conservative privacy guarantee.
+Before starting our privacy analysis, we consider a simpler
+(but, as we will see, signiﬁcantly worse) approach. Theℓ2
+mechanism, and theK-norm mechanism more broadly, can
+be viewed as instances of the exponential mechanism (Mc-
+Sherry & Talwar, 2007). The exponential mechanism ad-
+mits a few possible approximate DP analyses. For example,
+theε-DP exponential mechanism satisﬁes ε2
+8 -concentrated
+DP (Cesar & Rogers, 2021), and a concentrated DP guaran-
+tee can be converted to an approximate DP guarantee (Bun
+2
+
+--- PAGE 3 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+& Steinke, 2016; Canonne et al., 2020; Asoodeh et al., 2020;
+Zhu et al., 2022). However, any such analysis also applies to
+the Laplace mechanism, and theε-DP Laplace mechanism
+is only (ε′,δ )-DP for ε′ ≈ ε −O(δ) (Lemma A.2 in the
+Appendix). This is a negligible improvement for realisticδ,
+so a different privacy analysis is necessary.
+3.1.1. F IRST TERM UPPER BOUND
+For the privacy guarantee to hold, Equation (1) must hold
+for arbitrary neighboring databasesX andX′. Since theℓ2
+ball is spherically symmetric, without loss of generality we
+consider statisticT whereT (X) = 0 andT (X′) = e1 =
+(1, 0,..., 0). Shorthand the respective mechanisms asM(0)
+andM(1). Then
+ℓM,X,X′(y) = ln
+(fX(y)
+fX′(y)
+)
+= ln
+( exp[−∥y∥2/σ]
+exp[−∥y −e1∥2/σ]
+)
+= 1
+σ (∥y −e1∥2 − ∥y∥2)
+so we want to upper bound
+Py∼M(0)
+[ 1
+σ (∥y −e1∥2 − ∥y∥2) ≥ε
+]
+. (2)
+We shorthand the relevant region in Equation (2) asV .
+Deﬁnition 3.1. DeﬁneV = {y | 1
+σ (∥y−e1∥2−∥y∥2) ≥ε},
+M’s high privacy loss region.
+A simple case isσ ≥ 1
+ε .
+Lemma 3.2. σ ≥ 1
+ε if and only if Py∼M(0) [y ∈V ] = 0.
+Proof. The equation |∥y −e1∥2 − ∥y∥2| = σε deﬁnes a
+hyperboloid with foci 0 ande1 and constant differenceσε.
+If we instead consider ∥y −e1∥2 −∥y∥2 ≥σε, removing the
+absolute value restricts the hyperboloid to the −e1 facing
+component, and moving to inequality yields the convex hull
+of that component. An illustration appears in Figure 2.
+Ifσ > 1
+ε , then ∥y −e1∥2 − ∥y∥2 ≥ σε has no solution
+because the triangle inequality means ∥y −e1∥2 − ∥y∥2 ≤
+∥e1∥. Thus V = ∅, so Py∼M(0) [y ∈V ] = 0 . If σ = 1
+ε ,
+then ∥y−e1∥2−∥y∥2 ≥σε only holds fory contained in the
+−e1 axis. This set has measure 0, so Py∼M(0) [y ∈V ] = 0.
+Finally, ifσ <1
+ε , then ∥y −e1∥2 − ∥y∥2 ≥σε determines
+a −e1 facing component of the hyperboloid that is non-
+degenerate, so its convex hull has positive measure, i.e.
+Py∼M(0) [y ∈V ]> 0.
+The rest of this subsection considersσ <1
+ε . When d = 1,
+allℓp norm mechanisms are identical. In particular, theℓ2
+mechanism is equivalent to the Laplace mechanism.
+e1
+Figure 2. An illustration of V for σ = 1 /(2ε). We draw the
+projection ofV onto span(e1,e 2) as the shaded region.
+Lemma 3.3. Ifσ ≤ 1
+ε andd = 1, then Py∼M(0) [y ∈V ] =
+1 − 1
+2 exp
+(1
+2[ε − 1
+σ ]
+)
+.
+Proof. M has the same noise density as the Laplace mech-
+anism Lap (σ), and |y − e1| − |y| ≥ σε if and only if
+y ≤ 1
+2(1 −σε). For z ≥ 0, the Lap (σ) CDF is F (z) =
+1 − 1
+2 exp
+(
+−z
+σ
+)
+, so by 1 −σε ≥ 0, Py∼M(0) [y ∈V ] =
+1 − 1
+2 exp
+(1
+2[ε − 1
+σ ]
+)
+.
+This leaves the caseσ ≤ 1
+ε andd ≥ 2. We proceed under
+that assumption.
+Assumption 3.4. Statistic T has dimension d ≥ 2, and
+σ <1
+ε .
+Whend ≥ 2, the level sets ofM are spheres, and we will
+show that the the high privacy loss portions of level sets are
+spherical caps.
+Deﬁnition 3.5. Forr > 0 and z ∈ Rd, deﬁne Sr,z =
+{x ∈ Rd | ∥x −z∥2 =r}, the sphere of radiusr centered
+at z. For any sphere Sr,z where z = (c, 0,..., 0), the
+spherical cap ofSr,z of heighth is the set of points ˆSr,z,h =
+{(x1,...,x d) ∈ Rd | ∥x −z∥2 =r andx1 ≤c −r +h}.
+See Figure 3 for an illustration.
+Figure 3. The unit circle in R2 with a spherical cap (thick purple
+arc) of height 0.5. In Rd, the sphere and spherical cap are both
+(d − 1)-dimensional objects.
+Lemma 3.6. Deﬁne height
+h(r) = min
+(
+r(1 −εσ) + 1 − (εσ)2
+2 , 2r
+)
+.
+3
+
+--- PAGE 4 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Then ˆSr,0,h(r) =V ∩Sr,0.
+Proof. Orient the 2-dim plane span(e1,e 2) so that the posi-
+tivee1 direction is right and the positivee2 direction is up.
+Consider the points 0,e1, and somey ∈Sr,0 ∩H whereH
+is the upper half of the span(e1,e 2) plane (i.e.,y2 ≥ 0). Let
+θ be the clockwise angle fromy toe1. Proofs of the follow-
+ing claim (and others omitted in this subsection) appear in
+Appendix A.1.
+Claim 3.6.1. ∥y −e1∥2 − ∥y∥2 decreases asθ decreases.
+We want to identify a functionh(r) for allr> 0 such that
+ˆSr,0,h(r) =V ∩Sr,0. Assumption 3.4 meansσ <1
+ε , so by
+Lemma 3.2,V ∩Sr,0 is nonempty. The analysis splits into
+cases.
+Case 1: Sr,0 ̸⊂ V . Since 1
+σ (∥p −e1∥2 − ∥p∥2) changes
+monotonically by Claim 3.6.1 then there exists p =
+(p1,p 2, 0,..., 0) ∈ Sr,0 at the base of ˆSr,0,h(r) such that
+1
+σ (∥p −e1∥2 − ∥p∥2) =ε. Thenh(r) satisﬁes (r −h(r))2 +
+p2
+2 =r2, and we getp2 =
+√
+2h(r)r −h(r)2.
+We can now derive the desired expression forh(r).
+Claim 3.6.2. 1
+σ (∥p −e1∥2 − ∥p∥2) = ε is equivalent to
+h(r) =r(1 −εσ) + 1−ε2σ2
+2 .
+Moreover, we show that with the above deﬁnition ofh(r),
+the constrainth(r) ∈ [0, 2r] is equivalent to a constraint on
+the radius given byr ≥ 1−εσ
+2 .
+Claim 3.6.3. r(1 −εσ) + 1−ε2σ2
+2 ∈ [0, 2r] if and only if
+r ≥ 1−εσ
+2 .
+In summary, Sr,0 ̸⊂ V if and only if r ≥ 1−εσ
+2 , and for
+suchr, we have ˆSr,0,h(r) =V ∩Sr,0 whenh(r) is deﬁned
+as in Claim 3.6.2.
+Case 2: Sr,0 ⊂ V . By the above, Sr,0 ⊂ V if and only
+if r < 1−εσ
+2 . The statement Sr,0 ⊂ V is equivalent to
+1
+σ (∥p −e1∥2 − ∥p∥2) = 1
+σ (
+√
+(r + 1)2 − 2h(r) −r) ≥ ε
+for allp ∈Sr,0, and this inequality is equivalent toh(r) ≤
+r(1 −εσ) + 1−ε2σ2
+2 by replacing equality with inequalities
+in the proof of Claim 3.6.2. By Claim 3.6.3, r < 1−εσ
+2
+is equivalent tor(1 −εσ) + 1−ε2σ2
+2 > 2r. Then deﬁning
+h(r) = 2r sufﬁces to satisfyh(r) ≤ r(1 −εσ) + 1−ε2σ2
+2
+for allr< 1−εσ
+2 .
+In summary, if we deﬁneh(r) as
+h(r) =
+{
+r(1 −εσ) + 1−ε2σ2
+2 ifr ≥ 1−εσ
+2
+2r ifr< 1−εσ
+2
+thenh(r) ∈ [0, 2r] and ˆSr,0,h(r) =V ∩Sr,0. Since r(1 −
+εσ)+ 1−ε2σ2
+2 > 2r forr< 1−εσ
+2 , this piecewise function is
+equivalent toh(r) = min
+(
+r(1 −εσ) + 1−(εσ)2
+2 , 2r
+)
+.
+We showed in the above proof that, for smallr, the entirety
+ofSr,0 lies inV .
+Corollary 3.7. Ifr ≤ 1−εσ
+2 , thenSr,0 ⊂V .
+It remains to analyze the high privacy loss region for larger
+r. Our analysis will repeatedly reason about the fraction of
+a sphere occupied by a cap.
+Deﬁnition 3.8. LetFr,h denote the fraction of the surface
+ofSr,0 occupied by cap ˆSr,0,h.
+Lemma 3.9 ((Li, 2010)). LetIx(a,b ) =
+∫x
+0 ta−1(1−t)b−1dt∫ 1
+0 ta−1(1−t)b−1dt
+denote the regularized incomplete beta function. Let h be
+the height function deﬁned in Lemma 3.6. If h(r) ≤r, then
+Fr,h(r) = 1
+2I(2rh(r)−h(r)2)/r2
+(d−1
+2 , 1
+2
+)
+. If h(r) > r, then
+Fr,h(r) = 1 −Fr,2r−h(r).
+There is no closed-form expression for Ix(a,b ), but
+it is a standard function in mathematical libraries like
+SciPy (SciPy, 2024). 1 We can therefore use Lemma 3.9
+to compute the fraction of any Sr,0 that lies in V =
+∪r∈R+ ˆSr,0,h(r) (Lemma 3.6). It remains to extend these
+results about individual spheres to results about V as a
+whole.
+The next lemma shows that the high-loss cap fraction de-
+creases withr. It combines Lemma 3.6 and Lemma 3.9 to
+show directly that the appropriateIx(a,b ) is monotone in
+r in the desired direction. Since the proof is again mostly
+calculation, it also appears in Appendix A.1.
+Lemma 3.10. Fr,h(r) is monotone decreasing inr.
+This suggests the following approach: if M(0) samplesy
+with ∥y∥2 >r with probabilityp, thenpFr,h(r) is an upper
+bound on Py∼M(0) [y ∈V, ∥y∥2 >r ]. The following result
+gives a closed form for p. The expression uses the lower
+incomplete gamma function and the gamma function, which
+are also standard functions in mathematical libraries. The
+proof is mostly calculation and appears in Appendix A.1.
+Deﬁnition 3.11. Forz ≥ 0, the Gamma function is Γ(z) =∫∞
+0 tz−1e−tdt, the lower incomplete Gamma function is
+γ(z,x ) =
+∫x
+0 tz−1e−tdt, and the upper incomplete Gamma
+function is Γ(z,x ) = Γ(z) −γ(z,x ).
+Lemma 3.12. Forr> 0, Py∼M(0) [∥y∥2 ≤r] = γ(d,r/σ)
+Γ(d) .
+The preceding results yield the following upper bound.
+1Note that the analytic Gaussian mechanism (Balle & Wang,
+2018) depends similarly on the standard Gaussian CDF.
+4
+
+--- PAGE 5 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Lemma 3.13. Suppose Assumption 3.4 holds. Let r1 <
+...<r nr wherer1 = 1−εσ
+2 . Then, fory ∼M(0),
+P [y ∈V ] ≤ γ(d,r 1/σ)
+Γ(d)
++
+nr−1∑
+j=1
+γ(d,rj+1/σ) −γ(d,rj/σ)
+Γ(d) Frj,h(rj)
++ Γ(d,rnr/σ)
+Γ(d) Frnr,h(rnr ).
+Proof. The ﬁrst term is the mass placed on the ball lying
+entirely in the high privacy loss region (Corollary 3.7 and
+Lemma 3.12); the second term is a (left) Riemann sum
+that upper bounds the mass placed on the high privacy loss
+region between balls of radius r1 and rnr (Lemma 3.9,
+Lemma 3.12, and Lemma 3.10); and the last is an up-
+per bound on the mass placed on the high privacy loss
+region outside the ball of radius rnr. More speciﬁcally,
+it is a Riemann sum in which the jth approximating
+rectangle has base length as the jth interval on the grid[
+0, γ(d,r1/σ)
+Γ(d) ,..., γ(d,Rnr/σ)
+Γ(d) , ∞
+]
+and heightFrj,h(rj).
+Algorithm 1 provides overall upper bound pseudocode.
+Algorithm 1 Term1UpperBound
+1: Input: Dimensiond; scale parameterσ; privacy param-
+eterε; largest radiusr∗; number of radiinr
+2: ifσ >1/ε then
+3: Return 0 (Lemma 3.2)
+4: end if
+5: ifd = 1 then
+6: Return 1 − 1
+2 exp
+(1
+2
+[
+ε − 1
+σ
+])
+(Lemma 3.3)
+7: end if
+8: Deﬁner1 ← 1−εσ
+2 ,rnr ←r∗, andr2,...,r nr−1 regu-
+larly spaced betweenr1 andrnr
+9: Return upper bound from Lemma 3.13
+3.1.2. S ECOND TERM LOWER BOUND
+It remains to lower bound Py∼M(1) [ℓM,X′,X(y) ≤ −ε]. By
+the same logic used to derive Equation (2), we rewrite it as
+Py∼M(1)
+[
+ln
+(f′
+X(y)
+fX(y)
+)
+≤ −ε
+]
+= Py∼M(1)
+[ 1
+σ (∥y −e1∥2 − ∥y∥2) ≥ε
+]
+.
+The level sets ofM(1) are spheres centered ate1. As in the
+upper bound analysis, there are a few simple cases. The ﬁrst
+follows from the same reasoning used for Lemma 3.2.
+Corollary 3.14. Ifσ ≥ 1
+ε , then Py∼M(1) [y ∈V ] = 0.
+The second case uses the same argument as Lemma 3.3.
+Lemma 3.15. If σ ≤ 1
+ε and d = 1 , then
+Py∼M(1) [y ∈V ] = 1
+2 exp
+(1
+2
+[
+−ε − 1
+σ
+])
+.
+Proof. M(1) has the same noise density as the Laplace
+mechanism Lap (1,σ ), and |y −e1| − |y| ≥ σε if and only
+ify ≤ 1
+2(1 −σε). Forz <1, the Lap (1,σ ) CDF isF (z) =
+1
+2 exp
+(z−1
+σ
+)
+, so by 1 − σε ≥ 0, Py∼M(1) [y ∈V ] =
+1
+2 exp
+(1
+2
+[
+−ε − 1
+σ
+])
+.
+We therefore work under Assumption 3.4 for the rest of
+this section. The remaining analysis reasons about speciﬁc
+spheresSR,1.
+Deﬁnition 3.16. ForR> 0, deﬁneUR to be the fraction of
+SR,1 contained inV .
+We start by identifying whenUR = 0.
+Lemma 3.17. If 0<R< 1+εσ
+2 , thenUR = 0.
+Proof. Shorthandτ = εσ for neatness. By Corollary 3.7,
+Fr,h(r) = 1 for r ≤ 1−τ
+2 . Let r1 = 1−τ
+2 denote the
+largest radius such that Fr,h(r) = 1 . This shows that
+the point with the largest e1-coordinate in V ∩Sr,0 has
+e1-coordinate r for 0 < r ≤ r1. For r > r1, the point
+with the largeste1-coordinate inV ∩Sr,0 hase1-coordinate
+−r + h(r) = −rτ + 1−τ 2
+2 which is monotonically de-
+creasing asr increases. Overall, the point with the largest
+e1-coordinate inV ∩Sr,0 is increasing for 0<r ≤r1 and
+decreasing forr>r 1, sor1 is the maximume1-coordinate
+of this point over all radii.
+It follows that 0<R< 1 −r1 impliesSR,1 ∩Sr,0 = ∅ for
+allr> 0, and sinceV ⊂ ∪r∈R+Sr,0, we getUR = 0.
+It remains to handle the largeR case. We will show that, as
+was the case in the upper bound analysis, eachSR,1 ∩V is a
+spherical cap onSR,1. The ﬁrst result proves thatSR,1 ∩V
+has this form. This result is not technically necessary for
+the rest of the argument, but it explains why we attempt to
+solve forSR,1 ∩V as a cap later.
+Lemma 3.18. ForR ≥ 1+εσ
+2 ,SR,1 ∩V is a spherical cap
+ˆSR,1,H(R).
+Proof. Shorthand τ = εσ. Recall from Lemma 3.2 that
+V is the convex hull of the −e1 facing component of a
+hyperboloid with foci 0 ande1 and with constant difference
+τ. To see whySR,1 ∩V is a spherical cap, observe that both
+the hyperboloid-bounded regionV andSR,1 are symmetric
+arounde1, so their intersection must be symmetric around
+e1 as well. Let Pv1,v2 denote projection onto span(v1,v 2).
+ThenPe1,e2(V ) ∩Pe1,e2(SR,1) is a 1-dimensional spherical
+cap of some height H inPe1,e2(SR,1). Since V ∩SR,1 is
+symmetric arounde1, the previous sentence also holds if we
+5
+
+--- PAGE 6 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+replacePe1,e2 withPe1,v for anyv orthogonal toe1. Thus
+V ∩SR,1 = ∪v⊥e1Pe1,v(V ) ∩Pe1,v(SR,1) = ˆSR,1,H.
+It remains to identify the H referenced in Lemma 3.18.
+To do so, we start with an arbitrary y ∈ SR,1 and solve
+for an e1 coordinate X such that y1 ≤ X if and only if
+y1 ≤ −∥y∥2 +h(∥y∥2) (Lemma 3.6). The bulk of the proof
+beyond this idea is algebraic manipulation, so it appears in
+Appendix A.2.
+Lemma 3.19. Deﬁne X = 1+(εσ)2−2εσR
+2 and H(R) =
+R − 1 +X. Then cap ˆSR,1,H(R) =SR,1 ∩V .
+Lemma 3.20. IfR ≥ 1+εσ
+2 , thenUR is monotone increas-
+ing inR.
+Proof. Shorthandτ = εσ. Lemma 3.17 established that
+UR = 0 forR < 1+τ
+2 , so it remains to show that UR is
+increasing inR forR ≥ 1+τ
+2 . The proof of Lemma 3.19
+established that H(R) ∈ [0,R ], so we apply Lemma 3.9
+to get that ˆSR,1,H(R) occupies a fraction ofSR,1 given by
+1
+2I(2RH(R)−H(R)2)/R2
+(d−1
+2 , 1
+2
+)
+. By the same logic used in
+the proof of Lemma 3.10, we can show thatUR is monotone
+increasing by verifying that the expression in theI subscript
+is nonnegative and increasing inR.
+The ﬁrst condition follows from the aforementioned result
+H(R) ≤R. For the second condition,
+2R[R − 1 +X] − [R − 1 +X]2
+R2
+= R2 − 1 + 2X −X2
+R2
+= 1 −
+(X − 1
+R
+)2
+= 1 −
+(τ 2 − 2τR − 1
+2R
+)2
+.
+We wanted to prove that this expression is increasing inR,
+so we show that the second term is decreasing inR. Taking
+its derivative with respect toR yields
+2
+(τ 2 − 2τR − 1
+2R
+)
+· 2R(−2τ) − 2(τ 2 − 2τR − 1)
+4R2
+=
+(τ 2 − 2τR − 1
+R
+)
+· 1 −τ 2
+2R2 .
+BecauseR >0 and 0< τ <1, the numerator of the ﬁrst
+term is negative, and the remaining terms are positive, so
+the entire quantity is negative.
+Since we want to lower bound the mass on these UR, we
+use Lemma 3.12 and employ a left Riemann sum in which
+thejth approximating rectangle has base length as thejth
+interval on the grid
+[
+γ(d,R1/σ)
+Γ(d) ,...,
+γ(d,RnR/σ)
+Γ(d) , ∞
+]
+and has
+heightFRj,H(Rj). The proof of the following result uses
+similar logic as the proof of Lemma 3.13.
+Lemma 3.21. Suppose Assumption 3.4 holds. Let R1 <
+...<R nR whereR1 = 1+τ
+2 . Then fory ∼M(1),
+P [y ∈V ] ≥
+nR−1∑
+j=1
+γ(d,Rj+1/σ) −γ(d,Rj/σ)
+Γ(d) FRj,H(Rj)
++ Γ(d,RnR/σ)
+Γ(d) FRnR,H(RnR)
+where we reused the deﬁnition ofF from Deﬁnition 3.8.
+Algorithm 2 provides overall lower bound pseudocode.
+Algorithm 2 Term2LowerBound
+1: Input: Dimensiond; scale parameterσ; privacy param-
+eterε; largest radiusR∗; number of radiinR
+2: ifσ ≥ 1/ε then
+3: Return 0 (Corollary 3.14)
+4: end if
+5: ifd = 1 then
+6: Return 1
+2 exp
+(1
+2
+[
+−ε − 1
+σ
+])
+(Lemma 3.15)
+7: end if
+8: DeﬁneR1 ← 1+τ
+2 ,RnR ← R∗, and R2,...,R nR−1
+regularly spaced betweenR1 andRnR
+9: Return lower bound from Lemma 3.21
+3.1.3. O VERALL ALGORITHM
+Algorithm 1 upper bounds the ﬁrst term in the inequality in
+Lemma 2.3 and Algorithm 2 lower bounds the second term.
+This upper bounds the LHS of the inequality, so if it is at
+mostδ, then the mechanism is (ε,δ )-DP.
+The last step is choosing nr,r∗,nR, andR∗. Our experi-
+ments suggests that settingnr =nR = 1000 yields a rea-
+sonably tight approximation ford ≤ 100 (see Section 4.1);
+larger values should only be tighter, at the cost of speed. We
+chooser∗ using Lemma 3.12 so Py∼M(0) [∥y∥2 >r∗] =
+δ
+100; in the context of Lemma 3.13, we use Frnr,h(rnr ) to
+upper bound the cap fraction for all Sr,0 with r ≥ rnr,
+so we choose r∗ to make the effect of this approximation
+negligible. By the same logic, we useR∗ =r∗.
+Algorithm 3 collects the entire process into pseudocode.
+3.2. Parallel Sampler
+The sampler described here is a simple consequence of
+Lemma 2.4 and well-known statistical facts, and similar
+samplers have appeared for related mechanisms (Yu et al.,
+2014; Steinke & Ullman, 2016). We collect the relevant
+information here, with proofs in Appendix A.3 for com-
+pleteness.
+6
+
+--- PAGE 7 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Algorithm 3 CheckApproximateDP
+1: Input: Dimensiond; scale parameterσ; privacy param-
+etersε,δ; numbers of radiinr,nR
+2: Compute r∗ such that Py∼M(0) [∥y∥2 >r∗] = δ
+100
+(Lemma 3.12)
+3: T1 ← Term1UpperBound(d,σ,ε,r ∗,nr)
+4: T2 ← Term2LowerBound(d,σ,ε,r ∗,nR)
+5: Return (T1 −eεT2 ≤δ)
+By Lemma 2.4, we samplerz wherer ∼ Gamma (d + 1,σ )
+and z ∼U Bd
+2. In a parallel setting, suppose we have a
+worker for each ofd coordinates and a central manager. We
+ﬁrst sampler.
+Lemma 3.22. Let U1,...,U d+1 ∼iid U(0, 1) be uni-
+form random samples. Then −σ ∑d+1
+i=1 log(Ui) ∼
+Gamma (d + 1,σ ).
+By Lemma 3.22, each workeri can sample log(Ui), and the
+manager can add the combined sum to their own sample and
+scale the result by −σ to obtainr. It remains to samplez.
+Lemma 3.23. Let X1,...,X d ∼iid N(0, 1), and let
+Y ∼ U(0, 1) be a uniform sample from [0, 1]. Then
+Y 1/d · (X1,...,Xd)√∑d
+i=1X 2
+i
+is a uniform sample fromBd
+2.
+To apply Lemma 3.23, each worker samples a standard
+Gaussian and reports its square in the same combine used
+to computer in Lemma 3.22. The manager samplesY and
+publishes it along with r and the sum of squares. At this
+point, each worker can compute their coordinate ofrz.
+4. Experiments
+This section discusses experiments evaluating the tightness
+of our privacy analysis (Section 4.1) as well as theℓ2 mech-
+anism’s error (Section 4.2) and speed (Section 4.3). All
+experiments use theℓ2 mechanism withnr =nR = 1000.
+Experiment code may be found on Github (Google, 2025).
+4.1. Privacy
+Our ﬁrst experiments attempt to measure the tightness of
+our privacy analysis. To do so, we compare two methods
+for estimating P [ℓM,X,X′ ≥ε] −eεP [ℓM,X′,X ≤ −ε], the
+quantity that must be upper bounded byδ forM to satisfy
+(ε,δ )-DP (Lemma 2.3).
+We ﬁxε = 1,δ = 0.01, and vary d = 1, 2,..., 100. At
+eachd, the ﬁrst method empirically estimates the smallest
+σ such that
+P [ℓM,X,X′ ≥ 1] −e · P [ℓM,X′,X ≤ −1] ≤δ, (3)
+whereM is theℓ2 mechanism with parameterσ, andM(X)
+is centered at 0 while M(X′) is centered at 1. By the
+analysis of Section 3, Equation (3) is equivalent to
+Py∼M(0)
+[ 1
+σ (∥e1 −y∥2 − ∥y∥2) ≥ε
+]
+−e · Py∼M(1)
+[ 1
+σ (∥e1 −y∥2 − ∥y∥2) ≥ε
+]
+≤δ.
+We can estimate the value of this expression by drawingn
+samples fromM(0) andn samples fromM(1), counting
+the fractionc1 satisfying the ﬁrst inequality and the fraction
+c2 satisfying the second inequality, and then computing
+c1 −e ·c2. Binary searching over σ to ﬁnd the smallest
+value where this computation is upper bounded byδ leads to
+an empirical estimate of the minimumσ yielding a (1, 0.01)-
+DPℓ2 mechanism.
+The second method computes itsσ using the analysis of Sec-
+tion 3. As shown in Figure 4, our algorithm closely tracks
+the empirical values. This provides empirical evidence that
+the resulting privacy analysis is both sound and (with the
+chosennr =nR = 1000 and range ford) tight.
+0 20 40 60 80 100
+dimension d
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0parameter 
+empirical privacy analysis tightness
+empirical
+algorithmic
+Figure 4. A comparison of empirical (dotted) and algorithmic
+(solid) estimates of privacy loss. At eachd, the empirical method
+usesn = 1000/δ = 10 5 samples.
+4.2. Error
+We ﬁrst derive some basic results about the mean squared
+ℓ2 error of the Laplace,ℓ2, and Gaussian mechanisms used
+in our experiments. The Laplace and ℓ2 results are corol-
+laries of the following lemma. The lemma is an extension
+of a previous result about the mean squared ℓ2 norm of a
+sample from anℓp ball (Joseph et al., 2025) and is proved
+in Appendix A.4.
+Lemma 4.1. The mean squared ℓ2 error of the d-
+dimensionalℓp mechanism with parameterσ is
+(dσ)2(d + 1)
+(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+)
+.
+7
+
+--- PAGE 8 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Since a d-dimensional statistic with ℓ2 sensitivity 1 has
+ℓ1 sensitivity
+√
+d, substituting p = 1 and parameter σ
+√
+d
+into Lemma 4.1 yields the following result for the Laplace
+mechanism.
+Corollary 4.2. The Laplace mechanism with parameter
+σ
+√
+d has mean squaredℓ2 error 2d2σ2.
+Theℓ2 mechanism usesp = 2 and parameterσ.
+Corollary 4.3. Theℓ2 mechanism with parameter σ has
+mean squaredℓ2 errord(d + 1)σ2.
+A similar result for the Gaussian mechanism is easy to prove
+directly (see Appendix A.4 for proof).
+Lemma 4.4. The Gaussian mechanism with parameterσ
+has mean squaredℓ2 errordσ2.
+For a range of d, we solve for the smallest possible σ for
+each mechanism to achieve (ε,δ )-DP and plot the mean
+squared ℓ2 error according to the preceding results. The
+Laplace mechanism usesσ =
+√
+d/(ε +δ)2, the Gaussian
+mechanism binary searches overσ as described by Balle &
+Wang (2018), and theℓ2 mechanism binary searches over
+σ using the algorithms from Section 3. Throughout, binary
+searches use tolerance 0.001 and we use (1, 10−5)-DP.
+This produces the left plot in Figure 1 in the introduction.
+The Laplace mechanism obtains lower error than the ana-
+lytic Gaussian mechanism for smalld, the analytic Gaussian
+mechanism obtains lower error than the Laplace mechanism
+for larger d, and the ℓ2 mechanism dominates both. The
+gap between theℓ2 mechanism and the better of the Laplace
+mechanism and analytic Gaussian mechanism is 0 atd = 1
+(when the Laplace and ℓ2 mechanism are identical) and
+peaks at 50% atd = 7 before gradually shrinking, to 5% at
+d = 100 and< 1% atd = 500 (not pictured).
+Analogous plots for a high-privacy regime of (0.1, 10−7)-
+DP and a low-privacy regime of (10, 10−3)-DP are essen-
+tially the same.
+4.3. Speed
+The last set of experiments evaluates the speed of the ℓ2
+mechanism, as executed on a typical personal computer.
+This runtime is split into two operations: the time to com-
+puteσ and the time to sample the mechanism.
+The largest gap appears in the time to computeσ (Figure 5).
+The Laplace computation is≈ 100x faster than the Gaussian
+computation, which is ≈ 100x faster than theℓ2 computa-
+tion. This may be expected, as the Laplace computation is
+a single arithmetic expression, the Gaussian computation
+is a binary search over the standard normal CDF, and the
+2Note that the smallest possibleσ for which the Laplace mech-
+anism is (ε,δ )-DP is provably negligibly smaller than the one used
+here. See Appendix A.4 for details.
+ℓ2 computation is a binary search where each evaluation
+iterates overnr +nR = 2000 radii. Nonetheless, we note
+that theℓ2 computation still runs in ≈ 0.1 seconds, this time
+does not increase withd, and the calculation only needs to
+be performed once for each setting of (ε,δ,d ).
+0 20 40 60 80 100
+dimension d
+10 5
+10 4
+10 3
+10 2
+10 1
+time (s)
+ computation time
+laplace
+gaussian
+2
+Figure 5. A plot of time in seconds to compute the minimumσ to
+achieve (1, 10−5)-DP. Theℓ2 mechanism line jumps afterd = 1
+because that case uses Lemma 3.3 instead of approximating the
+spherical cap region.
+The time to draw 1000 mechanism samples is less varied
+(Figure 6). The ℓ2 mechanism is again slowest, but it is
+within a factor of two of the other mechanisms, and no
+mechanism takes more than ≈ 0.01 seconds.
+0 20 40 60 80 100
+dimension d
+0.000
+0.002
+0.004
+0.006
+0.008
+0.010time (s)
+sampling time
+laplace
+gaussian
+2
+Figure 6. This plot uses the same setup as Figure 5 but records
+sampling time.
+8
+
+--- PAGE 9 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Impact Statement
+This paper presents work whose goal is to advance the ﬁeld
+of Machine Learning. There are many potential societal
+consequences of our work, none which we feel must be
+speciﬁcally highlighted here.
+References
+Abadi, M., Chu, A., Goodfellow, I., McMahan, H. B.,
+Mironov, I., Talwar, K., and Zhang, L. Deep learning
+with differential privacy. In Conference on Computer and
+Communications Security (CCS), 2016.
+Asoodeh, S., Liao, J., Calmon, F. P., Kosut, O., and Sankar,
+L. A better bound gives a hundred rounds: Enhanced
+privacy guarantees via f-divergences. In International
+Symposium on Information Theory (ISIT), 2020.
+Balle, B. and Wang, Y .-X. Improving the gaussian mecha-
+nism for differential privacy: Analytical calibration and
+optimal denoising. In International Conference on Ma-
+chine Learning (ICML), 2018.
+Bun, M. and Steinke, T. Concentrated differential privacy:
+Simpliﬁcations, extensions, and lower bounds. In Theory
+of Cryptography Conference (TCC), 2016.
+Canonne, C. L., Kamath, G., and Steinke, T. The discrete
+gaussian for differential privacy. Neural Information
+Processing Systems (NeurIPS), 2020.
+Cesar, M. and Rogers, R. Bounding, concentrating, and
+truncating: Unifying privacy loss composition for data
+analytics. In Algorithmic Learning Theory (ALT), 2021.
+Chan, T.-H. H., Shi, E., and Song, D. Private and continual
+release of statistics. Transactions on Information and
+System Security (TISSEC), 2011.
+Chaudhuri, K., Monteleoni, C., and Sarwate, A. D. Differ-
+entially private empirical risk minimization. Journal of
+Machine Learning Research (JMLR), 2011.
+Dwork, C., McSherry, F., Nissim, K., and Smith, A. Cal-
+ibrating noise to sensitivity in private data analysis. In
+Theory of Cryptography Conference (TCC), 2006.
+Dwork, C., Naor, M., Pitassi, T., and Rothblum, G. N. Differ-
+ential privacy under continual observation. In Symposium
+on the Theory of Computing (STOC), 2010.
+Edmonds, A., Nikolov, A., and Ullman, J. The power of
+factorization mechanisms in local and central differen-
+tial privacy. In Symposium on the Theory of Computing
+(STOC), 2020.
+Ganesh, A. and Zhao, J. Privately answering counting
+queries with generalized gaussian mechanisms. Founda-
+tions of Responsible Computing (FORC), 2021.
+Google. dp l2. https://github.com/
+google-research/google-research/tree/
+master/dp_l2, 2025.
+Hardt, M. and Talwar, K. On the geometry of differential pri-
+vacy. In Symposium on the Theory of Computing (STOC),
+2010.
+Joseph, M., Ribero, M., and Yu, A. Privately Counting
+Partially Ordered Data. In International Conference on
+Learning Representations (ICLR), 2025.
+Kifer, D., Smith, A., and Thakurta, A. Private Convex
+Empirical Risk Minimization and High-dimensional Re-
+gression. In Conference on Learning Theory (COLT) ,
+2012.
+Li, C., Miklau, G., Hay, M., McGregor, A., and Rastogi,
+V . The matrix mechanism: optimizing linear counting
+queries under differential privacy. The VLDB Journal,
+2015.
+Li, S. Concise formulas for the area and volume of a hyper-
+spherical cap. Asian Journal of Mathematics & Statistics,
+2010.
+McKenna, R., Miklau, G., Hay, M., and Machanavajjhala,
+A. Optimizing Error of High-Dimensional Statistical
+Queries under Differential Privacy. The VLDB Journal,
+2018.
+McSherry, F. and Talwar, K. Mechanism design via dif-
+ferential privacy. In Foundations of Computer Science
+(FOCS), 2007.
+Nikolov, A. Private query release via the johnson-
+lindenstrauss transform. In Symposium on Discrete Algo-
+rithms (SODA), 2023.
+Nikolov, A. and Tang, H. Gaussian Noise is Nearly Instance
+Optimal for Private Unbiased Mean Estimation. arXiv
+preprint arXiv:2301.13850, 2023.
+Nikolov, A., Talwar, K., and Zhang, L. The geometry of
+differential privacy: the sparse and approximate cases. In
+Symposium on the Theory of Computing (STOC), 2013.
+SciPy. scipy.special.betainc, 2024.
+Song, S., Chaudhuri, K., and Sarwate, A. D. Stochastic
+gradient descent with differentially private updates. In
+Global Conference on Information and Signal Processing
+(GlobalSIP), 2013.
+9
+
+--- PAGE 10 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Steinke, T. and Ullman, J. Between pure and approximate
+differential privacy. Journal of Privacy and Conﬁdential-
+ity, 2016.
+Yu, F., Rybar, M., Uhler, C., and Fienberg, S. E.
+Differentially-private logistic regression for detecting
+multiple-SNP association in GW AS databases. InPrivacy
+in Statistical Databases, 2014.
+Zhu, Y ., Dong, J., and Wang, Y .-X. Optimal accounting of
+differential privacy via characteristic function. In Artiﬁ-
+cial Intelligence and Statistics (AISTATS), 2022.
+10
+
+--- PAGE 11 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+A. Appendix
+A.1. Omitted Proofs From Upper Bound
+Claim 3.6.1. ∥y −e1∥2 − ∥y∥2 decreases asθ decreases.
+Proof. By the law of cosines,
+∥y −e1∥2 =
+√
+∥y∥2
+2 + ∥e1∥2
+2 − 2∥y∥2∥e1∥2 cos(θ)
+=
+√
+r2 + 1 − 2r cos(θ),
+so as y moves clockwise through Sr,0 ∩H from −e1 toe1,θ decreases from π to 0, cos(θ) grows from −1 to 1, and
+∥y −e1∥2 shrinks fromr + 1 to |r − 1|. Since ∥y∥2 =r remains constant, ∥y −e1∥2 − ∥y∥2 decreases asθ decreases. The
+same conclusion holds if we choosey in the lower half plane and consider the analogous counterclockwise angle.
+Claim 3.6.2. 1
+σ (∥p −e1∥2 − ∥p∥2) =ε is equivalent toh(r) =r(1 −εσ) + 1−ε2σ2
+2 .
+Proof.
+∥p −e1∥2 =
+√
+(r + 1 −h(r))2 + 2h(r)r −h(r)2
+=
+√
+(r + 1)2 − 2h(r)
+and
+ε = 1
+σ (∥p −e1∥2 − ∥p∥2)
+ε = 1
+σ (
+√
+(r + 1)2 − 2h(r) −r)
+(σε +r)2 =(r + 1)2 − 2h(r)
+2h(r) =2r + 1 − (σε)2 − 2rσε
+h(r) =r(1 −εσ) + 1 −ε2σ2
+2 .
+Claim 3.6.3. r(1 −εσ) + 1−ε2σ2
+2 ∈ [0, 2r] if and only ifr ≥ 1−εσ
+2 .
+Proof. The upper constraint ofr(1 −εσ) + 1−ε2σ2
+2 ≤ 2r is equivalent tor ≥ 1−εσ
+2 as follows
+r(1 −εσ) + 1 −ε2σ2
+2 ≤ 2r
+1 −ε2σ2
+2 ≤r(1 +εσ)
+1 −εσ
+2 ≤r.
+The lower constraint ofr(1 −εσ) + 1−ε2σ2
+2 ≥ 0 is satisﬁed for anyr since 1 −εσ ≥ 0 implies
+r(1 −εσ) + 1 −ε2σ2
+2 = (1 −εσ)
+(
+r + 1 +εσ
+2
+)
+≥ 0.
+Lemma 3.12. Forr> 0, Py∼M(0) [∥y∥2 ≤r] = γ(d,r/σ)
+Γ(d) .
+11
+
+--- PAGE 12 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+Proof. The density forY isf(y) ∝ exp (−∥y∥2/σ), so we compute the distribution’s normalization factorZ. We use two
+facts. First, a (d − 1)-sphere, i.e., a sphere in Rd, with radiuss has surface area 2πd/2
+Γ(d/2) ·sd−1. Second, byu-substitution
+withu =s/σ, ∫ ∞
+0
+e−s/σsd−1ds =
+∫ ∞
+0
+e−u ·ud−1σddu = Γ(d)σd
+since Γ(z) =
+∫∞
+0 e−ttz−1dt. We compute the integral Z using hyperspherical coordinates s,θ 1,...,θ d−1 wheres ≥ 0,
+θ1 ∈ [0, 2π], andθj ∈ [0,π ] for 2 ≤j ≤d − 1. Let
+V (θ1,...,θ d−1) = sind−2(θ1) sind−3(θ2)... sin(θd−1)
+be the angle dependent terms of the hyperspherical volume element. Then
+Z =
+∫ ∞
+0
+∫ 2π
+0
+∫ π
+0
+...
+∫ π
+0
+e−s/σsd−1V (θ1,...,θ d−1)∂d−1...∂ 1∂s
+= 2πd/2
+Γ(d/2)
+∫ ∞
+0
+e−s/σsd−1∂s
+= 2πd/2σd
+Γ(d/2) · Γ(d).
+This gives
+PY [∥y∥ ≤ r] = 1
+Z · 2πd/2
+Γ(d/2)
+∫ r
+0
+e−s/σsd−1ds
+= 1
+Z · 2πd/2σd
+Γ(d/2) ·γ(d,r/σ )
+= γ(d,r/σ )
+Γ(d) .
+Lemma 3.10. Fr,h(r) is monotone decreasing inr.
+Proof. Shorthand τ = εσ. By Corollary 3.7, Fr,h(r) = 1 for r ≤ 1−τ
+2 . Suppose r > 1−τ
+2 . Then by Lemma 3.6,
+h(r) =r(1 −τ) + 1−τ 2
+2 .
+Case 1:r< 1−τ 2
+2τ . Thenh(r)>r , andFr,h(r) = 1 −Fr,2r−h(r). Since we want to prove thatFr,h(r) decreases withr, it
+sufﬁces to show thatFr,2r−h(r) increases withr. By Lemma 3.9,
+Fr,2r−h(r) = 1
+2I(2r[2r−h(r)]−[2r−h(r)]2)/r2
+(d − 1
+2 , 1
+2
+)
+.
+We expand the subscript forI
+2r(2r −h(r)) − (2r −h(r))2
+r2 = 4r2 − 2rh(r) − (4r2 − 4rh(r) +h(r)2)
+r2
+= 2rh(r) −h(r)2
+r2 . (4)
+Sinceh(r) ∈ [0, 2r] (Lemma 3.6), 2rh(r) −h(r)2 ≥ 0. BecauseIx(a,b ) increases withx forx ≥ 0, it is enough to show
+that [2rh(r) −h(r)2]/r2 increases withr. Expanding yields
+2rh(r) −h(r)2
+r2 = 2r(1 −τ) + (1 −τ 2)
+r − r2(1 −τ)2 +r(1 −τ)(1 −τ 2) + (1−τ 2)2
+4
+r2 .
+12
+
+--- PAGE 13 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+We drop terms that don’t depend onr to get
+1 −τ 2
+r − (1 −τ)(1 −τ 2)
+r − (1 −τ 2)2
+4r2 = (1 −τ 2)
+[τ
+r − (1 −τ 2)
+4r2
+]
+.
+Differentiating the second term with respect tor gives 1−2τr−τ 2
+2r3 , and this is positive exactly whenr< 1−τ 2
+2τ .
+Case 2:r ≥ 1−τ 2
+2τ . Thenh(r) ≤r, and
+Fr,h(r) = 1
+2I(2rh(r)−h(r)2)/r2
+(d − 1
+2 , 1
+2
+)
+.
+By similar logic, it sufﬁces to show that (2rh(r) −h(r)2)/r2 is nonincreasing inr forr ≥ 1−τ 2
+2τ . This follows from the
+analysis of the previous case.
+A.2. Omitted Proofs From Lower Bound
+Lemma 3.19. DeﬁneX = 1+(εσ)2−2εσR
+2 andH(R) =R − 1 +X. Then cap ˆSR,1,H(R) =SR,1 ∩V .
+Proof. Shorthandτ =εσ for neatness. To verify the claim, we start with an arbitraryy ∈SR,1 and attempt to determine
+a cutoffX ∈ R such thaty ∈V iffy1 ≤X. For any two points y,y′ ∈SR,1 such thaty1 =y′
+1, it is true that y ∈V iff
+y′ ∈V sinceV is spherically symmetric arounde1. Ify′ =y1e1 +v for somev orthogonal toe1, then bySR,1’s spherical
+symmetry arounde1, the pointy =y1e1 + |v|e2 is also inSR,1. Therefore, our goal is to ﬁnd the minimum cutoffX for the
+pointy = (y1,y 2, 0,..., 0) such thaty ∈V iffy1 ≤X.
+We know y ∈ Sr′,0 for some r′ > 0. Since y2
+1 + y2
+2 = r′2, and y ∈ SR,1 implies (y1 − 1)2 + y2
+2 = R2, then
+combining these yields r′ =
+√
+R2 + 2y1 − 1. Thus we have y ∈ V if and only if y1 ≤ −r′ +h(r′). By Lemma 3.6,
+−r′ +h(r′) = min(−τr′ + 1−τ 2
+2 , 2r′). We have −τr′ + 1−τ 2
+2 = −τ
+√
+R2 + 2y1 − 1 + 1−τ 2
+2 , so we solve for the largest
+X whereX ≤ min(−τ
+√
+R2 + 2X − 1 + 1−τ 2
+2 , 2
+√
+R2 + 2X − 1).
+Solving forX under the ﬁrst constraint yields
+(
+X − 1 −τ 2
+2
+)2
+≥τ 2(R2 + 2X − 1)
+X2 −X(1 +τ 2) +τ 4 − 2τ 2 + 1 − 4τ 2R2 + 4τ 2
+4 ≥ 0
+X2 −X(1 +τ 2) +τ 4 + 2τ 2 + 1 − 4τ 2R2
+4 ≥ 0. (5)
+The roots of the LHS are given by
+X = 1 +τ 2 ±
+√
+(1 +τ 2)2 − ([1 +τ 2]2 − 4τ 2R2)
+2 = 1 +τ 2 ± 2τR
+2 .
+Letx1 = 1+τ 2−2τR
+2 andx2 = 1+τ 2+2τR
+2 . As the LHS of Equation (5) is a convex parabola, the inequality is satisﬁed on the
+intervals (−∞,x 1] ∪ [x2, ∞). But the ﬁrst constraint onX also implies the weaker inequalityX <1−τ 2
+2 soX /∈ [x2, ∞).
+Thenx1 is the largest value that satisﬁes the ﬁrst constraint.
+For anyX ∈ (x1,x 2), we haveX >−τ
+√
+R2 + 2X − 1 + 1−τ 2
+2 ≥ min(−τ
+√
+R2 + 2X − 1 + 1−τ 2
+2 , 2
+√
+R2 + 2X − 1).
+So if we can show that x1 ≤ 2√R2 + 2x1 − 1, thenx1 will indeed be the desired cutoff. We actually prove a stronger
+inequality
+x1 ≤
+√
+R2 + 2x1 − 1
+1 +τ 2 − 2τR
+2 ≤R −τ
+(1 +τ)2 ≤ 2R(1 +τ)
+1 +τ
+2 ≤R
+13
+
+--- PAGE 14 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+which follows from our starting assumption onR. SoX = 1+τ 2−2τR
+2 is the desired cutoff. This leads to a cap onSR,1 of
+height
+H(R) =X − (1 −R) = 1 +τ 2 − 2τR
+2 − 1 +R =R(1 −τ) − 1 −τ 2
+2 .
+The last step is verifying that this is a valid height lying in [0, 2R]. The lower bound follows from R(1 −τ) ≥ 1−τ 2
+2
+rearranging into the starting assumptionR ≥ 1+τ
+2 . We prove a stronger upper bound ofR by rearranging
+R(1 −τ) − 1 −τ 2
+2 ≤R
+−1 −τ 2
+2 ≤τR
+which uses 0<τ < 1 andR> 0.
+A.3. Omitted Proofs From Sampler
+Lemma 3.22. LetU1,...,U d+1 ∼iid U(0, 1) be uniform random samples. Then −σ ∑d+1
+i=1 log(Ui) ∼ Gamma (d + 1,σ ).
+Proof. We ﬁrst show that − log(U(0, 1)) ∼ Expo (1), an exponential random variable. Let f be the CDF of Expo (1).
+Then P[f−1(U) ≤ t] = P[U ≤ f(t)] = f(t) sof−1(U) ∼ Expo (1). Since f−1(t) = − log(1 −t) for 0 ≤ t ≤ 1, and
+U ∼ (1 −U), we get − log(U) ∼ Expo (1).
+Note that Expo (1) corresponds to a random variable that measures the time required for the ﬁrst arrival from a Poisson
+process with rate 1. Moreover, Gamma (d + 1,σ ) ∼σGamma (d + 1, 1) and Gamma (d + 1, 1) corresponds to a random
+variable that measures the time of the (d + 1)th arrival of a Poisson process with rate 1. The random variable of the
+(d + 1)th arrival is equal to the sum of the random variables of interarrival times for the ﬁrst (d + 1) arrivals. Since
+a Poisson process has stationary increments, each of these interarrival times are i.i.d. as Expo (1). It follows that
+Gamma (d + 1, 1) ∼ ∑d+1
+i=1 Ei ∼ − ∑d+1
+i=1 log(Ui) whereEi ∼ Expo (1).
+Lemma 3.23. LetX1,...,X d ∼iid N(0, 1), and letY ∼U(0, 1) be a uniform sample from [0, 1]. ThenY 1/d · (X1,...,Xd)√∑d
+i=1X 2
+i
+is a uniform sample fromBd
+2.
+Proof. The term (X1,...,Xd)√∑d
+i=1X 2
+i
+is a normalized draw from ad-dimensional multivariate Gaussian with an identity covariance
+matrix. As this distribution is spherically symmetric, normalizing the draw to have unit length produces a uniform draw from
+the unit sphere. Deﬁne the functionf to be the CDF of the random variable of theℓ2 norm of a uniform sample fromBd
+2. Then
+f(r) =rd. We show thatf is also the CDF ofY 1/d. We have P[Y 1/d ≤r] = P[U(0, 1)1/d ≤r] = P[U(0, 1) ≤rd] =rd,
+and the lemma follows.
+A.4. Omitted Proofs From Experiments
+The following result about the expected squaredℓ2 norm ofℓp balls will be useful.
+Lemma A.1 ((Joseph et al., 2025)). Let E2
+2(X) denote the expected squaredℓ2 norm of a uniform sample fromX, and let
+rBd
+p denote thed-dimensionalℓp ball of radiusr. Then E2
+2(rBd
+p) =r2 · d
+3
+(
+3d
+d+2
+)(
+Γ(d
+p )Γ( 3
+p )
+Γ( 1
+p )Γ(d+2
+p )
+)
+.
+Lemma 4.1. The mean squaredℓ2 error of thed-dimensionalℓp mechanism with parameterσ is
+(dσ)2(d + 1)
+(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+)
+.
+Proof. Consider the mechanism releasing a noisy version ofT (X) = 0. Call this mechanismMp
+σ. Recall from Lemma 2.4
+that we can sample it by sampling r ∼ Gamma (d + 1,σ ), sampling z ∼ Bd
+p, and outputting rz. The distribution
+Gamma (d + 1,σ ) has density
+f(x) = xde−x/σ
+Γ(d + 1)σd+1. (6)
+14
+
+--- PAGE 15 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+so
+Ey∼Mp
+σ
+[
+∥y∥2
+2
+]
+=
+∫ ∞
+0
+f(r)E2
+2(rBd
+p)dr
+=
+∫ ∞
+0
+rde−r/σ
+Γ(d + 1)σd+1r2 · d
+3
+( 3d
+d + 2
+)(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+)
+dr
+= d
+3Γ(d + 1)σd+1
+( 3d
+d + 2
+)(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+) ∫ ∞
+0
+rd+2e−r/σdr
+= d
+3Γ(d + 1)σd+1
+( 3d
+d + 2
+)(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+)
+· Γ(d + 3)σd+3
+= (dσ)2(d + 1)
+(
+Γ(d
+p)Γ( 3
+p)
+Γ( 1
+p)Γ(d+2
+p )
+)
+.
+Lemma 4.4. The Gaussian mechanism with parameterσ has mean squaredℓ2 errordσ2.
+Proof. Denote the mechanism by Nσ. Then by linearity of expectation and the fact that the Gaussian mechanism has
+independent Gaussian marginals,
+Ey∼Nσ
+[
+∥y∥2
+2
+]
+= E
+
+
+d∑
+j=1
+y2
+j
+
+
+=dEz∼N(0,σ2)
+[
+z2]
+=dσ2
+where the last equality used
+Ez∼N(0,σ2)
+[
+z2]
+= Var(z) + E [z]2 =σ2.
+The following result provides evidence that, with reasonable parameters, approximate DP does not yield meaningful utility
+improvements over pure DP for the Laplace mechanism. A result like this is likely folklore, but we include it here for
+completeness.
+Lemma A.2. The Laplace mechanism with parameterσ ≤ 1/ε does not satisfy (ε,δ )-DP forε< 2 ln(1 −δ) + 1
+σ .
+Proof. LetT (X) = 0 and letT (X′) =e1. Then ∥T (X) −T (X′)∥1 = 1, and
+Py∼M(0)
+[
+ln
+(fX(y)
+fX′(y)
+)
+≥ε
+]
+= Py∼M(0) [∥y −e1∥1 − ∥y∥1 ≥σε] = Py∼M(0) [|y1 − 1| − |y1| ≥ σε].
+MechanismM is equivalent to the spherical Laplace distribution where each dimension is drawn from Lap (σ). This
+distribution has CDF F (x) = 1 − 1
+2 exp(−x/σ) for x ≥ 0. Condition |y1 − 1| − |y1| ≥ σε holds if and only if
+y1 ≤ 1
+2(1 −σε), so the probability of drawing such ay is
+1 − 1
+2 exp
+(
+− 1
+σ
+[ 1
+2(1 −σε)
+])
+= 1 − 1
+2 exp
+(ε − 1
+σ
+2
+)
+Therefore P [ℓM,X,X′ ≥ε] = 1 − 1
+2 exp
+(ε− 1
+σ
+2
+)
+.
+We now analyze P [ℓM,X′,X ≤ −ε]. BecauseℓM,X′,X = log(fX′(y)/fX(y)) = 1
+σ · (|y1| − |y1 − 1|), we get
+P [ℓM,X′,X ≤ −ε] = Py∼M(1) [|y1 − 1| − |y1| ≥ σε]
+15
+
+--- PAGE 16 ---
+Approximate Differential Privacy of theℓ2 Mechanism
+whereM(1) denotes thed-dimensional Laplace mechanism centered ate1. By the same logic used above,|y1−1|−|y1| ≥ σε
+if and only if y1 ≤ 1
+2(1 −σε). For y ∼ M(1), this event has the same probability as y′
+1 ≤ 1
+2(1 −σε) − 1 = 1
+2(−1 −
+σε) when y′ ∼ M(0). Furthermore, Lap (σ) has CDF F (x) = 1
+2 exp(x/σ) for x < 0. Thus P [ℓM,X′,X ≤ −ε] =
+1
+2 exp
+(1
+2
+[
+− 1
+σ −ε
+])
+.
+Combining these results and applying 1 +x ≤ex yields
+P [ℓM,X,X′ ≥ε] −eεP [ℓM,X′,X ≤ −ε] = 1 − 1
+2 exp
+(ε − 1
+σ
+2
+)
+−eε 1
+2 exp
+(1
+2
+[
+− 1
+σ −ε
+])
+= 1 − exp
+(ε − 1
+σ
+2
+)
+By Lemma 2.3, this last quantity must be upper bounded byδ forM to be (ε,δ )-DP. Rearranging yields the expression in
+the claim.
+16

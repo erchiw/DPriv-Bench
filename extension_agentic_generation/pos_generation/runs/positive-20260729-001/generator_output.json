@@ -1,0 +1,392 @@
+{
+  "schema_version": "1.0",
+  "run_id": "positive-20260729-001",
+  "source_manifest_sha256": "f73624203fea0d49c9eaad5abbbda522c73ceb765cb5784cbc8395e5e1efb8c4",
+  "candidates": [
+    {
+      "candidate_id": "pos-2402-rnm-profile",
+      "source_id": "2402.06701v1-254f04deb11d",
+      "question_tex": "Let $X\\sim X'$ denote neighboring datasets under a fixed add/remove or replace-one adjacency relation. Let $m\\in\\mathbb N$, $[m]=\\{1,\\ldots,m\\}$, and let $f_i$ be real-valued scores satisfying $|f_i(X)-f_i(X')|\\le 1$ for every $i\\in[m]$ and every $X\\sim X'$. Let $Z_1,\\ldots,Z_m$ be i.i.d. real noises with common density $p$, and define $M(X)=\\operatorname*{arg\\,max}_{i\\in[m]}\\{f_i(X)+Z_i\\}$ using fixed data-independent tie-breaking. For distributions $P,Q$ with densities $p_P,p_Q$, define the hockey-stick divergence $H_{e^t}(P\\|Q)=\\int [p_P(y)/p_Q(y)-e^t]_+p_Q(y)\\,dy$, where $[u]_+=\\max\\{u,0\\}$. Define $\\delta_2(t)=\\sup_{|a-a'|\\le 2}H_{e^t}(\\operatorname{Law}(a+Z_1)\\|\\operatorname{Law}(a'+Z_1))$. Is it true that, for every $t\\in\\mathbb R$ and every $X\\sim X'$, one has $H_{e^t}(M(X)\\|M(X'))\\le m\\,\\delta_2(t)$?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Fix $X\\sim X'$ and an output index $i$. Conditional on $Z_i=r-2$, if $i$ wins on $X$, then $i$ wins on $X'$ when its noise is changed to $r$: indeed, $f_i(X')\\ge f_i(X)-1$ while every competing score satisfies $f_j(X')\\le f_j(X)+1$, so the extra shift by $2$ preserves the winning inequality. Write $w_i(r)$ and $w_i'(r)$ for the corresponding conditional winning probabilities on $X$ and $X'$. Thus the numerator probability for output $i$ can be represented using $p(r-2)w_i(r-2)$, with $w_i(r-2)\\le w_i'(r)$. For $h_t(u)=[u-e^t]_+$, convexity of its perspective and Jensen's inequality give, exactly as in the proof of Theorem 3.2, $H_{e^t}(M(X)\\|M(X'))\\le\\sum_{i=1}^m\\int h_t(p(r-2)/p(r))p(r)w_i'(r)\\,dr$. Since $0\\le w_i'(r)\\le1$ and $h_t\\ge0$, this is at most $\\sum_{i=1}^m\\int h_t(p(r-2)/p(r))p(r)\\,dr=mH_{e^t}(\\operatorname{Law}(Z_1+2)\\|\\operatorname{Law}(Z_1))\\le m\\delta_2(t)$. This proves the claimed bound. The source states the result as Theorem 3.2 on page 4 and gives this perspective/Jensen derivation in Appendix A.1, pages 16--17.",
+      "assumptions": [
+        "The adjacency relation is fixed, and each score has sensitivity at most 1 for that relation.",
+        "The noises are independent and identically distributed with a common density.",
+        "Tie-breaking is fixed and independent of the dataset.",
+        "The additive-noise privacy profile takes the supremum over shifts whose distance is at most 2."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 4, Theorem 3.2",
+          "quote": "We have: $H_{e^\\epsilon}(M(X)\\|M(X'))\\le m\\cdot\\delta(\\epsilon)$, where $\\delta(\\epsilon)$ is the privacy profile of the additive noise mechanism with sensitivity 2.",
+          "supports": "The central report-noisy-max privacy-profile inequality and the sensitivity-2 constant."
+        },
+        {
+          "locator": "Pages 16--17, Appendix A.1, equations (A.1)--(A.3)",
+          "quote": "In the first inequality we have used Lemma 2.3 and Jensen's inequality.",
+          "supports": "The convex-perspective/Jensen step used in the public proof."
+        }
+      ],
+      "citation": "Koskela, Redberg, and Wang (2024), Privacy Profiles for Private Selection",
+      "pdf_link": "https://arxiv.org/pdf/2402.06701",
+      "publish_year": "2024",
+      "section_number": "3",
+      "subject": "Private Selection",
+      "topic": "Privacy Profiles",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-2402-truncated-nb-pure-dp",
+      "source_id": "2402.06701v1-254f04deb11d",
+      "question_tex": "Fix $\\gamma\\in(0,1)$ and $\\eta\\in(-1,\\infty)$. Let $K\\in\\mathbb N$ have the truncated negative-binomial law $D_{\\eta,\\gamma}$ defined, for $k\\in\\mathbb N$, by $\\Pr(K=k)=\\frac{(1-\\gamma)^k}{\\gamma^{-\\eta}-1}\\prod_{i=0}^{k-1}\\frac{i+\\eta}{i+1}$ when $\\eta\\ne0$, and by $\\Pr(K=k)=\\frac{(1-\\gamma)^k}{k\\log(1/\\gamma)}$ when $\\eta=0$. A selection algorithm $A$ draws $K$ independently, runs a base mechanism $Q$ on the same dataset $K$ times, and releases the run with the best value in a fixed ordered quality-score space. Under the paper's neighboring-dataset relation, suppose $Q$ is $\\varepsilon$-differentially private, meaning $\\Pr(Q(X)\\in E)\\le e^\\varepsilon\\Pr(Q(X')\\in E)$ for all neighboring $X,X'$ and measurable $E$. Is $A$ necessarily $(\\eta+2)\\varepsilon$-differentially private?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Let $\\delta_Q(s)$ be the privacy profile of $Q$, so pure $\\varepsilon$-DP gives $\\delta_Q(\\varepsilon)=0$. Theorem 5.2 (page 7; proved as Theorem C.1 on pages 21--22) states that, for $m=\\mathbb E[K]$, $H_{e^t}(A(X)\\|A(X'))\\le m\\delta_Q(\\widehat t)$, where $\\widehat t=t-(\\eta+1)\\log(e^{s}+(1-\\gamma)\\delta_Q(s)/\\gamma)$ for any $s\\ge0$. Set $s=\\varepsilon$ and $t=(\\eta+2)\\varepsilon$. Since $\\delta_Q(\\varepsilon)=0$, $\\widehat t=(\\eta+2)\\varepsilon-(\\eta+1)\\varepsilon=\\varepsilon$. Hence $H_{e^{(\\eta+2)\\varepsilon}}(A(X)\\|A(X'))\\le m\\delta_Q(\\varepsilon)=0$. Applying the same bound to the ordered pair $X',X$ yields the reverse inequality, so the two output laws satisfy pure $(\\eta+2)\\varepsilon$-DP. This is precisely the one-step instantiation given in Corollary 5.3 and its proof on pages 7 and 22--23.",
+      "assumptions": [
+        "$\\gamma\\in(0,1)$, $\\eta\\in(-1,\\infty)$, and $K$ has exactly the stated truncated negative-binomial distribution.",
+        "$K$ is independent of the data and of the base-mechanism randomness.",
+        "The same $\\varepsilon$-DP base mechanism is run on the same dataset in every trial.",
+        "Selection returns the best trial according to a fixed ordered score space."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 7, Corollary 5.3",
+          "quote": "If the base mechanism $Q$ is $\\epsilon$-DP, then the selection algorithm $A$ is $(\\eta+2)\\epsilon$-DP.",
+          "supports": "The exact pure-DP conclusion and constant."
+        },
+        {
+          "locator": "Pages 22--23, Corollary C.2",
+          "quote": "Let $\\epsilon_1$ be such that $\\delta(\\epsilon_1)=0$... by Theorem 5.2, $H_{e^\\epsilon}(A\\|A')=0$ if $\\epsilon=(\\eta+2)\\epsilon_1$.",
+          "supports": "The direct privacy-profile instantiation proving the corollary."
+        }
+      ],
+      "citation": "Koskela, Redberg, and Wang (2024), Privacy Profiles for Private Selection",
+      "pdf_link": "https://arxiv.org/pdf/2402.06701",
+      "publish_year": "2024",
+      "section_number": "5.1",
+      "subject": "Private Selection",
+      "topic": "Randomized Hyperparameter Tuning",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-2408-correlated-noise-error",
+      "source_id": "2408.06853v3-93f991484996",
+      "question_tex": "Let $d,n\\in\\mathbb N$, $\\mu>0$, $X=(x_1,\\ldots,x_n)$ with $x_i\\in[0,1]^d$, and $f(X)=\\sum_{i=1}^n x_i$. Let $\\mathbf 1_d$ be the all-ones vector in $\\mathbb R^d$. Independently sample $\\eta\\sim\\mathcal N(0,(\\sqrt d+1)/(4\\mu^2))$ and $Z\\sim\\mathcal N(0,((d+\\sqrt d)/(4\\mu^2))I_d)$, where $I_d$ is the $d\\times d$ identity. If the released query vector is $\\widetilde f=f(X)+\\eta\\mathbf 1_d+Z$, is the error in every coordinate distributed as $\\mathcal N(0,(d+2\\sqrt d+1)/(4\\mu^2))$, with standard deviation $(\\sqrt d+1)/(2\\mu)$?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "For coordinate $j$, $\\widetilde f_j-f(X)_j=\\eta+Z_j$. The two summands are independent centered Gaussians, so their sum is centered Gaussian with variance equal to the sum of variances: $(\\sqrt d+1)/(4\\mu^2)+(d+\\sqrt d)/(4\\mu^2)=(d+2\\sqrt d+1)/(4\\mu^2)=(\\sqrt d+1)^2/(4\\mu^2)$. Because $\\mu>0$, the standard deviation is therefore $(\\sqrt d+1)/(2\\mu)$. This is the calculation in Lemma 3.1 on page 5.",
+      "assumptions": [
+        "$d,n$ are positive integers and $\\mu>0$.",
+        "$\\eta$ and $Z$ are independent.",
+        "$Z$ has covariance $((d+\\sqrt d)/(4\\mu^2))I_d$."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 5, Lemma 3.1",
+          "quote": "Algorithm 1 estimates each query with error distributed as $\\mathcal N(0,(d+2\\sqrt d+1)/(4\\mu^2))$.",
+          "supports": "The coordinate-error distribution."
+        },
+        {
+          "locator": "Page 5, proof of Lemma 3.1",
+          "quote": "Since $\\eta$ and $z_i$ are independent samples from zero-mean Gaussians their sum is distributed as a zero-mean Gaussian.",
+          "supports": "The variance-addition derivation."
+        }
+      ],
+      "citation": "Lebeda (2025), Better Gaussian Mechanism using Correlated Noise",
+      "pdf_link": "https://arxiv.org/pdf/2408.06853",
+      "publish_year": "2025",
+      "section_number": "3",
+      "subject": "Privacy Mechanisms",
+      "topic": "Correlated Gaussian Noise",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-2408-correlated-noise-gdp",
+      "source_id": "2408.06853v3-93f991484996",
+      "question_tex": "Let $d,n\\in\\mathbb N$, $\\mu>0$, $X=(x_1,\\ldots,x_n)$ with $x_i\\in[0,1]^d$, $f(X)=\\sum_{i=1}^n x_i$, and let $\\mathbf 1_d$ and $I_d$ denote the all-ones vector and identity matrix. Two datasets are add/remove neighbors if one is obtained from the other by adding or removing one row. Independently sample $\\eta\\sim\\mathcal N(0,(\\sqrt d+1)/(4\\mu^2))$ and $Z\\sim\\mathcal N(0,((d+\\sqrt d)/(4\\mu^2))I_d)$, and release $A(X)=(f(X)+\\eta\\mathbf 1_d+Z,\\ n+2\\eta)$. For distributions $P,Q$, let $T(P,Q)$ be their hypothesis-testing trade-off function; a mechanism is $\\mu$-GDP if $T(A(X),A(X'))\\ge T(\\mathcal N(0,1),\\mathcal N(\\mu,1))$ pointwise for every neighboring $X,X'$. Does $A$ satisfy $\\mu$-GDP under add/remove adjacency?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Map each row $x_i$ to $\\widehat x_i=(2x_i-\\mathbf1_d,d^{1/4})\\in\\mathbb R^{d+1}$ and set $g(X)=\\sum_i\\widehat x_i$. Adding or removing one row changes $g$ by a vector with squared norm at most $d+d^{1/2}$, so its $\\ell_2$ sensitivity is at most $\\sqrt{d+\\sqrt d}$. The standard Gaussian mechanism $G(X)=g(X)+W$ with $W\\sim\\mathcal N(0,((d+\\sqrt d)/\\mu^2)I_{d+1})$ is therefore $\\mu$-GDP (Lemma 2.1 combined with Lemmas 3.2--3.3). Define the bijection $h(u,v)=(2u-v\\mathbf1_d,d^{1/4}v)$. For $A(X)=(u,v)$, its first $d$ transformed coordinates equal $2f(X)-n\\mathbf1_d+2Z$, while the last equals $d^{1/4}n+2d^{1/4}\\eta$. These are the coordinates of $g(X)$ plus independent centered Gaussian noises: each has variance $(d+\\sqrt d)/\\mu^2$. Hence $h(A(X))$ has exactly the law of $G(X)$. Since $h$ is a data-independent bijection, $A$ and $G$ have the same trade-off functions for every neighboring pair. Thus $A$ is $\\mu$-GDP. This is Theorem 3.1 on page 6, with the equivalence established in Lemma 3.4.",
+      "assumptions": [
+        "Datasets use add/remove adjacency, not replacement adjacency.",
+        "Every row belongs to $[0,1]^d$.",
+        "$\\mu>0$, and all Gaussian noises have exactly the stated variances and are independent.",
+        "The mechanism releases both the noisy sum and the noisy dataset size."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 6, Theorem 3.1",
+          "quote": "The mechanism that outputs $f(X)+\\eta\\mathbf1_d+Z$ and $n+2\\eta$ ... satisfies $\\mu$-GDP under the add/remove neighboring relation.",
+          "supports": "The mechanism definition, adjacency relation, and privacy conclusion."
+        },
+        {
+          "locator": "Pages 5--6, Lemmas 3.2--3.4",
+          "quote": "There exists a bijection $h$ ... such that $h(M(X))$ is distributed as $M'(X)$.",
+          "supports": "The transformed standard-Gaussian mechanism proof route."
+        }
+      ],
+      "citation": "Lebeda (2025), Better Gaussian Mechanism using Correlated Noise",
+      "pdf_link": "https://arxiv.org/pdf/2408.06853",
+      "publish_year": "2025",
+      "section_number": "3",
+      "subject": "Privacy Mechanisms",
+      "topic": "Correlated Gaussian Noise",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-2602-approx-dp-fdp-equivalence",
+      "source_id": "2602.06756v2-e2c3a161e6ba",
+      "question_tex": "Let $S,S^-$ be remove-neighboring datasets, and let $M(S)$ be a distribution on an output space. For distributions $P,Q$, define the trade-off function $T[P,Q](\\alpha)=\\inf_{\\phi}\\{1-\\mathbb E_Q[\\phi]:\\mathbb E_P[\\phi]\\le\\alpha\\}$, where the infimum ranges over measurable randomized tests $\\phi$ taking values in $[0,1]$. A mechanism is $f$-DP if both $T[M(S),M(S^-)]\\ge f$ and $T[M(S^-),M(S)]\\ge f$ pointwise for every remove pair. For $\\varepsilon\\ge0$ and $\\delta\\in[0,1]$, define $f_{\\varepsilon,\\delta}(\\alpha)=\\max\\{0,1-\\delta-e^\\varepsilon\\alpha,e^{-\\varepsilon}(1-\\delta-\\alpha)\\}$. Is $M$ $(\\varepsilon,\\delta)$-DP in both directions for every remove pair if and only if it is $f_{\\varepsilon,\\delta}$-DP?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Write $P=M(S)$ and $Q=M(S^-)$. Assume first that both DP inequalities hold. For any test with $\\mathbb E_P\\phi\\le\\alpha$, applying $Q(A)\\le e^\\varepsilon P(A)+\\delta$ to the randomized event selected by $\\phi$ gives $1-\\mathbb E_Q\\phi\\ge1-\\delta-e^\\varepsilon\\alpha$. Applying $P(A)\\le e^\\varepsilon Q(A)+\\delta$ to the complementary randomized event gives $1-\\mathbb E_Q\\phi\\ge e^{-\\varepsilon}(1-\\delta-\\mathbb E_P\\phi)\\ge e^{-\\varepsilon}(1-\\delta-\\alpha)$. The type-II error is also nonnegative, so taking the infimum gives $T[P,Q]\\ge f_{\\varepsilon,\\delta}$; swapping $P,Q$ gives the other direction. Conversely, suppose both trade-off inequalities hold. For a measurable event $E$, use the deterministic test $\\phi=\\mathbf1_E$. Since this test is feasible at $\\alpha=P(E)$, $1-Q(E)\\ge T[P,Q](P(E))\\ge1-\\delta-e^\\varepsilon P(E)$, hence $Q(E)\\le e^\\varepsilon P(E)+\\delta$. Applying the same argument to $T[Q,P]$ gives $P(E)\\le e^\\varepsilon Q(E)+\\delta$. Thus the two notions are equivalent. This is Proposition 2.6 on page 3.",
+      "assumptions": [
+        "$\\varepsilon\\ge0$ and $\\delta\\in[0,1]$.",
+        "Adjacency is the remove-pair relation and privacy is required in both directions.",
+        "Trade-off functions range over measurable randomized tests."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 3, Proposition 2.6",
+          "quote": "A mechanism $M$ is $(\\varepsilon,\\delta)$-DP if and only if it is $f_{\\varepsilon,\\delta}$-DP.",
+          "supports": "The equivalence claim."
+        },
+        {
+          "locator": "Page 3, Proposition 2.6",
+          "quote": "$f_{\\varepsilon,\\delta}(\\alpha)=\\max(0,1-\\delta-e^\\varepsilon\\alpha,e^{-\\varepsilon}(1-\\delta-\\alpha))$.",
+          "supports": "The exact piecewise-linear trade-off function."
+        }
+      ],
+      "citation": "Tran, Koskela, Räisä, and Honkela (2026), f-Differential Privacy Filters: Validity and Approximate Solutions",
+      "pdf_link": "https://arxiv.org/pdf/2602.06756",
+      "publish_year": "2026",
+      "section_number": "2",
+      "subject": "Differential Privacy Foundations",
+      "topic": "f-Differential Privacy",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-2602-gaussian-tradeoff-tensor",
+      "source_id": "2602.06756v2-e2c3a161e6ba",
+      "question_tex": "For distributions $P,Q$, let $T[P,Q]$ denote their hypothesis-testing trade-off function. For $\\mu\\ge0$, define the Gaussian trade-off function $G_\\mu=T[\\mathcal N(0,1),\\mathcal N(\\mu,1)]$. For trade-off functions represented as $f_1=T[P_1,Q_1]$ and $f_2=T[P_2,Q_2]$, define their tensor product by $f_1\\otimes f_2=T[P_1\\times P_2,Q_1\\times Q_2]$. For every $\\mu_1,\\mu_2\\ge0$, is $G_{\\mu_1}\\otimes G_{\\mu_2}=G_{\\sqrt{\\mu_1^2+\\mu_2^2}}$?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "By the tensor definition, $G_{\\mu_1}\\otimes G_{\\mu_2}=T[\\mathcal N(0,I_2),\\mathcal N((\\mu_1,\\mu_2),I_2)]$. Apply an orthogonal rotation sending $(\\mu_1,\\mu_2)$ to $(r,0)$, where $r=\\sqrt{\\mu_1^2+\\mu_2^2}$. This rotation is a measurable bijection and leaves the standard bivariate normal invariant, so it preserves the testing trade-off function. The rotated testing problem is $T[\\mathcal N(0,I_2),\\mathcal N((r,0),I_2)]$. Its second coordinate has the same $\\mathcal N(0,1)$ law under both hypotheses and is independent of the first; consequently the likelihood ratio, and hence the optimal test, depends only on the first coordinate. The trade-off function therefore equals $T[\\mathcal N(0,1),\\mathcal N(r,1)]=G_r$. This is the rotation argument in Proposition A.18 on page 16.",
+      "assumptions": [
+        "$\\mu_1,\\mu_2$ are nonnegative.",
+        "The tensor product is defined through product distribution pairs.",
+        "Gaussian distributions have unit variance in the definition of $G_\\mu$."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 16, Proposition A.18",
+          "quote": "Gaussian trade-off functions satisfy $G_{\\mu_1}\\otimes G_{\\mu_2}=G_{\\sqrt{\\mu_1^2+\\mu_2^2}}$.",
+          "supports": "The exact tensor-product identity."
+        },
+        {
+          "locator": "Page 16, proof of Proposition A.18",
+          "quote": "For Gaussian trade-off functions ... we apply the rotation transformation as a bijection.",
+          "supports": "The key rotation derivation."
+        }
+      ],
+      "citation": "Tran, Koskela, Räisä, and Honkela (2026), f-Differential Privacy Filters: Validity and Approximate Solutions",
+      "pdf_link": "https://arxiv.org/pdf/2602.06756",
+      "publish_year": "2026",
+      "section_number": "A.2",
+      "subject": "Accounting and Composition",
+      "topic": "Gaussian Differential Privacy",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-neurips24-zcdp-to-approx-dp",
+      "source_id": "NeurIPS-2024-private-geometric-median-Paper-Conference-9183d3cdd56a",
+      "question_tex": "Let neighboring datasets use replacement adjacency. For $\\alpha>1$, define the Renyi divergence $D_\\alpha(P\\|Q)=\\frac{1}{\\alpha-1}\\log\\int (dP/dQ)^\\alpha\\,dQ$. Suppose a randomized mechanism $A$ is $\\rho$-zCDP for some $\\rho\\ge0$, meaning that $D_\\alpha(A(X)\\|A(X'))\\le\\rho\\alpha$ for every $\\alpha>1$ and every neighboring $X,X'$. For every $\\delta\\in(0,1)$, is $A$ necessarily $(\\rho+2\\sqrt{\\rho\\log(1/\\delta)},\\delta)$-differentially private?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Fix neighboring $X,X'$ and write $P=A(X)$, $Q=A(X')$. For any $\\alpha>1$, let $L=\\log(dP/dQ)$ under $P$. Then $\\mathbb E_P[e^{(\\alpha-1)L}]=e^{(\\alpha-1)D_\\alpha(P\\|Q)}$. Markov's inequality implies $P[L>s]\\le\\exp((\\alpha-1)(D_\\alpha(P\\|Q)-s))$. Taking $s=\\rho\\alpha+\\log(1/\\delta)/(\\alpha-1)$ and using $D_\\alpha\\le\\rho\\alpha$ makes this probability at most $\\delta$. For every event $E$, split according to $L\\le s$ and $L>s$ to obtain $P(E)\\le e^sQ(E)+\\delta$. Now put $u=\\alpha-1>0$: $s\\le\\rho+\\rho u+\\log(1/\\delta)/u$. The last two terms are minimized at $u=\\sqrt{\\log(1/\\delta)/\\rho}$ when $\\rho>0$, yielding $s=\\rho+2\\sqrt{\\rho\\log(1/\\delta)}$; the $\\rho=0$ case follows by taking $u\\to\\infty$. Since the zCDP premise holds for every ordered neighboring pair, the DP inequality holds in both directions. This is Lemma 1.4 on page 5.",
+      "assumptions": [
+        "Adjacency is replacement adjacency.",
+        "$\\rho\\ge0$ and $\\delta\\in(0,1)$.",
+        "The zCDP inequality holds for every Renyi order $\\alpha>1$ and every ordered neighboring pair."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 5, Lemma 1.4",
+          "quote": "Assume ... $A$ satisfies $\\rho$-zCDP, then for every $\\delta>0$, $A$ is $(\\rho+2\\sqrt{\\rho\\log(1/\\delta)},\\delta)$-DP.",
+          "supports": "The zCDP-to-approximate-DP conversion and exact constant."
+        },
+        {
+          "locator": "Page 5, Definition 1.3",
+          "quote": "For every neighbouring dataset (i.e., replacement) ... and every $\\alpha\\in(1,\\infty)$, it holds $D_\\alpha(A_n(X)\\|A_n(X'))\\le\\rho\\alpha$.",
+          "supports": "The adjacency relation, quantifier over Renyi orders, and zCDP convention."
+        }
+      ],
+      "citation": "Haghifam, Steinke, and Ullman (2024), Private Geometric Median",
+      "pdf_link": null,
+      "publish_year": "2024",
+      "section_number": "1.4",
+      "subject": "Differential Privacy Foundations",
+      "topic": "Concentrated Differential Privacy",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-neurips24-radius-query-sensitivity",
+      "source_id": "NeurIPS-2024-private-geometric-median-Paper-Conference-9183d3cdd56a",
+      "question_tex": "Let $n\\in\\mathbb N$, $X=(x_1,\\ldots,x_n)\\in(\\mathbb R^d)^n$, $\\gamma\\in[1/2,1]$, $m=\\lceil\\gamma n\\rceil$, and $\\nu\\ge0$. Define $N_i^X(\\nu)=|\\{j\\in[n]:\\|x_j-x_i\\|_2\\le\\nu\\}|$ and $N_X(\\nu)=\\frac1m\\max_{I\\subseteq[n],\\,|I|=m}\\sum_{i\\in I}N_i^X(\\nu)$. If replacement-neighboring datasets $X,X'$ differ in one sample, is $|N_X(\\nu)-N_{X'}(\\nu)|\\le3$?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Relabel the differing sample as index $1$. For any fixed $I\\subseteq[n]$ of size $m$, each count $N_i(\\nu)$ with $i\\ne1$ changes by at most $1$, because only membership of the replaced point can change. If $1\\notin I$, the unnormalized sum changes by at most $m$. If $1\\in I$, the center itself changes, so $N_1(\\nu)$ may change by at most $n$, while the remaining $m-1$ counts change by at most $1$ each; the total change is at most $n+m-1$. For two indexed families $(a_I),(b_I)$, $|\\max_I a_I-\\max_I b_I|\\le\\max_I|a_I-b_I|$. Therefore $|N_X(\\nu)-N_{X'}(\\nu)|\\le(n+m-1)/m\\le1+n/m\\le1+1/\\gamma\\le3$, since $m=\\lceil\\gamma n\\rceil\\ge\\gamma n$ and $\\gamma\\ge1/2$. This is Lemma 2.2 on page 5 and its proof on page 24.",
+      "assumptions": [
+        "Datasets have the same size and differ by replacing one sample.",
+        "$\\gamma\\in[1/2,1]$ and $m=\\lceil\\gamma n\\rceil$.",
+        "The maximum ranges over subsets of exactly $m$ distinct indices.",
+        "Distances use the Euclidean norm."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 5, Lemma 2.2",
+          "quote": "The query $N(\\nu)$ ... has a sensitivity upper-bounded by 3.",
+          "supports": "The global sensitivity conclusion."
+        },
+        {
+          "locator": "Page 24, proof of Lemma 2.2",
+          "quote": "the sensitivity is bounded by $\\frac1m((m-1)+n)\\le1+\\frac n m\\le1+\\frac1\\gamma\\le3$.",
+          "supports": "The exact counting argument and constant."
+        }
+      ],
+      "citation": "Haghifam, Steinke, and Ullman (2024), Private Geometric Median",
+      "pdf_link": null,
+      "publish_year": "2024",
+      "section_number": "2.1",
+      "subject": "Private Statistics",
+      "topic": "Private Geometric Median",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-joseph25-knorm-pure-dp",
+      "source_id": "joseph25a-1-63074cceccc6",
+      "question_tex": "Fix either add/remove or swap adjacency. Let $\\|\\cdot\\|$ be a norm on $\\mathbb R^d$, let $T$ be a statistic with sensitivity $\\Delta$, meaning $\\|T(X)-T(X')\\|\\le\\Delta$ for all neighboring $X,X'$, and let $\\sigma>0$. Define the $K$-norm mechanism $M$ to have conditional density $f_X(y)=Z^{-1}\\exp(-\\|y-T(X)\\|/\\sigma)$ on $\\mathbb R^d$, where $Z$ is the translation-invariant normalizing constant. Is $M$ $(\\Delta/\\sigma)$-differentially private?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "For neighboring $X,X'$ and every output $y$, translation invariance makes the normalizing constant identical for the two densities. Hence $f_X(y)/f_{X'}(y)=\\exp((\\|y-T(X')\\|-\\|y-T(X)\\|)/\\sigma)$. By the reverse triangle inequality, $\\|y-T(X')\\|-\\|y-T(X)\\|\\le\\|T(X)-T(X')\\|\\le\\Delta$. Thus $f_X(y)\\le e^{\\Delta/\\sigma}f_{X'}(y)$ pointwise. Integrating over any measurable event gives $\\Pr(M(X)\\in E)\\le e^{\\Delta/\\sigma}\\Pr(M(X')\\in E)$; swapping the neighbors gives the reverse inequality. Therefore $M$ is pure $(\\Delta/\\sigma)$-DP. This is the privacy assertion of Lemma 2.4 on page 2.",
+      "assumptions": [
+        "A single adjacency relation, add/remove or swap, is fixed throughout.",
+        "$T$ has norm sensitivity at most $\\Delta$ for that relation.",
+        "$\\sigma>0$.",
+        "The mechanism uses exactly the density proportional to $\\exp(-\\|y-T(X)\\|/\\sigma)$."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 2, Lemma 2.4",
+          "quote": "Given norm $\\|\\cdot\\|$, scale parameter $\\sigma$, statistic $T$ with $\\|\\cdot\\|$-sensitivity $\\Delta$ ... the $K$-norm mechanism ... satisfies $\\Delta/\\sigma$-DP.",
+          "supports": "The mechanism, sensitivity convention, scale, and exact pure-DP parameter."
+        },
+        {
+          "locator": "Page 2, immediately before Definition 2.1",
+          "quote": "Our results apply for either the add-remove or swap notions of neighboring databases.",
+          "supports": "The permitted adjacency relations."
+        }
+      ],
+      "citation": "Joseph, Kulesza, and Yu (2025), Approximate Differential Privacy of the l2 Mechanism",
+      "pdf_link": null,
+      "publish_year": "2025",
+      "section_number": "2",
+      "subject": "Privacy Mechanisms",
+      "topic": "K-norm Mechanism",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    },
+    {
+      "candidate_id": "pos-joseph25-l2-mse",
+      "source_id": "joseph25a-1-63074cceccc6",
+      "question_tex": "Let $d\\in\\mathbb N$ and $\\sigma>0$. The $d$-dimensional $\\ell_2$ mechanism releases $T(X)+Y$, where $Y\\in\\mathbb R^d$ has density proportional to $\\exp(-\\|y\\|_2/\\sigma)$. Is its mean squared $\\ell_2$ error equal to $\\mathbb E\\|Y\\|_2^2=d(d+1)\\sigma^2$?",
+      "label": 1,
+      "expected_answer": "yes",
+      "proof": "Use spherical coordinates and write $R=\\|Y\\|_2$. The angular factor cancels in normalization, so $R$ has density $r^{d-1}e^{-r/\\sigma}/(\\Gamma(d)\\sigma^d)$ for $r\\ge0$, i.e. a Gamma distribution with shape $d$ and scale $\\sigma$. Therefore $\\mathbb E\\|Y\\|_2^2=\\mathbb E[R^2]=\\sigma^2\\Gamma(d+2)/\\Gamma(d)=d(d+1)\\sigma^2$. Equivalently, this is the $p=2$ specialization of Lemma 4.1. The exact result is stated as Corollary 4.3 on page 8, and the general moment calculation is given on pages 14--15.",
+      "assumptions": [
+        "$d$ is a positive integer.",
+        "$\\sigma>0$.",
+        "The noise density is exactly proportional to $\\exp(-\\|y\\|_2/\\sigma)$."
+      ],
+      "source_evidence": [
+        {
+          "locator": "Page 8, Corollary 4.3",
+          "quote": "The $\\ell_2$ mechanism with parameter $\\sigma$ has mean squared $\\ell_2$ error $d(d+1)\\sigma^2$.",
+          "supports": "The exact mean-squared-error formula."
+        },
+        {
+          "locator": "Pages 14--15, proof of Lemma 4.1",
+          "quote": "The mean squared $\\ell_2$ error of the $d$-dimensional $\\ell_p$ mechanism with parameter $\\sigma$ is ...",
+          "supports": "The general radial moment calculation whose $p=2$ specialization yields the corollary."
+        }
+      ],
+      "citation": "Joseph, Kulesza, and Yu (2025), Approximate Differential Privacy of the l2 Mechanism",
+      "pdf_link": null,
+      "publish_year": "2025",
+      "section_number": "4.2",
+      "subject": "Privacy Mechanisms",
+      "topic": "l2 Mechanism",
+      "generator_checks": {
+        "all_symbols_defined": true,
+        "adjacency_explicit_or_irrelevant": true,
+        "parameter_domains_preserved": true,
+        "claim_matches_source": true,
+        "proof_is_self_contained": true
+      }
+    }
+  ]
+}

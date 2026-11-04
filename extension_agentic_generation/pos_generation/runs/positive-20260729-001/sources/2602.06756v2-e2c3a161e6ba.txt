@@ -1,0 +1,4625 @@
+--- PAGE 1 ---
+f-Differential Privacy Filters: Validity and
+Approximate Solutions
+Long Tran1 Antti Koskela2 Ossi Räisä3∗ Antti Honkela1
+1Department of Computer Science, University of Helsinki, Finland
+2Nokia Bell Labs, Espoo, Finland
+3CISPA Helmholtz Center for Information Security, Saarbrücken, Germany
+Abstract
+Accounting for privacy loss under fully adaptive composition—where mechanism
+choice and privacy parameters may depend on the history of prior outputs—is a
+central challenge in differential privacy (DP). Here, privacy filters are stopping
+rules ensuring a prescribed global budget is not exceeded. A leading candidate
+for optimal filter design is f-DP, which characterizes the full extent of adversar-
+ial hypothesis testing and recovers (ε, δ)-DP through piece-wise linear trade-off
+functions, while enabling tight (ε, δ)-DP accounting in standard compositions via
+tensor products. Yet whether such filters can be correctly defined under f-DP
+remains unclear. We show that the natural f-DP filter—tracking path-wise accu-
+mulating tensor products and stopping when the prescribed curve is crossed—is
+fundamentally invalid, precluding the direct use of standard efficient numerical
+Fast-Fourier-Transform accounting in the fully adaptive setting. We character-
+ize this failure, establishing necessary and sufficient conditions for the natural
+filter’s validity. Furthermore, we prove a fully adaptive central limit theorem for
+f-DP, establishing Gaussian convergence of cumulative privacy losses under full
+adaptivity. As a demonstration, we construct a closed-form approximate GDP
+filter for subsampled Gaussian mechanisms that provably outperforms RDP-based
+accounting in asymptotic regimes ( q≪1 and q≈1 ) without tracking the full
+trade-off function, demonstrating that the slack in RDP is not intrinsic to adaptive
+composition—though CLT-based approximations are known to be optimistic at
+realistic subsampling rates, a limitation that remains an open challenge.
+1 Introduction
+Differential privacy (DP) rigorously quantifies privacy loss from computations on sensitive
+data (Dwork et al., 2006; Dwork and Roth, 2014). A key property is composition: complex al-
+gorithms can be analyzed by composing privacy guarantees of simpler mechanisms. Common
+composition results require knowing privacy parameters beforehand. However, fully adaptive compo-
+sitions—where mechanisms and their privacy parameters depend on prior outputs—are essential for
+iterative algorithms like differentially private stochastic gradient descent and adaptive data analysis.
+Accounting for privacy loss in this setting is a central challenge.
+Privacy filters and odometers formalize fully adaptive composition for(ε, δ)-DP (Rogers et al., 2016),
+and Rényi DP (RDP) admits simple, tight filters under full adaptivity (Feldman and Zrnic, 2021),
+making RDP-based accounting the current state of the art. In contrast, much less is understood about
+fully adaptive composition for f-DP (Dong et al., 2022). Only in the special case of Gaussian DP
+(GDP) can accurate fully adaptive bounds be obtained (Koskela et al., 2023). Applying the f-DP
+∗Work primarily done while at the University of Helsinki.
+Preprint.
+arXiv:2602.06756v2  [cs.CR]  12 May 2026
+
+--- PAGE 2 ---
+tensor product gives the tightest composition results for non-adaptive compositions—and since any
+(ε, δ)-DP guarantee admits an exact equivalent piece-wise linear trade-off function (Dong et al.,
+2022), this tightness extends to the(ε, δ)-DP framework as well. This raises a natural question:
+Doesf-DP admit valid filters under fully adaptive composition, in analogy to RDP and GDP?
+A natural candidate filter tracks the accumulating tensor product of trade-off functions and halts once
+it crosses the prescribed f-DP budget, mirroring standard f-DP composition and adaptive RDP/GDP
+accounting schemes. Our first main result shows that this approach is fundamentally invalid.
+Failure of natural f-DP filters.We show that composing trade-off functions and stopping at a
+threshold does not, in general, guarantee that the resulting stopped interaction satisfies the samef-DP
+bound. This failure occurs even when each individual mechanism is validly f-DP and even when the
+composed trade-off function never exceeds the threshold along the realized history of outcomes. We
+give explicit negative examples and a general construction that explains when and why such failures
+arise. Moreover, we show that this phenomenon occurs for fully adaptive compositions of subsampled
+Gaussian mechanisms, the main workhorse of private machine learning. As a consequence, the
+natural filter rules out the most direct route to efficient numerical Fast-Fourier-Transform (FFT)
+accounting (Koskela et al., 2020; Gopi et al., 2021; Doroshenko et al., 2022) in the fully adaptive
+setting, blocking the standard approach for accurate(ε, δ)bounds.
+When f-DP filters are valid.While the natural f-DP filter fails in general, we show that it becomes
+valid under specific structural conditions on the trade-off functions. We provide necessary and
+sufficient conditions under which stopping based on composed trade-off curves yields a correct f-DP
+guarantee. These conditions clarify why divergence-based notions such as RDP admit simple filters
+under full adaptivity, while trade-off-function-based notions do not.
+Fully adaptive f-DP central limit theorem.We prove a central limit theorem (CLT) for adaptive
+privacy loss processes, extending the non-fully adaptive CLT of Dong et al. (2022) to the fully adaptive
+setting via a modern variant of the martingale Berry–Esseen bound (Fan, 2019). This CLT suggests a
+general methodology for constructing approximate GDP filters: any mechanism family admitting
+closed-form PLRV moment approximations yields a closed-form approximate filter, with the CLT
+error quantifying approximation quality. As a demonstration, we instantiate this methodology for
+subsampled Gaussian mechanisms. At realistic subsampling rates, the resulting filter underestimates
+privacy loss—a known limitation of CLT-based Gaussian approximations even in the non-adaptive
+setting (Zheng et al., 2020; Gopi et al., 2021; Alghamdi et al., 2023). In the extreme low- and
+high-subsampling regimes, however, it yields asymptotically valid guarantees strictly tighter than the
+fully adaptive RDP accounting of Feldman and Zrnic (2021), without ever tracking the full trade-off
+function, demonstrating that the slack in RDP stems from the lossy reduction to Rényi divergences
+rather than any fundamental barrier in adaptive composition.
+Contributions.The main contributions of this paper are as follows:
+1. We show that the natural f-DP filter — which composes individual trade-off functions and
+stops at a prescribed threshold — is not valid under fully adaptive composition, precluding
+the direct extension of FFT numerical accounting to such setting. We provide explicit
+counterexamples and a general construction of this failure. We show that this failure occurs
+even when we restrict to subsampled Gaussian mechanisms. (Corollary 3.3, Figure 1)
+2. We establish necessary and sufficient conditions under which the natural f-DP filter be-
+comes valid, characterizing when trade-off-function-based accounting is possible under full
+adaptivity. (Theorems 3.5 and 3.6)
+3. We prove a fully adaptivef-DP central limit theorem, establishing that cumulative privacy
+losses converge to Gaussian distributions, yielding GDP bounds under full adaptivity. This
+extends the non-adaptive CLT of Dong et al. (2022) via martingale Berry–Esseen techniques,
+and suggests a general methodology for constructing approximate GDP filters for any
+mechanism family admitting closed-form PLRV moment approximations. (Theorem 4.1)
+4. As a demonstration of our CLT, we instantiate this methodology for subsampled Gaussian
+mechanisms, constructing a closed-form approximate GDP filter that yields strictly tighter
+guarantees than fully adaptive RDP accounting in asymptotic regimes q≪1 and q≈1 ,
+without tracking the full trade-off function. (Algorithm 2)
+Related work.Privacy filters were introduced by Rogers et al. (2016), who formalized fully adaptive
+composition for (ε, δ)-DP and established the foundations of filter-based accounting. Feldman and
+2
+
+--- PAGE 3 ---
+Zrnic (2021) showed that Rényi DP admits simple and tight privacy filters under full adaptivity,
+with the added flexibility of individual privacy accounting. Whitehouse et al. (2023) subsequently
+constructed approximate Rényi DP filters achieving essentially no loss in tightness relative to advanced
+standard composition. In the GDP setting, Koskela et al. (2023) developed an accurate fully adaptive
+filter exploiting the Gaussian structure. Haney et al. (2025) studied the transfer of filters from the
+noninteractive to the interactive setting under a general framework that includesf-DP, but did not
+analyze specific filter constructions. Independently and concurrently, Regehr et al. (2026) also
+prove that the natural f-DP filter is invalid and provide complementary validity conditions. Beyond
+this shared result, we additionally prove a fully adaptive f-DP central limit theorem that suggests
+a general methodology for constructing approximate GDP filters via mechanism-specific PLRV
+moment approximations, of which the subsampled Gaussian filter is one instantiation.
+2 Background
+Differential Privacy.A mechanism M is a function that maps a dataset input S=(X 1, . . . , Xn) to
+a distribution M(S) on a space O of possible outputs. We call (S, S−) remove neighbours if S− is
+obtained by removing one datapoint fromS.
+Definition 2.1(Differential Privacy).A mechanism M is (ε, δ)-DP if for any remove pair S and S−,
+P[M(S)∈A]≤e εP
+
+M
+
+S−
+∈A
+
++δandP
+
+M
+
+S−
+∈A
+
+≤e εP[M(S)∈A] +δ
+for all setAin the output spaceO. Whenδ= 0, we shorten(ε,0)-DP intoε-DP.
+Definition 2.2.Given distributionsP, Qon a common spaceO, the trade-off function is defined as
+T[P, Q](α) = inf
+ϕ:O→[0,1]
+{1−E Q[ϕ] :E P [ϕ]≤α}.
+When treating the pair (P, Q) as a binary testing problem of H0 :y∼P vs. H1 :y∼Q , the
+function ϕ is a randomized rejection rule that maps y∈ O to the probability ϕ(y) of accepting H1.
+Then, EP [ϕ] is the false positive rate (FPR), while 1−E Q[ϕ] is the false negative rate (FNR), and
+henceT[P, Q]represents the optimal FNR at any FPRα∈[0,1].
+Theorem 2.3.A function f: [0,1]→[0,1] is the trade-off function of some distribution pair if and
+only iff(α)≤1−α,fis decreasing, convex, continuous.
+An everywhere smaller trade-off function means a uniformly easier testing problem, and hence
+weaker privacy protection.
+Definition 2.4.Two trade-off functionsf 1, f2 are Blackwell ordered iff 1 ≥f 2 orf 1 ≤f 2.
+Definition 2.5( f-Differential Privacy).A mechanism M is f-DP where f is a trade-off function, if
+T
+
+M(S),M
+
+S−
+≥fandT
+
+M
+
+S−
+,M(S)
+
+≥f
+point-wise for any remove pairS, S −. In particular,Misµ-GDP if it isG µ-DP:
+Gµ =T[N(0,1),N(µ,1)] =T[N(0, 1/µ2),N(1, 1/µ2)].
+The subsampled Gaussian trade-off function of a remove pair isSG −
+q,µ =
+
+SG+
+q,µ
+−1
+where
+SG+
+q,µ(α) =T[N(0,1),(1−q)N(0,1) +qN(µ,1)] = (1−q)(1−α) +qG µ(α).
+Proposition 2.6.A mechanismMis(ε, δ)-DP if and only if it isf ε,δ-DP for
+fε,δ(α) = max
+
+0,1−δ−e εα,e −ε(1−δ−α)
+
+.
+By deploying (ε, δ)-DP as fε,δ-DP, all results for f-DP immediately apply to (ε, δ)-DP as well. In
+particular, thef-DP standard composition results is expressed via tensor products
+T[P 1, Q1]⊗T[P 2, Q2] =T[P 1 ×P 2, Q1 ×Q 2],
+from which we can derive the tight(ε, δ)-DP of standard compositions.
+3
+
+--- PAGE 4 ---
+Theorem 2.7( f-DP Composition).If M1 is tightly f1-DP , and the adaptively chosenM2 is f2-DP
+where f2 is fixed and tight, then (M1,M 2) is f1 ⊗f 2-DP . In particular, ifM1 is µ1-GDP and M2
+is µ2-GDP , then(M1,M 2) is
+p
+µ2
+1 +µ 2
+2-GDP . Moreover,f1 ⊗f 2 can be converted into the tight
+(ε, δ)-DP guarantee at eachε >0,
+min{δ≥0 : (M 1,M 2)is(ε, δ)-DP}= min{δ≥0 :f 1 ⊗f 2 ≥f ε,δ}.
+Definition 2.8.For distributions (P, Q) on a common space O, denote L= ln P
+Q. The PLRVs are
+defined as L(y), y∼P and L(y), y∼Q . The PLRV density is called the privacy loss density (PLD).
+The cdf of each PLRV characterizes the FPR and FNR of likelihood ratio tests, directly represent-
+ing the trade-off function via the Neyman-Pearson lemma. Under compositions, PLRVs sum as
+ln M1:T (S)
+M1:T (S−) =P ln Mt(S)
+Mt(S−), indicating CLT-based convergence to Gaussian distributions.
+Extended DP Notions.In adaptive composition, the next distributions P2(y1) and Q2(y1) are chosen
+based on the realization y1 ∼P 1 and y1 ∼Q 1, respectively. We denote then the adaptive product as
+T[P 1, Q1]⊗ adapt T[P 2(y1), Q2(y1)] =T[P 1 ×P 2(y1), Q1 ×Q 2(y1)].(1)
+Let F be a family of trade-off functions. The greatest lower bound of F is not the point-wise
+infimum, but rather the lower convex envelope of that infimum, denoted f ↓ =ce inf f∈F f. For a
+single trade-off functionf, we define its symmetrization as sym(f) =ce min(f, f −1).
+Not all trade-off functions are Blackwell ordered, so the bound f ↓ of a family F can deviate
+significantly from every f∈ F . Kaissis et al. (2024) proposed ∆-divergence to measure the distance
+between two arbitrary trade-off functions. We then define convergence of trade-off functions via
+∆-divergence, and prove its equivalence to other convergence notions (see Theorem C.8).
+Definition 2.9.The lower closure ¯F of a family F of trade-off functions is the set of all limits of any
+everywhere increasing sequence inF. We furthermore defineF ⊗ =
+
+f⊗g:f∈ F, g∈ ¯F
+	
+.
+In addition, we use∆-divergence to extend GDP to privacy guarantees that converge to it.
+Definition 2.10.A mechanismMis∆-approximatelyµ-GDP if itsf-DP guarantee satisfies
+Gµ(α+ ∆)−∆≤f(α)≤G µ(α−∆) + ∆for allα.
+Fully Adaptive Composition.Fully adaptive composition extends standard composition by allowing
+mechanism choice and privacy parameters to depend arbitrarily on the history of prior outputs. This is
+crucial in practice: in DP-SGD, for instance, committing to a fixed schedule of qt and σt in advance
+is often suboptimal for utility, yet adapting them based on observed model behaviour or remaining
+privacy budget requires exactly this framework.
+Algorithm 1Privacy filter in fully adaptive com-
+position
+inputAdaptively chosen mechanisms M(y1:t−1)
+t (·)
+fort= 1, . . . , T, privacy budgetω B, datasetS.
+fort= 1toTdo
+computeprivacy levelω t ofM (y1:t−1)
+t
+ifF(ω B, ω1, . . . , ωt) =HALTthen
+return(y 1, . . . , yt−1)
+computey t ← M(y1:t−1)
+t (S)
+return(y 1, . . . , yT )
+Under full adaptivity, privacy parameters be-
+come random variables dependent on the
+stochastic outcomes of previous mechanisms,
+requiring path-dependent privacy accounting
+methods where the composition length itself
+may be random. To manage this complexity,
+Rogers et al. (2016) introduced privacy filters
+and privacy odometers as two complementary
+approaches. Privacy filters are adaptive stop-
+ping rules that halt mechanism releases to ensure
+pre-specified privacy guarantees, while privacy
+odometers track cumulative privacy loss without
+requiring a fixed budget in advance. Since odometers must ensure valid privacy bounds at any
+analyst-chosen stopping time, they present significant theoretical and practical difficulties. In this
+work, we focus on privacy filters (Algorithm 1), which maintain fixed privacy guarantees at the cost
+of random stopping times. Here, the privacy level is denoted ωt due to the freedom to choose DP
+definitions. Central to the composition, the privacy filter F compares the privacy parameters ω1:t
+realized so far to the budgetω B to determine whether the upcoming mechanism release is allowed.
+Definition 2.11.A privacy filter F is valid if given any sequence of mechanisms M1:T and any
+budgetω B, Algorithm 1 produces a composition that satisfies a privacy guarantee equal toω B.
+4
+
+--- PAGE 5 ---
+Among several valid filters developed in previous work (e.g. Feldman and Zrnic, 2021; Whitehouse
+et al., 2023), the GDP filter by Koskela et al. (2023) directly adapts the standard GDP composition
+result to the filtering framework, and provides a foundation for our more generalf-DP results.
+Theorem 2.12.With GDP guaranteesω t =µ t, the following filter is valid (cf. Theorem 2.7):
+F(µ B, µ1, . . . , µt) =
+CONTif Pt
+i=1 µ2
+i ≤µ 2
+B,
+HALTotherwise.
+3 Naturalf-DP Filter
+We first give the formal definition of the naturalf-DP filter construction.
+Definition 3.1.The naturalf-DP filter is defined as
+F(f B, f1, . . . , ft) =
+CONT iff 1 ⊗. . .⊗f t ≥f B,
+HALT otherwise.
+This filter keeps track of the realized trade-off functions ft of the released mechanisms and compares
+their tensor product with the budget fB. Such a procedure is motivated by the standard f-DP
+composition theorem (Theorem 2.7), and it is a direct generalization of the valid GDP filter (Theorem
+2.12). It is therefore tempting to expect validity under full adaptivity as well—which would also
+allow numerical PLD composition methods (Koskela et al., 2020; Gopi et al., 2021; Doroshenko
+et al., 2022) to extend to this setting. We show that this validity claim is false in general.
+Calibration Point and Filter Invalidity.To understand this failure, we reduce to a two-step adaptive
+composition, since the general case can be viewed through this setting. The first mechanism has a
+trade-off of f1, and the second adaptively chosen mechanism has a trade-off of f(y1)
+2 which can be
+selected arbitrarily from a family F2. The true composition is described by the adaptive product of f1
+andf (y1)
+2 , whereas the naturalf-DP filter only tracks the standard productsf 1 ⊗f (y1)
+2 .
+Theorem 3.2(Adaptive Tightness of Theorem 2.7).Let f1 be a fixed trade-off function, and let F2
+be a family of trade-off functions. Denote the greatest lower bound f ↓
+2 =ce inf f2∈F2 f2. Then, for
+any adaptive choice y1 7→f (y1)
+2 ∈ F 2, the adaptive product of f1 and f(y1)
+2 is lower bounded by
+f1 ⊗f ↓
+2 . Moreover, this bound is tight:
+f1 ⊗f ↓
+2 =ce min
+
+f1 ⊗adapt f(y1)
+2
+
+.
+More precisely, at each FPR α∈(0,1) , there exists an adaptive choice y1 7→f (y1)
+2 such that
+the adaptive product f1 ⊗adapt f(y1)
+2 is arbitrarily close to the lower bound f1 ⊗f ↓
+2 at α (but not
+necessarily at other FPRs).
+Suppose there exist f21, f22 ∈ F2 that intersect at an FPR α0 (a calibration point, see Kaissis et al.,
+2024). Their lower envelope f ↓
+2 =ce min(f 21, f22) then falls below both f21 and f22 on some
+interval containing α0. Consequently, f1 ⊗f ↓
+2 can be strictly smaller than both f1 ⊗f 21 and f1 ⊗f 22:
+the former captures all extent of the true effect achievable under adaptive selection over F2, whereas
+the latter are the per-branch bounds monitored by the naturalf-DP filter.
+Corollary 3.3.The f-DP filter is not valid for subsampled Gaussian mechanisms (and is thus
+not valid in general): There exist f1, f21, f22 that are (tensor products of) subsampled Gaus-
+sian trade-off functions, and a budget fB, such that f1 ⊗f 21 ≥f B and f1 ⊗f 22 ≥f B, but
+(f1 ⊗ce min(f 21, f22))(α)< f B(α)at some FPRα∈(0,1). See Figure 1.
+Such crossings are generic in common mechanism families, including Laplace mechanisms. The
+absence of crossings for (tensor products of) Gaussian trade-off functions is a notable special case.
+Additional details and proofs for the material up to this point are deferred to Appendix B.
+Blackwell Chains and Filter Characterization.By contrast, this issue does not occur for RDP or
+GDP filters, since their guarantees are scalar-valued and therefore always comparable. This motivates
+imposing structural assumptions under which the naturalf-DP filter becomes valid.
+5
+
+--- PAGE 6 ---
+0.0 0.2 0.4 0.6 0.8 1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+f ( )
+f21
+f22
+0.0 0.2 0.4 0.6 0.8 1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+fB
+f1 ×adapt f(y1)
+2
+0.0 0.2 0.4 0.6 0.8 1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+sym(fB)
+sym(f1 ×adapt f(y1)
+2 )
+Figure 1: Counterexample showing that the natural f-DP filter can fail in fully adaptive composition
+of subsampled Gaussian mechanisms (Corollary 3.3). We fix q= 0.5 , set f1 =SG −
+q,1.3, f21 =
+SG−
+q,0.1 ⊗SG −
+q,10, f22 =SG −
+q,2 ⊗SG −
+q,2, and define the budget fB =ce min(f 1 ⊗f 21, f 1 ⊗f 22).
+Left: the two candidate future trade-off functions cross (not Blackwell-ordered).Middle: each branch
+passes the budget check, but the realized adaptive composition still falls below fB, violating validity.
+Right: the violation persists after symmetrization into appropriatef-DP guarantee.
+Definition 3.4(Blackwell Chain).A family F of trade-off functions is a Blackwell chain if F is
+totally ordered with respect to the Blackwell order:f 1 ≥f 2 orf 1 ≤f 2 for anyf 1, f2 ∈ F.
+For any Blackwell chain F, the trade-off functions f∈ F can approach the greatest lower bound
+f ↓ =ce inf f∈F f arbitrarily close FPR-uniformly. Gaussian trade-off functions form such a chain,
+with Gµ decreasing in µ and their lower bound approximated uniformly. Thus, the Blackwell chain
+assumption removes the gap between adaptive products and standard products (as in Corollary 3.3)
+and ensures validity of thef-DP filter.
+Theorem 3.5.Let F be the family of tight f-DP guarantees of mechanisms available for adaptive
+selection at each step. The natural f-DP filter is valid in fully adaptive composition of up to T≥2
+steps ifF ( ⊗)(T−2) is a Blackwell chain.
+The form F( ⊗)(T−2) arises from reducing T -step adaptive composition to a two-step setting, where
+the first and second trade-off functions are drawn from F and F( ⊗)(T−2) , respectively. The proof
+(Appendix D) shows that the Blackwell chain assumption allows one to conclude that if every
+f2 ∈ F ( ⊗)(T−2) satisfies f1 ⊗f 2 ≥f B, then f ↓
+2 does as well. This deduction is a generalization of
+the RDP filter proof in Feldman and Zrnic (2021) and the GDP filter proof in Koskela et al. (2023),
+extended from scalar to function objects. As Gaussian trade-off functions are closed under tensor
+products, Theorem 3.5 straightforwardly recovers the valid GDP filter as a special case.
+The notion of lower closure ¯F within F ⊗ used above relies on convergence of trade-off functions,
+for which we adopt ∆-divergence (Kaissis et al., 2024) as the underlying metric. As an independent
+technical contribution, we prove that convergence in ∆-divergence is equivalent to pointwise conver-
+gence on (0,1] and to uniform convergence on compact subsets within(0,1] (Theorem C.8, Appendix
+C), providing a flexible toolkit for theoretical analyses of trade-off function approximations.
+We conclude this section by sharpening Corollary 3.3 into a general converse statement.
+Theorem 3.6.Let F be the family of tight f-DP guarantees of mechanisms available for adaptive
+selection at each step. In fully adaptive composition of up toTsteps, if:
+1. Some mechanism at step 1 is notε-DP for anyε, and
+2.F ( ⊗)(T−2) fails to be a Blackwell chain,
+then thef-DP filter is invalid.
+Theorem 3.5 and Theorem 3.6 together yield a sharp characterisation:Beyond ε-DP mechanisms, the
+naturalf-DP filter is valid if and only ifF ( ⊗)(T−2) is a Blackwell chain.
+4 Fully Adaptivef-DP Central Limit Theorem
+Fully Adaptive Central Limit Theorem.Having established when the natural exact f-DP filter
+is and is not valid, we move on to proving a central limit theorem for fully adaptive privacy loss
+6
+
+--- PAGE 7 ---
+processes. In contrast to the previous section, we analyze the composition structure through the
+stochastic process of PLRVs. At each step t, the output yt extends the observed history y1:t−1, which
+in turn governs the choice of the next pair of distrbutions (Pt+1, Qt+1) and hence the next PLRV
+Lt+1. If a filter halts the composition early, all subsequent PLRVs are set to zero. The total privacy
+loss is thus the terminal value of a stochastic process — a running sum of sequentially realized
+log-likelihood ratios, each drawn from a distribution that may depend on all preceding outputs.
+Despite this adaptive feedback, the cumulative sum remains approximately Gaussian under some
+control and regularity conditions.
+Theorem 4.1.Let P1, . . . , PT and Q1, . . . , QT be adaptive sequences of distributions, where for
+each t, the choices of Pt and Qt may depend on the past realizations y1, . . . , yt−1 drawn under
+P1, . . . , Pt−1 and Q1, . . . , Qt−1, respectively. Define Lt = ln Pt
+Qt
+as the PLRV at step t, and let
+P= QT
+t=1 Pt, Q= QT
+t=1 Qt, and y= (y 1, . . . , yT ). We assume that the following conditions hold
+with probability 1:
+1.
+
+PT
+t=1 Ey∼P [Lt(yt)|y 1:t−1]−m 1
+ ≤η 1,
+2.
+PT
+t=1 Ey∼Q[Lt(yt)|y 1:t−1] +m 2
+ ≤η 2,
+3.
+PT
+t=1 Vary∼P [Lt(yt)|y 1:t−1]−v
+ ≤κ,
+4.
+PT
+t=1 Vary∼Q[Lt(yt)|y 1:t−1]−v
+ ≤κ,
+5.E y∼P
+h
+|Lt −E y∼P [Lt(yt)|y 1:t−1]|3
+ y1:t−1
+i
+≤ρ·Var y∼P [Lt(yt)|y 1:t−1]for allt,
+6.E y∼Q
+h
+|Lt −E y∼Q[Lt(yt)|y 1:t−1]|3
+ y1:t−1
+i
+≤ρ·Var y∼Q[Lt(yt)|y 1:t−1]for allt.
+Here, we require that4ρ2 ≤v and 4κ≤v . Under these assumptions, the trade-off function T[P, Q]
+satisfies the following inequalities for allα:
+Gµ+ϕ(α+ ∆)−∆≤T[P, Q](α)≤G µ−ϕ(α−∆) + ∆,
+whereµ= m1+m2√v ,ϕ= η1+η2√v , and∆ =C
+
+ρ√v
+ln ρ√v
+ +p κ
+v
+
+for some universal constantC.
+Our fully adaptive CLT generalizes the non-adaptive CLT of Dong et al. (2022). Instead of relying
+on the classical Berry–Esseen theorem, the proof’s main idea (detailed in Appendix E) applies the
+martingale Berry–Esseen theorem of Fan (2019) to the martingale differences
+Lt(yt)−E y∼P [Lt(yt)|y 1:t−1]√v , y∼Pand Lt(yt)−E y∼Q[Lt(yt)|y 1:t−1]√v , y∼Q.
+Conditions 5–6 control higher-order moments relative to variance, ensuring no small number of steps
+dominates privacy loss and allowing a Gaussian approximation with error∆ of such form—where
+the constant C, inherited from Fan (2019), is not tracked explicitly as is standard in this literature.
+Conditions 1–4 ensure path-realized sums of conditional means and variances remain approximately
+constant, reflecting moment computation from Dong et al. (2022).
+More broadly, Conditions 1–4 suggest a general methodology for constructing approximate GDP
+filters: any mechanism family for which the cumulative conditional means and variances of PLRVs
+can be approximated analytically admits a closed-form approximate filter via Theorem 4.1. The
+resulting filter tracks these moment approximations in place of the full trade-off function, with the
+CLT error∆quantifying the approximation quality.
+Demonstration: Approximate GDP Filter for Subsampled Gaussian Mechanisms.We derive
+closed-form PLRV moment approximations for subsampled Gaussian mechanisms in the asymptotic
+regimes q≪1 and q≈1 . For an arbitrary remove pair S, S−, let P=M(S) and Q=M(S −)
+denote the mechanism outputs, with σ the Gaussian noise and µ the norm of the removed datapoint’s
+contribution. The leading-order Taylor expansions give:
+1. Forq≪1,E P
+h
+ln P
+Q
+i
+≈ −E Q
+h
+ln P
+Q
+i
+≈ 1
+2VarP
+h
+ln P
+Q
+i
+≈ 1
+2VarQ
+h
+ln P
+Q
+i
+≈ 1
+2 q2
+
+e
+µ2
+σ2 −1
+
+.
+2. Forq≈1,E P
+h
+ln P
+Q
+i
+≈ −E Q
+h
+ln P
+Q
+i
+≈ 1
+2VarP
+h
+ln P
+Q
+i
+≈ 1
+2VarQ
+h
+ln P
+Q
+i
+≈ 1
+2 q2 µ2
+σ2 .
+7
+
+--- PAGE 8 ---
+Algorithm 2:Approximate GDP Filter in Fully
+Adaptive Composition of Subsampled Gaussian
+Mechanisms
+Algorithm 3:Individual Privacy Accounting for
+Subsampled Gaussian Mechanisms via Approxi-
+mate GDP Filtering
+common inputBoolean flag ˜q, dataset S. Adaptively chosen sequence of objects for t= 1, . . . , T :
+functions gt(·, y1:t−1), sampling rates qt(y1:t−1), noise scales σt(y1:t−1) in [¯σ,∞), clips Ct(y1:t−1).
+additional inputprivacy budgetB.
+fort= 1toTdo
+chooseg t, qt, σt, Ct based ony 1:t−1
+ift= 1thenB t ←B
+elseB t ←B t−1 −Budg(˜q, qt−1, σt−1,1)
+CB,t ←C t ·invBudg(˜q, qt, σt, Bt)
+sampleS t fromSat rateq t
+forX j ∈S t do
+`gt,j ←g t(Xj)·min
+h
+1, min(Ct,CB,t)
+∥gt(Xj)∥
+i
+yt ←P
+Xj ∈St `gt,j +N
+
+0, σ2
+t C2
+t I
+
+ifC B,t ≤C t then break
+returny 1, . . . , yt
+additional inputdataset size n, per-datapoint
+budgetsB j forj= 1, . . . , n.
+fort= 1toTdo
+chooseg t, qt, σt, Ct based ony 1:t−1
+forX j inSdo
+ift= 1thenB t,j ←B j
+elseB t,j ←B t−1,j−
+Budg(˜q, qt−1, σt−1Ct−1,∥`gt−1,j∥)
+CB,t,j ←invBudg(˜q, qt, σtCt, Bt,j)
+`gt,j ←g t(Xj)·min
+h
+1, min(Ct,CB,t,j)
+∥gt(Xj)∥
+i
+sampleS t fromSat rateq t
+yt ←P
+Xj ∈S `gt,j +N
+
+0, σ2
+t C2
+t I
+
+returny 1, . . . , yT
+Crucially, these terms depend on the remove pair only through µ, making them pair-invariant and
+enabling a path-wise filter that certifies privacy uniformly over all neighbouring pairs. We denote these
+per-step approximations Budg(˜q, q, σ, µ), with ˜q∈ {0,1} indicating the regime. Approximation
+errors are numerically negligible for q <0.2 and q >0.8 ; proofs and error bounds are in Appendix F.
+Algorithm 2 instantiates one approximate GDP filter, allowing qt ∈(0,¯q] with ¯q≪1 (regime ˜q= 0)
+or qt ∈[¯q,1] with ¯q≈1 (regime ˜q= 1). The function invBudg is the algebraic inverse ofBudg in µ,
+returning the clipping level that exactly uses the remaining budget. Since the PLRV mean equals the
+Rényi divergence of order one, the filter can be interpreted as an approximate order-one RDP-style
+filter, while providing a final guarantee of approximate GDP.
+The following scaling conditions ensure the total privacy spend remains non-degenerate as T grows:
+T¯q2 = Θ(1) as ¯q→0 for regime ˜q= 0, and T¯σ−2 = Θ(1) with ˆq:= 1−¯q=O(¯σ−2) as ¯σ→ ∞
+for regime˜q= 1.
+Theorem 4.2.Under the above scaling assumptions, the composition of subsampled Gaussian
+mechanisms produced by Algorithm 2 satisfies:
+1. Near˜q= 0:∆-approx.
+√
+2B+O(¯q)
+
+-GDP , with an error∆ =O( √¯q)as¯q→0.
+2. Near˜q= 1:∆-approx.
+√
+2B+O(¯σ−2)
+
+-GDP , with an error∆ =O
+ ln ¯σ
+¯σ
+
+as¯σ→ ∞.
+Theorem 4.2 is derived by applying Theorem 4.1 with m1 =m 2 =B and v= 2B to an arbitrary
+remove pair (Appendix E). Verification that the CLT conditions hold in each regime is given by
+Theorems F.1 and F.2. The errors here vanish as¯q→0 or ¯σ→ ∞, so the guarantee approaches exact√
+2B-GDP in each regime. Since the RDP-to-f-DP conversion is inherently lossy by a nonvanishing
+factor (Zhu et al., 2022), appropriate parameter selection yields strictly tighter guarantees than fully
+adaptive RDP accounting.
+The CLT methodology extends naturally to individual privacy accounting. Algorithm 3 replaces the
+single global budget of Algorithm 2 with per-individual budgets Bt,j for each datapoint Xj ∈S ,
+updating privacy costs using ∥`gt−1,j∥ rather than the shared worst-case bound Ct−1. The budget-
+aware clipping threshold CB,t,j is chosen so that the next update cannot overspend Bt,j; once
+depleted, CB,t,j = 0 and Xj contributes no further. In fact, Algorithm 3 generalizes the individual
+accounting of Feldman and Zrnic (2021) fromq= 1to both asymptotic regimesq≪1andq≈1.
+Theorem 4.3.Suppose the initial individual budgets are uniform, i.e. Bj =B for all j= 1, . . . , n .
+Then Algorithm 3 satisfies identical asymptotic privacy guarantees as stated in Theorem 4.2.
+Numerical Validation via Monte Carlo Simulation.We validate Theorem 4.2 through Monte Carlo
+simulation of DP-SGD-like fully adaptive compositions (Appendix G). We compare the theoretical
+8
+
+--- PAGE 9 ---
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+2.8 2.9 3.0 3.1 3.2
+10 8
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+(c)
+2B-GDP
+Empirical
+(1, B)-RDP
+1.0
+ 0.5
+ 0.0 0.5 1.0 1.5
+Privacy Loss
+0.000
+0.002
+0.004
+0.006
+0.008
+0.010
+0.012
+CDF Error
+(b)
+CDF Discrepancy
+= 0.0125
+Figure 2: Monte Carlo validation of Theorem 4.2 (Approximate GDP Filter, Algorithm 2) via
+Theorem 4.1 (Fully Adaptive Central Limit Theorem).(a)Empirical CDF vs. Gaussian approxima-
+tion: confirms CLT convergence.(b)CDF discrepancy: empirical ∆≈0.0125 (maximum CDF
+discrepancy), a large deviation from
+√
+2B-GDP bound.(c)Comparison between privacy bounds:
+(1, B)-RDP (single-order; the structurally equivalent baseline to our filter) is significantly pessimistic,√
+2B-GDP is optimistic. Comparison against multi-order RDP filters would be methodologically
+mismatched, as our filter never accesses higher-order information.
+√
+2B-GDP bounds against the true privacy bounds and those from the single-order(1, B)-RDP filter—
+the structurally equivalent baseline, as the approximate GDP filter operates by tracking order-one
+Rényi divergence (see below).
+Figure 4 illustrates Gaussian convergence of the empirical PLD and the corresponding privacy bound
+comparison. At q= 0.1 , the
+√
+2B-GDP approximation underestimates privacy loss—a known
+limitation of CLT-based approximations even in the non-adaptive case (Zheng et al., 2020; Gopi et al.,
+2021; Alghamdi et al., 2023)—while the(1, B)-RDP bound is notably pessimistic.
+Table 1: Empirical error∆ and
+√
+2B-
+GDP values across subsampling rates.
+∆decreases asq→0orq→1.
+q∆Error
+√
+2B-GDP
+0.01 0.003182 0.1775
+0.1 0.01464 0.5612
+0.199 0.02606 0.7897
+0.801 0.01463 1.416
+0.95 0.004807 1.454
+The tightness over RDP has a clear interpretation: since the
+PLRV mean equals the order-one Rényi divergence, the ap-
+proximate GDP filter effectively operates as a single order-one
+RDP filter. Unlike standardly deployed multi-order RDP fil-
+ters, this single-order structure permits more mechanisms
+to proceed, yielding strictly tighter guarantees throughout—
+though at the cost of validity outside the asymptotic regimes.
+Table 1 confirms that ∆ decreases as q→0 or q→1 ,
+consistent with Theorem 4.2, and becomes negligible once q
+is sufficiently extreme—at which point the
+√
+2B-GDP bound
+becomes valid and strictly outperforms fully adaptive RDP accounting, demonstrating that the slack
+in RDP stems from its lossy Rényi divergence representation rather than any fundamental barrier in
+adaptive composition. Whether tighter multi-order-equivalent approximate filters—constructed via
+the same CLT framework by tracking higher-order PLRV moments—can close the remaining gap at
+moderate subsampling rates is a natural direction for future work.
+5 Discussion and Conclusions
+This work resolves a central open question in fully adaptive privacy accounting forf-DP. We show
+that the natural f-DP filter is invalid under full adaptivity and establish necessary and sufficient
+conditions for validity—a sharp characterization that explains why divergence-based notions such
+as RDP admit simple filters while trade-off-function-based notions do not. On the constructive
+side, we prove a fully adaptive f-DP central limit theorem, establishing Gaussian convergence of
+9
+
+--- PAGE 10 ---
+cumulative privacy losses under full adaptivity, suggesting a general methodology for constructing
+approximate GDP filters via mechanism-specific PLRV moment approximations. As one instantiation,
+we construct a closed-form approximate GDP filter for subsampled Gaussian mechanisms that, in
+asymptotic regimes, yields valid guarantees strictly tighter than fully adaptive RDP accounting
+without tracking the full trade-off function—demonstrating that the slack in RDP stems from its lossy
+Rényi divergence representation rather than any fundamental barrier in adaptive composition.
+Acknowledgements
+This research was conducted in collaboration with Nokia Bell Labs, as part of Nokia’s Veturi
+program. The program is supported by funding from Business Finland, whose contribution is
+gratefully acknowledged. This work was also supported by the Research Council of Finland (Flagship
+programme: Finnish Center for Artificial Intelligence, FCAI, Grant 356499 and Grant 359111), the
+Strategic Research Council at the Research Council of Finland (Grant 358247), and the European
+Union (Project 101070617). Views and opinions expressed are however those of the author(s) only
+and do not necessarily reflect those of the European Union or the European Commission. Neither
+the European Union nor the granting authority can be held responsible for them. The authors
+acknowledge the research environment provided by ELLIS Institute Finland.
+References
+W. Alghamdi, J. F. Gomez, S. Asoodeh, F. Calmon, O. Kosut, and L. Sankar. The saddle-point
+method in differential privacy. InProceedings of the 40th International Conference on Machine
+Learning, pages 508–528, 2023.
+G. Andrew, O. Thakkar, H. B. McMahan, and S. Ramaswamy. Differentially private learning with
+adaptive clipping. InAdvances in Neural Information Processing Systems, 2021.
+J. Awan and S. Vadhan. Canonical noise distributions and private hypothesis tests. InNeurIPS 2021
+Workshop Privacy in Machine Learning, 2021.
+B. Balle, G. Barthe, and M. Gaboardi. Privacy profiles and amplification by subsampling.Journal of
+Privacy and Confidentiality, 10(1), 2020.
+C. L. Canonne, G. Kamath, and T. Steinke. The discrete Gaussian for differential privacy. In
+Proceedings of the 34th International Conference on Neural Information Processing Systems,
+2020.
+J. Dong, A. Roth, and W. J. Su. Gaussian Differential Privacy.Journal of the Royal Statistical Society
+Series B: Statistical Methodology, 84(1):3–37, 2022.
+V . Doroshenko, B. Ghazi, P. Kamath, R. Kumar, and P. Manurangsi. Connect the dots: Tighter discrete
+approximations of privacy loss distributions.Proceedings on Privacy Enhancing Technologies,
+2022:552–570, 2022.
+J. Duchi, E. Hazan, and Y . Singer. Adaptive subgradient methods for online learning and stochastic
+optimization.Journal of Machine Learning Research, 12(61):2121–2159, 2011.
+C. Dwork and A. Roth. The algorithmic foundations of differential privacy.Foundations and Trends
+in Theoretical Computer Science, 9(3–4):211–407, 2014.
+C. Dwork, F. McSherry, K. Nissim, and A. Smith. Calibrating noise to sensitivity in private data
+analysis. InTheory of Cryptography Conference, pages 265–284, 2006.
+X. Fan. Exact rates of convergence in some martingale central limit theorems.Journal of Mathemati-
+cal Analysis and Applications, 469(2):1028–1044, 2019.
+X. Fan and Q.-M. Shao. Berry–Esseen bounds for self-normalized martingales.Communications in
+Mathematics and Statistics, 6, 2017.
+V . Feldman and T. Zrnic. Individual Privacy Accounting via a Rényi Filter. InAdvances in Neural
+Information Processing Systems, pages 28080–28091, 2021.
+10
+
+--- PAGE 11 ---
+S. Gopi, Y . T. Lee, and L. Wutschitz. Numerical composition of differential privacy. InAdvances in
+Neural Information Processing Systems, pages 11631–11642, 2021.
+S. Haney, M. Shoemate, G. Tian, S. Vadhan, A. Vyrros, V . Xu, and W. Zhang. Concurrent composition
+for interactive differential privacy with adaptive privacy-loss parameters.Journal of Privacy and
+Confidentiality, 15, 2025.
+C. C. Heyde and B. M. Brown. On the Departure from Normality of a Certain Class of Martingales.
+The Annals of Mathematical Statistics, 41(6):2161–2165, 1970.
+G. Kaissis, S. Kolek, B. Balle, J. Hayes, and D. Rueckert. Beyond the Calibration Point: Mechanism
+Comparison in Differential Privacy. InProceedings of the 41st International Conference on
+Machine Learning, 2024.
+A. Koskela, J. Jälkö, and A. Honkela. Computing tight differential privacy guarantees using FFT. In
+Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics,
+pages 2560–2569, 2020.
+A. Koskela, M. Tobaben, and A. Honkela. Individual Privacy Accounting with Gaussian Differential
+Privacy. InThe Eleventh International Conference on Learning Representations, 2023.
+M. Lécuyer. Practical privacy filters and odometers with Rényi differential privacy and applications
+to differentially private deep learning.arXiv preprint arXiv:2103.01379, 2021.
+M. Regehr, B. Hu, E. Leeman, P. Manurangsi, P. Tholoniat, and M. Lécuyer. Privacy filters are
+captured by residues: A characterization of free natural filters and the cost of adaptivity.arXiv
+preprint arXiv:2602.15815, 2026.
+R. Rogers, A. Roth, J. Ullman, and S. Vadhan. Privacy odometers and filters: pay-as-you-go com-
+position. InProceedings of the 30th International Conference on Neural Information Processing
+Systems, pages 1929–1937, 2016.
+J. Whitehouse, A. Ramdas, R. Rogers, and Z. S. Wu. Fully-adaptive composition in differential
+privacy. InProceedings of the 40th International Conference on Machine Learning, 2023.
+Q. Zheng, J. Dong, Q. Long, and W. Su. Sharp composition bounds for gaussian differential privacy
+via edgeworth expansion.Proceedings of machine learning research, 119:11420–11435, 2020.
+Y . Zhu, J. Dong, and Y .-X. Wang. Optimal Accounting of Differential Privacy via Characteristic
+Function. InProceedings of The 25th International Conference on Artificial Intelligence and
+Statistics, pages 4782–4817, 2022.
+11
+
+--- PAGE 12 ---
+Contents
+1 Introduction 1
+2 Background 3
+Differential Privacy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+Extended DP Notions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+Fully Adaptive Composition . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3 Naturalf-DP Filter 5
+Calibration Point and Filter Invalidity . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+Blackwell Chains and Filter Characterization . . . . . . . . . . . . . . . . . . . . . . 5
+4 Fully Adaptivef-DP Central Limit Theorem 6
+Fully Adaptive Central Limit Theorem . . . . . . . . . . . . . . . . . . . . . . . . . 6
+Demonstration: Approximate GDP Filter for Subsampled Gaussian Mechanisms . . . 7
+Numerical Validation via Monte Carlo Simulation . . . . . . . . . . . . . . . . . . . 8
+5 Discussion and Conclusions 9
+Appendix 13
+A Additional Background: Privacy Profile 13
+A.1 Privacy Profile vs. Trade-off Function . . . . . . . . . . . . . . . . . . . . . . . 13
+A.2 Tensor Product of Trade-off Functions/Privacy Profiles . . . . . . . . . . . . . . 14
+B Counterexamples Againstf-DP Filter Validity 17
+B.1 Details of the Counterexample in Corollary 3.3 . . . . . . . . . . . . . . . . . . 18
+B.2 Proof of Adaptive Tightness of Standard Composition Results . . . . . . . . . . 19
+C Convergence of Privacy Profiles/Trade-off Functions 21
+C.1 Existence of Convergent Sequence in Blackwell Chains . . . . . . . . . . . . . . 21
+C.2 Unifying Various Notions of Convergence . . . . . . . . . . . . . . . . . . . . . 21
+D Proofs forf-DP Filter Validity via Blackwell Chains 24
+D.1 Blackwell Chain Property Impliesf-DP Filter Validity . . . . . . . . . . . . . . 24
+D.2 Failure of Blackwell Chain Property Impliesf-DP Filter Invalidity . . . . . . . 26
+E Fully Adaptive Central Limit Theorem 27
+E.1 Proof to the Fully Adaptivef-DP Central Limit Theorem . . . . . . . . . . . . 27
+E.2 Proofs for Demonstration of Approximate GDP Filter . . . . . . . . . . . . . . 29
+F Privacy Loss Moments: Approximations 30
+F.1 Numerical Illustration of Moment Approximations . . . . . . . . . . . . . . . . . 31
+F.2 Derivations Using Taylor Expansions . . . . . . . . . . . . . . . . . . . . . . . 33
+G Further Monte Carlo Simulations for the Approximate GDP Filter 40
+G.1 Conversion of RDP Order 1 to(ε, δ)-DP . . . . . . . . . . . . . . . . . . . . . 40
+G.2 Details of Monte Carlo Simulations . . . . . . . . . . . . . . . . . . . . . . . . . 41
+12
+
+--- PAGE 13 ---
+A Additional Background: Privacy Profile
+A.1 Privacy Profile vs. Trade-off Function
+The results here are standard; proofs can be found in Dong et al. (2022), Zhu et al. (2022), Kaissis
+et al. (2024). The hockey-stick divergence is an integral that directly captures (ε, δ)-DP bounds.
+Define[x] + = max(x,0).
+Definition A.1.The hockey-stick divergence at order γ≥0 of a pair of distributions P, Q with
+densitiesp, qis
+Dγ[P||Q] =
+Z
+O
+[p(y)−γq(y)] + dy= max
+A⊂O
+P(A)−γQ(A).
+A mechanism M is (ε, δ)-DP if Deε[M(S)|| M(S −)]≤δ and Deε[M(S−)|| M(S)]≤δ for all
+remove pairS, S −.
+The privacy profile on a mechanism level defined by Balle et al. (2020) is given as Definition A.5
+below. We first give a definition on the distribution level.
+Definition A.2.The privacy profile of a pair of distributions (P, Q) is a function H: [0,∞)→[0,1]
+that represents the hockey-stick divergenceH(γ) =D γ[P||Q]of all ordersγ≥0.
+Theorem A.3.A function H: [0,∞)→[0,1] is the privacy profile of some pair of distributions if
+and only ifH(0) = 1,His decreasing, convex, andH(γ)≥[1−γ] +.
+We can describe the spectrum of all(ε, δ)-DP bounds using privacy profiles.
+Definition A.4.A mechanismMis dominated by a privacy profileHif for all remove pairS, S −,
+Dγ
+
+M(S)|| M
+
+S−
+≤H(γ)andD γ
+
+M
+
+S−
+|| M(S)
+
+≤H(γ)
+at all γ≥0 . M is dominated by a privacy profile H under remove adjacency if only the first
+inequality holds. M is dominated by a pair of distributions (P, Q) (under remove adjacency) if it is
+dominated by the privacy profile of(P, Q)(under remove adjacency).
+For a family of privacy profiles H, the point-wise supremum H ↑ of all H∈ H is another privacy
+profile by Theorem A.3, and thereforeH ↑ is the smallest upper bound ofH.
+Definition A.5.The privacy profile of a mechanismMis the one that tightly dominatesM:
+HM(γ) = sup
+S,S− remove pair
+max
+
+Dγ
+
+M(S)|| M
+
+S−
+, Dγ
+
+M
+
+S−
+|| M(S)
+
+.
+HM represents tight δ-bounds in (ε, δ)-DP for all ε∈R . In addition, the privacy profile of M under
+remove adjacency is
+H −
+M(γ) = sup
+S,S− remove pair
+Dγ
+
+M(S)|| M
+
+S−
+.
+In fact, tight f-DP is equivalent to a privacy profile of(ϵ, δ)-DP bounds. This relationship justifies
+the conventional reason why the privacy profile includes the parametersγ=e ε ∈(0,1), orε <0.
+Theorem A.6.There is a bijection between the trade-off functions and the privacy profiles. Specifi-
+cally, letfandHbe the trade-off function and privacy profile of(P, Q)respectively, then
+1.H(γ) = 1 +
+
+f −1∗
+(−γ)for allγ≥0,
+2.f −1(α) = 1 +H ∗(−α)for allα∈[0,1],
+where * denotes the convex conjugate operation and f −1 =T[Q, P] is the inverse function of f (see
+Proposition A.8).
+Furthermore, this bijection carries over the Blackwell ordering.
+Theorem A.7.Let f1, f2 be trade-off functions, and let H1, H2 be the corresponding privacy profiles
+respectively. Then the following are equivalent.
+13
+
+--- PAGE 14 ---
+1.f 1(α)≥f 2(α)for allα∈[0,1].
+2.H 1(γ)≤H 2(γ)for allγ≥0.
+Similar to trade-off functions, we say that the privacy profilesH1 and H2 are Blackwell ordered if
+H1 ≤H 2 or H1 ≥H 2 point-wise. In light of Theorem A.6 and Theorem A.7, Definition 2.5 of
+f-DP is equivalent to Definition A.4 of the dominating privacy profile.
+For a family of trade-off functions F, their point-wise infimum does not maintain convexity in
+general, and hence it is not necessarily a trade-off function. Instead, the greatest lower bound f ↓ of
+all f∈ F can be obtained by first converting F to the corresponding family of privacy profiles H by
+using Theorem A.6, taking the point-wise supremum H ↑ and converting H ↑ to f ↓ using Theorem
+A.6 again. This is equivalently the lower convex envelope of the point-wise infimum ofF.
+Proposition A.8.For a pair of distributions(P, Q),
+1.T[Q, P]is the reflection ofT[P, Q]across the identity line.
+2. For allγ >0,
+Dγ[Q||P] = 1−γ+γD 1
+γ
+[P||Q].
+Corollary A.9.Let HM be the privacy profile of a mechanism M, and let fM be the corresponding
+tightest trade-off function such thatMisf M-DP . Then the following holds.
+1. The graph off M(α)is symmetric w.r.t. the identity line.
+2. For allγ >0,H M(γ) = 1−γ+γH M
+
+1
+γ
+
+.
+A privacy profileH −
+M ofMunder remove adjacency implies that the privacy profileH M is
+HM(γ) = max
+
+H −
+M(γ),1−γ+γH −
+M
+ 1
+γ
+
+.
+It is therefore sufficient to analyze privacy profiles under remove adjacency.
+Definition A.10.A privacy profileHis symmetric ifH(γ) = 1−γ+γH
+
+1
+γ
+
+.
+For an arbitrary privacy profile H, denote ˆH(γ) = 1−γ+γH
+
+1
+γ
+
+and sym(H) = max
+
+H, ˆH
+
+.
+Note that ifHis symmetric, thenH= ˆH=sym(H).
+A.2 Tensor Product of Trade-off Functions/Privacy Profiles
+Zhu et al. (2022) showed that the dominating pairs of distributions transform nicely under standard
+compositions.
+Theorem A.11.If M1 is dominated by (P1, Q1), and the adaptively chosen M2 is dominated by a
+fixed pair(P 2, Q2), then(M 1,M 2)is dominated by(P 1 ×P 2, Q1 ×Q 2).
+This motivates the definition of the tensor product of privacy profiles, or equivalently, trade-off
+functions.
+Definition A.12.LetH 1, H2 be privacy profiles. The tensor productH 1 ⊗H 2 is defined as
+(H1 ⊗H 2)(γ) =D γ[P1 ×P 2 ||Q 1 ×Q 2],
+where(P 1, Q1)is any pair of distributions that has a privacy profile ofH 1, and(P 2, Q2)is any pair
+of distributions that has a privacy profile ofH2. Using Fubini’s theorem,
+(H1 ⊗H 2)(γ) =
+Z
+O1×O2
+[p1(y1)p 2(y2)−γq 1(y1)q 2(y2)]+ dy1dy2
+=
+Z
+O1
+H2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1.
+14
+
+--- PAGE 15 ---
+Proposition A.13.The tensor product of privacy profiles satisfies all following properties.
+0. It is well-defined.
+1. It is commutative and associative.
+2. It carries over the Blackwell ordering: IfH 21 ≥H 22, thenH 1 ⊗H 21 ≥H 1 ⊗H 22.
+3.H⊗H Id =H Id ⊗H=H , where HId(γ) = [1−γ] + is the perfectly private privacy profile.
+4. \(H1 ⊗H 2) = ˆH1 ⊗ ˆH2.
+Proof. Proof for 0. We need to show that the resulting privacy profile H1 ⊗H 2 is indepen-
+dent of the distribution pair (P1, Q1) and (P2, Q2) behind H1 and H2. It is sufficient to show
+that property 2 holds: By property 2, Dγ[P21, Q21] =D γ[P22, Q22] for all γ implies that
+Dγ[P1 ×P 21, Q1 ×Q 21] =D γ[P1 ×P 22, Q1 ×Q 22]for allγ.
+Proof for 2. Using Fubini’s theorem,
+(H1 ⊗H 21)(γ) =
+Z
+O1
+H21
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1
+≥
+Z
+O1
+H22
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1 = (H1 ⊗H 22)(γ).
+Proof for 1.H 1 ⊗H 2 =H 2 ⊗H 1 follows from
+p1(y1)p 2(y2) =p 2(y2)p 1(y1),
+q1(y1)q 2(y2) =q 2(y2)q 1(y1).
+(H1 ⊗H 2)⊗H 3 =H 1 ⊗(H 2 ⊗H 3)follows from the Fubini’s theorem combined with
+p1(y1)p 2(y2)p 3(y3) =p 1(y1)[p2(y2)p 3(y3)],
+q1(y1)q 2(y2)q 3(y3) =q 1(y1)[q2(y2)q 3(y3)].
+Proof for 3.H Id is the privacy profile of any pair of identical distributions(P2, P2). Therefore
+(H1 ⊗H 2)(γ) =
+Z
+O1×O2
+[p1(y1)p 2(y2)−γq 1(y1)p 2(y2)]+ dy1dy2
+=
+Z
+O1×O2
+[p1(y1)−γq 1(y1)]+ p2(y2) dy1dy2 =
+Z
+O1
+[p1(y1)−γq 1(y1)]+ dy1 =H 1(γ).
+Proof for 4. By the definition of tensor product and Proposition A.8,
+\(H1 ⊗H 2)(γ) =D γ[Q1 ×Q 2 ||P1 ×P 2] =
+
+ˆH1 ⊗ ˆH2
+
+(γ).
+Properties 2 and 3 from Proposition A.13 together imply that H1 ⊗H 2 ≥H 1, i.e. tensor product
+weakens privacy protections. The following Theorem A.14 is equivalent to Theorem A.11
+Theorem A.14.If M1 is dominated by H1, and the adaptively chosen M2 is dominated by a fixed
+H2, then(M 1,M 2)is dominated byH 1 ⊗H 2.
+Alternatively, we can define the tensor product of trade-off functions. We list results by Dong et al.
+(2022), which are equivalent to the corresponding versions in terms of privacy profiles presented
+above.
+Definition A.15.Letf 1, f2 be trade-off functions. The tensor productf 1 ⊗f 2 is defined as
+f1 ⊗f 2 =T[P 1 ×P 2, Q1 ×Q 2],
+where (P1, Q1) is any pair of distributions that satisfies f1 =T[P 1, Q1], and (P2, Q2) is any pair of
+distributions that satisfiesf 2 =T[P 2, Q2].
+15
+
+--- PAGE 16 ---
+Proposition A.16.The tensor product of trade-off functions satisfies all the following properties.
+0. It is well-defined.
+1. It is commutative and associative.
+2. It carries over the Blackwell ordering: Iff 21 ≤f 22, thenf 1 ⊗f 21 ≤f 1 ⊗f 22.
+3.f⊗Id=Id⊗f=f, whereId(α) = [1−α] + is the perfectly private privacy profile.
+4.(f 1 ⊗f 2)−1 =f −1
+1 ⊗f −1
+2 .
+Proof.The proposition is equivalent to Proposition A.13.
+Theorem A.17.If M1 is f1-DP , and the adaptively chosen M2 is f2-DP with a fixed f2, then
+(M1,M 2)isf 1 ⊗f 2-DP .
+The standard adaptive composition results in GDP follow by using a simple relationship.
+Proposition A.18.Gaussian trade-off functions satisfyG µ1 ⊗G µ2 =G √
+µ2
+1+µ2
+2
+.
+Proof. The hockey-stick divergence is an F -divergence, constructed using the convex function
+[x−γ] + = max(x−γ,0) . Therefore, it satisfies the data-processing inequality: for any randomized
+function T , Dγ[T(P),T(Q)]≤D γ[P, Q] for all γ. In particular, if T is a deterministic bijection,
+then Dγ[T(P),T(Q)] =D γ[P, Q] for all γ, and equivalently T[T(P),T(Q)] =T[P, Q] by
+Theorem A.6.
+For Gaussian trade-off functionsG µ1 andG µ2, we apply the rotation transformation as a bijection,
+Gµ1 ⊗G µ2 =T[N(0,I 2),N((µ 1, µ2),I 2)] =T
+
+N(0,I 2),N
+q
+µ2
+1 +µ 2
+2,0
+
+,I 2
+
+=T
+
+N(0,1),N
+q
+µ2
+1 +µ 2
+2,1
+
+=G √
+µ2
+1+µ2
+2
+.
+Corollary A.19.If M1 is µ1-GDP , and the adaptively chosenM2 is µ2-GDP with a fixed µ2, then
+(M1,M 2)is
+p
+µ2
+1 +µ 2
+2-GDP .
+The following Lemma A.20 shows that performing analysis per pair—applying tensor products on
+the pair’s trade-off functions before taking the infimum—can yield tighter bounds than the standard
+composition Theorem A.17, which directly composes the mechanism-level privacy bounds.
+Lemma A.20.Let F1 ={f 1,i}i∈I and F2 ={f 2,i}i∈I be families of trade-off functions with
+common indexing byi∈I. Then
+ceinf
+i∈I
+f1,i ⊗f 2,i ≥
+
+ceinf
+i∈I
+f1,i
+
+⊗
+
+ceinf
+i∈I
+f2,i
+
+,
+where ceinf denotes the convex envelope of the point-wise infimum. There exists an example in which
+the inequality is strict.
+Proof. For all i∈I , f1,i ≥ceinf i∈I f1,i and f2,i ≥ceinf i∈I f2,i. By Property 2 of Proposi-
+tion A.16, f1,i ⊗f 2,i ≥(ceinf i∈I f1,i)⊗(ceinf i∈I f2,i) for all i∈I , and hence we can take the
+ceinfof the left hand side.
+An example in which the inequality is strict: Forµ∈[0,1], letf 1,µ =G µ andf 2,µ =G 1−µ, then
+ceinf
+i∈I
+f1,i ⊗f 2,i =G 1 ≥G √
+2 =
+
+ceinf
+i∈I
+f1,i
+
+⊗
+
+ceinf
+i∈I
+f2,i
+
+.
+Corollary A.21.For arbitrary trade-off functionsf 1, f2,sym(f 1 ⊗f 2)≥sym(f 1)⊗sym(f 2).
+16
+
+--- PAGE 17 ---
+1.0 1.5 2.0 2.5 3.0
+0.20
+0.25
+0.30
+0.35
+0.40 H11 ×adapt H(y1)
+2
+H12 ×adapt H(y1)
+2
+Figure 3: Privacy profiles H11 ⊗adapt H(y1)
+2 and H12 ⊗adapt H(y1)
+2 for (P11, Q11) being 0.1-GDP and
+(P12, Q12) being 0.3-GDP, with the same selection rule for step 2 that assigns HG0.01 when y1 <0.3
+and HG2 otherwise. The two curves cross near γ≈1.5 , demonstrating that the Blackwell ordering
+H11 ≤H 12 of the first profiles is not preserved under adaptive tensor product.
+Adaptive Tensor Product.Translating the adaptive tensor product (1) via Theorem A.6 and Defini-
+tion A.12, the adaptive tensor product of privacy profiles takes the form
+
+H1 ⊗adapt H(y1)
+2
+
+(γ) =
+Z
+O1
+H(y1)
+2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1,
+where the selection rule H(y1)
+2 picks a privacy profile for the second mechanism based on the first
+outputy 1. Analogously to Property 2 in Proposition A.13, ifH (y1)
+21 ≤H (y1)
+22 for everyy 1, then
+H1 ⊗adapt H(y1)
+21 ≤H 1 ⊗adapt H(y1)
+22
+immediately by Fubini’s theorem. However, ordering in the first component behaves very differently.
+RemarkA.22.The adaptive tensor product is not well-defined as an operation on privacy profiles/trade-
+off functions alone. Unlike the standard tensor product, the implication
+H11 ≤H 12 ̸⇒H 11 ⊗adapt H(y1)
+2 ≤H 12 ⊗adapt H(y1)
+2
+fails in general. The reason is that the selection rule maps each first-mechanism output y1 to a second-
+mechanism profile via the likelihood ratio q1(y1)/p1(y1), so the result depends on how (P1, Q1) is
+organised over y1, not merely on the profile H1 it induces. Two distribution pairs sharing the same
+privacy profile can therefore yield different adaptive tensor products under the same selection rule.
+To see this concretely, let (P11, Q11) be 0.1-GDP and (P12, Q12) be 0.3-GDP, so that H11 ≤H 12.
+Fix the selection rule
+H(y1)
+2 =
+HG0.01 ify 1 <0.3,
+HG2 otherwise,
+where HGµ denotes the privacy profile corresponding to the trade-off function Gµ of µ-GDP via
+Theorem A.6. Figure 3 plots H11 ⊗adapt H(y1)
+2 and H12 ⊗adapt H(y1)
+2 : the two curves cross, so neither
+dominates the other pointwise despite the first profiles being Blackwell ordered.
+Nevertheless, all results on adaptive composition in this work are valid at the level of distribution
+pairs, and we abuse the notation ⊗adapt as a shorthand in the main text to better communicate the
+structure of these results.
+B Counterexamples Againstf-DP Filter Validity
+We compute tensor products in terms of privacy profiles, as Definition A.12 offers a direct integral
+form. We can then convert between privacy profiles and trade-off functions using Theorem A.6. By
+Theorem A.7, the naturalf-DP filter can be equivalently expressed using privacy profiles as
+F(H B, H1, . . . , Ht) =
+CONT ifH 1 ⊗. . .⊗H t ≤H B,
+HALT otherwise. (2)
+17
+
+--- PAGE 18 ---
+0.0 0.5 1.0 1.5 2.0 2.5
+0.4
+0.6
+0.8
+1.0
+0 0.971
+HSG(0.5, 2) × HSG(0.5, 2)
+HSG(0.5, 0.1) × HSG(0.5, 10)
+Figure 4: Tensor products of future privacy profiles, crossing at calibration point γ0 ≈0.971 . These
+correspond to the trade-off functions in the left panel of Figure 1.
+Motivated by Corollary A.21, we use the f-DP filter with a budget H −
+B for privacy profiles
+H −
+1 , . . . , H−
+t under remove adjacency, since the validity of the filter would imply that the pro-
+duced composition has a privacy profile sym
+
+H −
+B
+
+.
+B.1 Details of the Counterexample in Corollary 3.3
+We work throughout with remove-adjacency privacy profiles, as motivated in the paragraph above. Let
+the datapoint space be O={X} , so the only remove pair is S= (X) and S− =∅ . Fix composition
+length T= 3 , subsampling rate q= 0.5 , and additive Gaussian noise σ= 1 for all mechanisms
+M1:3. Under inputS −, every mechanism outputs mean0; under inputS, the output means are
+µ1 = 1.3,(µ 2, µ3) =
+(2,2)ify 1 ≤0.65,
+(0.1,10)ify 1 >0.65.
+Note thatM 3 depends only ony 1, the output ofM 1, and not ony 2.
+Budget construction.Denote by H −
+SG,q,µ the remove-adjacency privacy profile of the subsampled
+Gaussian mechanism with parameters(q, µ), converted fromSG −
+q,µ as given by Theorem A.6. Set
+H2×3,1 =H −
+SG,0.5,2 ⊗H −
+SG,0.5,2, H 2×3,2 =H −
+SG,0.5,0.1 ⊗H −
+SG,0.5,10,
+which correspond to the future privacy profiles of(M2,M 3) conditional on y1 ≤0.65 and y1 >0.65 ,
+respectively. These are illustrated in Figure 4; they cross at a calibration pointγ0 ≈0.971 , confirming
+there is no Blackwell order between them.
+The tightest budget that permits release ofy 2 andy 3 regardless ofy 1 is, by (2),
+HB,tight = max
+
+H −
+SG,0.5,1.3 ⊗H 2×3,1, H −
+SG,0.5,1.3 ⊗H 2×3,2
+
+,
+which passes the filter check for each branch by construction.
+True adaptive guarantee.Let pt and qt denote the output densities of Mt under inputs S and S−,
+respectively. Using Definition A.12, the tight privacy profile of the fully adaptive composition is
+Hadapt(γ) =
+Z
+R3
+h
+p1(y1)p 2(y2 |y 1)p 3(y3 |y 1)−γ q 1(y1)q 2(y2 |y 1)q 3(y3 |y 1)
+i
++
+dy1 dy2 dy3
+=
+Z
+R
+Z
+R2
+h
+p2(y2 |y 1)p 3(y3 |y 1)−γ q1(y1)
+p1(y1) q2(y2 |y 1)q 3(y3 |y 1)
+i
++
+dy2 dy3
+
+p1(y1) dy1
+=
+Z 0.65
+−∞
+H2×3,1
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1 +
+Z ∞
+0.65
+H2×3,2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1.
+All privacy profiles are computed as integrals numerically; the resulting HB,tight and Hadapt are
+compared in Figure 5.
+18
+
+--- PAGE 19 ---
+0 1 2 3 4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+0 0.971
+HB,tight
+Hadapt
+0 1 2 3 4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0 sym(HB,tight)
+sym(Hadapt)
+Figure 5: Left: Hadapt exceeds HB,tight in the region surrounding γ0 ≈0.971 . Right: the violation
+persists after symmetrization. These privacy profiles correspond to the middle and right panels in
+Figures 1.
+Why the failure occurs.We now show that Hadapt(γ0)> H B,tight(γ0), which establishes the
+invalidity claimed in Corollary 3.3.
+The two tensor products underlyingH B,tight each average afixedfuture profile over all outputsy 1:
+
+H −
+SG,0.5,1.3 ⊗H 2×3,i
+
+(γ) =
+Z
+R
+H2×3,i
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1, i= 1,2.
+By contrast, Hadapt is free to select a different profile per output. Atγ=γ 0, the ratio q1(y1)/p1(y1)≤
+1 when y1 ≤0.65 and >1 when y1 >0.65 , so the rescaled argument γ0q1(y1)/p1(y1) lies
+below γ0 in the first y1-region and above in the second. Because H2×3,1 > H2×3,2 below γ0 and
+H2×3,2 > H2×3,1 above γ0 (the calibration point), the adaptive integrand takes the larger profile in
+each region simultaneously:
+Hadapt(γ0) =
+Z 0.65
+−∞
+H2×3,1
+
+γ0
+q1(y1)
+p1(y1)
+
+p1(y1) dy1 +
+Z ∞
+0.65
+H2×3,2
+
+γ0
+q1(y1)
+p1(y1)
+
+p1(y1) dy1,
+whereas each fixed-branch integral must use thesameprofile across both regions. It follows that
+Hadapt(γ0)>max
+h
+H −
+SG,0.5,1.3 ⊗H 2×3,1
+
+(γ0),
+
+H −
+SG,0.5,1.3 ⊗H 2×3,2
+
+(γ0)
+i
+=H B,tight(γ0).
+By continuity of privacy profiles, the strict inequality holds on a neighbourhood of γ0. This confirms
+that the filter is violated, with the calibration point as the precise cause.
+B.2 Proof of Adaptive Tightness of Standard Composition Results
+We prove the result in terms of privacy profiles, then convert to trade-off functions via Theorem A.6.
+Theorem B.1.Let (P1, Q1) be a pair of distributions on O1 with privacy profile H1. For each
+y1 ∈ O 1, let (P (y1)
+2 , Q(y1)
+2 ) be freely chosen from a family of pairs of distributions on O2, and
+let H2 denote the family of all achievable privacy profiles at step 2. Set H ↑
+2 = sup H2∈H2 H2
+(pointwise). Then the adaptive product (P1 ×P (y1)
+2 , Q 1 ×Q (y1)
+2 ) for any selection rule is dominated
+by H1 ⊗H ↑
+2 . Furthermore, this bound is tight: for every γ≥0 and η >0 , there exists a selection
+ruley 1 7→(P (y1)
+2 , Q(y1)
+2 )such that
+
+H1 ⊗H ↑
+2
+
+(γ)−η≤D γ
+h
+P1 ×P (y1)
+2
+ Q1 ×Q (y1)
+2
+i
+≤
+
+H1 ⊗H ↑
+2
+
+(γ).
+RemarkB.2.The tightness statement is pointwise in γ: a single selection rule need not bring the full
+privacy profile uniformly close toH 1 ⊗H ↑
+2 .
+Proof.The upper bound follows immediately from Property 2 of Proposition A.13.
+19
+
+--- PAGE 20 ---
+For the lower tightness bound, fix γ >0 and η >0 . Since H ↑
+2 = supH2∈H2 H2, for each y1 ∈ O1
+we may chooseH (y1)
+2 ∈ H2 such that
+H ↑
+2
+
+γ q1(y1)
+p1(y1)
+
+−η < H (y1)
+2
+
+γ q1(y1)
+p1(y1)
+
+≤H ↑
+2
+
+γ q1(y1)
+p1(y1)
+
+.
+Integrating againstp 1(y1) dy1 and applying Definition A.12 gives
+
+H1 ⊗H ↑
+2
+
+(γ)−η≤
+Z
+O1
+H(y1)
+2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1
+=D γ
+h
+P1 ×P (y1)
+2
+ Q1 ×Q (y1)
+2
+i
+≤
+
+H1 ⊗H ↑
+2
+
+(γ).
+The trade-off function counterpart follows by translating between privacy profiles and trade-off
+functions.
+Corollary B.3.Under the same setup, let f ↓
+2 =ce inf f2∈F2 f2. Then the adaptive product is lower
+bounded byf 1 ⊗f ↓
+2 , and for everyα∈[0,1]andη >0there exists a selection rule such that
+
+f1 ⊗f ↓
+2
+
+(α)≤T
+h
+P1 ×P (y1)
+2
+ Q1 ×Q (y1)
+2
+i
+(α)≤
+
+f1 ⊗f ↓
+2
+
+(α) +η.
+Proof. Combine Theorem B.1 with the correspondence in Theorem A.6, using the fact that H ↑
+2
+in the privacy profile formulation corresponds to f ↓
+2 in the trade-off function formulation under
+Theorem A.7.
+Connection to the counterexample.Corollary B.3 implies that the f-DP filter can fail whenever
+H1 ⊗H ↑
+2 > H B at some point, since the adaptive composition can approach H1 ⊗H ↑
+2 arbitrarily
+closely there.
+Corollary B.4.In fully adaptive composition of up to 2 steps, 2 a counterexample to filter validity
+exists whenever there is someγ 0 >0such that
+
+H1 ⊗H ↑
+2
+
+(γ0)> H B(γ0).
+The proof of Theorem B.1 also makes explicit how calibration points lead to filter failure: when
+H2,1, H2,2 ∈ H2 cross atγ 0, the pointwise maximumH ↑
+2 = max(H2,1, H2,2)satisfies
+(H1 ⊗max(H 2,1, H2,2)) (γ0)>max((H 1 ⊗H 2,1) (γ0),(H 1 ⊗H 2,2) (γ0)),
+and the extremizing selection rule is simply y1 7→arg max H2∈{H2,1,H2,2} H2
+
+γ0
+q1(y1)
+p1(y1)
+
+. This is
+precisely the mechanism used in Appendix B.1, where H ↑
+2×3 = max(H2×3,1, H2×3,2). As shown
+in Figure 6, Hadapt touches H1 ⊗H ↑
+2×3 at γ0 ≈0.971 but not everywhere, consistent with the
+pointwise nature of the tightness result.
+0 1 2 3 4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+0 0.971
+HB,tight
+Hadapt
+H1 × H2 × 3
+0 1 2 3 4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0 sym(HB,tight)
+sym(Hadapt)
+sym(H1 × H2 × 3)
+Figure 6: H1 ⊗H ↑
+2×3 compared to Hadapt and HB,tight, illustrating Corollary B.4. The adaptive
+composition reachesH 1 ⊗H ↑
+2×3 at the calibration pointγ 0 but not globally.
+2Ify 1 causes the filter to halt, we setH (y1)
+2 (γ) =H Id(γ) = [1−γ] +.
+20
+
+--- PAGE 21 ---
+C Convergence of Privacy Profiles/Trade-off Functions
+C.1 Existence of Convergent Sequence in Blackwell Chains
+We can impose the structural assumption of Blackwell chain on privacy profiles, in a similar way to
+trade-off functions.
+Definition C.1.A family H of privacy profiles is a Blackwell chain if any pair H1, H2 ∈ H is
+Blackwell ordered, i.e.H 1 ≤H 2 orH 1 ≥H 2.
+By Theorem A.7, H is a Blackwell chain if and only if its corresponding family F of trade-off
+functions is a Blackwell chain.
+Lemma C.2.In a Blackwell chain H of privacy profiles with the point-wise supremum H ↑, there
+exists an everywhere increasing sequence(H n)n∈N such that for alln∈N,
+H ↑
+ i
+2n
+
+− 1
+n < H n
+ i
+2n
+
+≤H ↑
+ i
+2n
+
+fori= 1,2, . . . , n2 n.(3)
+Lemma C.2 enables inequalities at finitely many points covering regions [0, n] of increasing sizes
+n and increasing resolutions 1
+2n . As ∪n∈N [0, n] = [0,∞) and 1
+2n ↘0 , these inequalities serve to
+connect point-wise properties to set-wise properties.
+Proof. Since H ↑(γ) = supH∈H H(γ) , for all n∈N , for all i= 1,2, . . . , n2 n, there exists Hni ∈ H
+such that atγ= i
+2n ,
+H ↑
+ i
+2n
+
+− 1
+n < H ni
+ i
+2n
+
+≤H ↑
+ i
+2n
+
+.
+Let ˆHn = max1≤i≤n2n Hni, then ˆHn satisfies the required inequality (3), and ˆHn is in H since H
+is a Blackwell chain. Finally, since
+ i
+2n
+n2n
+i=1 ⊂
+ i
+2n+1
+(n+1)2n+1
+i=1 , we choose Hn = maxk≤n ˆHk so
+that(H n)n∈N is increasing while maintaining inequality (3).
+Lemma C.3.In a Blackwell chain of privacy profiles H with a smallest upper bound H ↑ =
+supH∈H H, there exists an everywhere increasing sequence (Hn)n∈N such that Hn ↗n→∞ H ↑
+point-wise.
+Proof. Apply Lemma C.2 to find an everywhere increasing sequence Hn such that for all n∈N , for
+i= 1,2, . . . , n2 n,
+H ↑
+ i
+2n
+
+− 1
+n < H n
+ i
+2n
+
+≤H ↑
+ i
+2n
+
+.
+We show that this sequence converges point-wise toH ↑. Fix γ >0 , then n≥γ once n is big enough,
+say,n≥N. Ifγhas a finite binary representation, then oncenis big enough,
+H ↑(γ)≥H n(γ)> H ↑(γ)− 1
+n ↗n→∞ H ↑(γ).
+Otherwise if γ has an infinite binary representation, let (γn)n≥N be a decreasing sequence that
+converges toγ, where eachγ n has a finite binary representation andH n(γn)> H ↑(γn)− 1
+n. Then
+H ↑(γ)≥H n(γ)≥H n(xn)> H ↑(γn)− 1
+n ↗n→∞ H ↑(γ).
+Here, we used the fact thatH ↑(γn)↗ n→∞ H ↑(γ), which is due to the continuity ofH ↑.
+C.2 Unifying Various Notions of Convergence
+In addition to the point-wise convergence shown in Lemma C.3, we discuss other notions of conver-
+gence.
+21
+
+--- PAGE 22 ---
+1. Uniform convergence supγ≥0 |Hn(γ)−H(γ)|
+n→∞
+− − − − →0, much stronger than point-wise
+convergence.
+2. Uniform convergence over any compact set: supγ∈[0,γmax] |Hn(γ)−H(γ)|
+n→∞
+− − − − →0for
+allγ max >0.
+3. Convergence in the symmetrized∆-divergence introduced by Kaissis et al. (2024):
+sup
+γ≥0
+|Hn(γ)−H(γ)|
+1 +γ
+n→∞
+− − − − →0
+Proposition C.4.Uniform convergence implies convergence in∆-divergence.
+Proof.The∆-divergence is smaller or equal to theL ∞ norm,
+sup
+γ≥0
+|H(γ)−H n(γ)|
+1 +γ ≤sup
+γ≥0
+|H(γ)−H n(γ)|.
+The following example shows that the implication in Proposition C.4 is strictly one-sided.
+Example C.5.Forn∈N, let
+Hn(γ) =
+1− γ
+n ifγ≤n,
+0otherwise.
+Then Hn converges to H= 1 point-wise but not uniformly. A closer examination reveals that for all
+n, H(γ)−H n(γ)
+1+γ reaches its maximum atγ=n. Therefore
+max
+γ≥0
+H(γ)−H n(γ)
+1 +γ = 1
+1 +n
+n→∞
+− − − − →0,
+i.e.H n converges toHin∆-divergence.
+Theorem C.6.The following notions of convergence are equivalent for a sequence of privacy profiles
+Hn that converges to a privacy profileH.
+1. Convergence in∆-divergence.
+2. Point-wise convergence.
+3. Uniform convergence over any compact set.
+Proof. 1=⇒2. At any orderγ 0 >0,
+|Hn(γ0)−H(γ 0)|= (1 +γ 0) |Hn(γ0)−H(γ 0)|
+1 +γ 0
+≤(1 +γ 0) sup
+γ≥0
+|Hn(γ)−H(γ)|
+1 +γ
+n→∞
+− − − − →0.
+2 =⇒ 3. Since Hn is decreasing for all n and H is continuous, uniform convergence over any
+compact set follows from Pólya’s theorem, which is proven e.g. as Lemma A.7 by Dong et al. (2022).
+3=⇒1. Fixϵ >0. We findNsuch that for alln > N,
+sup
+γ≥0
+|Hn(γ)−H(γ)|
+1 +γ < ϵ.
+Choose γmax = 1
+ϵ −1 so that 1
+1+γmax
+=ϵ . Note that Hn converges uniformly toH over γ∈[0, γ max],
+which implies that there existsNsuch that for alln > N,
+|Hn(γ)−H(γ)|< ϵfor allγ∈[0, γ max].
+Therefore, for alln > N,
+sup
+γ≥0
+|Hn(γ)−H(γ)|
+1 +γ = max
+"
+sup
+γ∈[0,γmax]
+|Hn(γ)−H(γ)|
+1 +γ ,sup
+γ>γmax
+|Hn(γ)−H(γ)|
+1 +γ
+#
+≤max
+
+ϵ, 1
+1 +γ max
+
+=ϵ.
+22
+
+--- PAGE 23 ---
+Corollary C.7.In a Blackwell chain H of privacy profiles with a smallest upper bound H ↑ =
+supH∈H H, there exists an everywhere increasing sequence (Hn)n∈N such that Hn ↗n→∞ H ↑
+under any notion of convergence in Theorem C.6.
+Proof.Combine Lemma C.3 with Theorem C.6.
+Theorem C.8.The following notions of convergence are equivalent for a sequence of trade-off
+functionsf n that converges to a trade-off functionf.
+1. Convergence in∆-divergence Kaissis et al. (2024):
+min
+
+∆≥0 :∀α∈[0,1−∆], fn(α+ ∆)−∆≤f(α)
+f(α+ ∆)−∆≤f n(α)
+
+n→∞
+− − − − →0.
+2. Point-wise convergence over(0,1].
+3. Uniform convergence over[α min,1]for allα min ∈(0,1].
+Proof. 1 =⇒2. fn converges to f in ∆-divergence if and only if there exists a decreasing sequence
+of positive numbers∆ n >0such that∆ n ↘n→∞ 0and for alln,
+f(α+ ∆ n)−∆ n ≤f n(α)for allα∈[0,1−∆ n],
+fn(α)≤f(α−∆ n) + ∆n for allα∈[∆ n,1].
+Fix α∈(0,1) . Then once n is large enough, say, n > N , ∆n < α <1−∆ n since ∆n ↘n→∞ 0.
+Therefore, for alln > N,
+f(α+ ∆ n)−∆ n ≤f n(α)≤f(α−∆ n) + ∆n.
+Since limn→∞ f(α+ ∆ n)−∆ n = limn→∞ f(α−∆ n) + ∆n =f(α) due to the continuity of f,
+limn→∞ fn(α) =f(α).
+2 =⇒3. Since fn is decreasing for all n and f is continuous, uniform convergence over [αmin,1] for
+all αmin ∈(0,1] follows from Pólya’s theorem, which is proven e.g. as Lemma A.7 by Dong et al.
+(2022).
+3 =⇒1. Fix ∆>0 . Since fn converges to f uniformly over [∆,1] , there exists some N such that
+for alln > N,
+−∆≤f n(α)−f(α)≤∆for allα∈[∆,1].
+The first and second inequalities imply, respectively,
+fn(α)≤f(α) + ∆≤f(α−∆) + ∆,
+f(α)≤f n(α) + ∆≤f n(α−∆) + ∆
+for allα∈[∆,1]. Since this holds for all∆>0,f n converges tofin∆-divergence.
+Corollary C.9.In a Blackwell chain F of trade-off functions with a greatest lower bound f ↓ =
+ceinf f∈F f, there exists an everywhere decreasing sequence(fn)n∈N such that fn ↘n→∞ f ↓ under
+any notion of convergence in Theorem C.8.
+Proof. Denote H the corresponding family of privacy profiles obtained by converting the trade-off
+functions in F using Theorem A.6. Since F is a Blackwell chain, H is also a Blackwell chain by
+Theorem A.7. By Corollary C.7, there exists an everywhere increasing sequenceH n that converges
+toH ↑ = supH∈H Hin∆-divergence.
+By Theorem A.7, the sequence of trade-off functions fn that corresponds to Hn is everywhere
+decreasing; and furthermore, the smallest upper bound H ↑ of privacy profiles inH corresponds to the
+greatest lower bound f ↓ of trade-off functions in F. Kaissis et al. (2024) showed that ∆-divergence
+can be converted between privacy profiles and trade-off functions, and hencefn converges to f ↓ in
+∆-divergence. By Theorem C.8,f n converges tof ↓ under all three notions of convergence.
+23
+
+--- PAGE 24 ---
+D Proofs forf-DP Filter Validity via Blackwell Chains
+D.1 Blackwell Chain Property Impliesf-DP Filter Validity
+We first restrict ourselves to the simplest case with composition length T= 2 as a fundamental result
+before extending it to the general case of fully adaptive composition of up to T≥3 . The following
+Proposition D.1 is a direct consequence of Theorem 2.7.
+Proposition D.1.Let M1 be f1-DP , and let the adaptively chosenM2 given output y1 from M1 be
+f(y1)
+2 -DP . If there exists a trade-off functionf↓
+2 such that
+1.f (y1)
+2 ≥f ↓
+2 for ally 1 ∈ O1,
+2.f 1 ⊗f ↓
+2 ≥f B,
+then the composition(M 1,M 2)isf B-DP .
+Among the lower bounds of the family of options f(y1)
+2 ∈ F , i.e. the trade-off functions that satisfy
+Condition 1 above, it is enough to verify whether the greatest lower bound f ↓
+2 =ceinf f2∈F2 f2
+satisfies Condition 2, as otherwise no other lower bound does.
+Figure 6 shows that calibration points cause Condition 2 to fail. As shown in Appendix B, a
+diverse family of mechanisms exhibiting a calibration point γ0 in their privacy profiles may cause
+H1 ⊗H ↑
+2
+
+(γ0)> H B(γ0), or equivalently
+
+f1 ⊗f ↓
+2
+
+(α0)< f B(α0) at the corresponding α0.
+This suggests that the Blackwell chain structural assumption is necessary for both conditions in
+Proposition D.1 to hold.
+Theorem D.2.Let M1 be f1-DP , and let the adaptively chosenM2 given output y1 from M1 be
+f(y1)
+2 -DP . If
+1.f 1 ⊗f (y1)
+2 ≥f B for ally 1 ∈ O1,
+2.F=
+n
+f(y1)
+2
+o
+y1∈O1
+is a Blackwell chain,
+then the greatest lower bound f ↓
+2 =ceinf y1∈O1 f(y1)
+2 satisfies f1 ⊗f ↓
+2 ≥f B. As a consequence, the
+composition(M 1,M 2)isf B-DP by Proposition D.1.
+This can be equivalently formulated using privacy profiles. Let the privacy profile of M1 be H1, and
+let the privacy profile of the adaptively chosenM 2 given outputy 1 fromM 1 beH (y1)
+2 . If
+1.H 1 ⊗H (y1)
+2 ≤H B for ally 1 ∈ O1,
+2.H=
+n
+H(y1)
+2
+o
+y1∈O1
+is a Blackwell chain,
+then the smallest upper boundH ↑
+2 = supy1∈O1 H(y1)
+2 satisfiesH 1 ⊗H ↑
+2 ≤H B.
+Proof. Let (P1, Q1) be any pair of distributions that has a privacy profile H1. For a fixed ˆy1,
+H1 ⊗H (ˆy1)
+2 ≤H B can be written explicitly as
+Z
+O1
+H(ˆy1)
+2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1 ≤H B(γ)for allγ≥0.
+WhileH 1 ⊗H ↑
+2 ≤H B can be written explicitly as
+Z
+O1
+H ↑
+2
+
+γ q1(y1)
+p1(y1)
+
+p1(y1) dy1 ≤H B(γ)for allγ≥0.
+24
+
+--- PAGE 25 ---
+Lemma C.3 states that there exists an everywhere increasing sequence
+
+H(ˆy1,n)
+2
+
+n∈N
+in H2 such that
+H(ˆy1,n)
+2 ↗n→∞ H ↑
+2 point-wise. By the monotone convergence theorem, for anyγ≥0,
+H1 ⊗H ↑
+2
+
+(γ) = lim
+n→∞
+
+H1 ⊗H ˆy1,n
+2
+
+(γ)≤H B(γ).
+In fact, Theorem D.2 has already covered the case T= 2 in Theorem 3.5, as we can equivalently
+choose f(y1)
+2 (α) =Id(α) = 1−α when y1 halts the filter early. We now give the remaining proof to
+Theorem 3.5.
+Theorem 3.5.Let F be the family of tight f-DP guarantees of mechanisms available for adaptive
+selection at each step. The natural f-DP filter is valid in fully adaptive composition of up to T≥2
+steps ifF ( ⊗)(T−2) is a Blackwell chain.
+Proof. The case T= 2 has been proven as Theorem D.2. We present a proof for the case of T= 3
+for clarity, where F( ⊗)(T−2) =F ⊗. The general case T >3 follows by iteratively applying the
+same argument.
+Without loss of generality, when the previous outputs halt the filter early, we can set the f-DP
+guarantees for remaining mechanisms as the perfectly private trade-off function Id(α) = 1−α .
+Hence, the filter inequality becomes, for all outputsy 1 ∈ O1 andy 2 ∈ O2,
+f1 ⊗f (y1)
+2 ⊗f (y1,y2)
+3 ≥f B,
+wheref t is thef-DP guarantee ofM t fort= 1,2,3.
+Fix y1 ∈ O 1. Then f1 ⊗f (y1)
+2 is fixed and f(y1,y2)
+3 only depends on y2 ∈ O 2. Sincen
+f(y1,y2)
+3
+o
+y2∈O2
+⊂ F ⊂ F ⊗,
+n
+f(y1,y2)
+3
+o
+y2∈O2
+is a Blackwell chain, and thus by Theorem D.2,
+f1 ⊗f (y1)
+2 ⊗f (y1,↓)
+3 ≥f B,
+wheref (y1,↓)
+3 =ceinf y2∈O2 f(y1,y2)
+3 is the greatest lower bound of
+n
+f(y1,y2)
+3
+o
+y2∈O2
+.
+The deduction so far holds for ally1 ∈ O1. Now, when we lety1 ∈ O1 change as a variable,f1 is fixed
+and f(y1)
+2 ⊗f (y1,↓)
+3 depends on y1. Since
+n
+f(y1)
+2 ⊗f (y1,↓)
+3
+o
+y1∈O1
+⊂ F ⊗,
+n
+f(y1)
+2 ⊗f (y1,↓)
+3
+o
+y1∈O1
+is a Blackwell chain, and consequently, by Theorem D.2 again,
+f1 ⊗f ↓↓
+2×3 ≥f B,
+wheref ↓↓
+2×3 =ceinf y1∈O1 f(y1)
+2 ⊗f (y1,↓)
+3 is the greatest lower bound of
+n
+f(y1)
+2 ⊗f (y1,↓)
+3
+o
+y1∈O1
+.
+Conditioned on a fixed y1 ∈ O1 as first output, M(y1)
+2 is f(y1)
+2 -DP, and for all y2 ∈ O2, M(y1,y2)
+3 is
+f(y1,y2)
+3 -DP and hence f(y1,↓)
+3 -DP. Therefore, by Theorem 2.7, the composition
+
+M(y1)
+2 ,M (y1,y2)
+3
+
+isf (y1)
+2 ⊗f (y1,↓)
+3 -DP for ally 2.
+It now follows that for all y1 ∈ O1 and all y2 ∈ O2,
+
+M(y1)
+2 ,M (y1,y2)
+3
+
+is f ↓↓
+2×3-DP. Since M1 is
+f1-DP, by Theorem 2.7,(M 1,M 2,M 3)isf 1 ⊗f ↓↓
+2×3-DP and hencef B-DP.
+The f-DP central limit theorem Dong et al. (2022) states that a composition of trade-off functions
+f1⊗. . .⊗fn converges to some Gaussian trade-off function in∆-divergence asn→ ∞ . Consequently,
+as T increases, the trade-off functions in F( ⊗)(T−2) increasingly resemble Gaussian trade-off
+functions.
+Example D.3.Let f be a trade-off function and consider the n-fold self-compositions F=
+(f ⊗n)n∈N∪{∞}, in which f ⊗∞ = 0 if f is not Id, and Id⊗∞ =Id . In this case, F( ⊗)(T−2) =
+(f ⊗n)n∈N∪{∞} for all T≥2 , which is a Blackwell chain by Proposition A.16. By Theorem 3.5,
+the f-DP filter is valid for mechanisms with tight f-DP guarantees matching f ⊗n for some n. A
+construction of such mechanisms when f is symmetric is given by the canonical noise distribution
+Awan and Vadhan (2021).
+25
+
+--- PAGE 26 ---
+D.2 Failure of Blackwell Chain Property Impliesf-DP Filter Invalidity
+Definition D.4.For a familyHof privacy profiles, define
+¯H=
+ ¯H:∃H n ∈ Hs.t.H n ↗ ¯H
+	
+as the family of limits ¯H of some everywhere increasing sequence Hn ∈ H under all notions of
+convergence in Theorem C.6. Furthermore, define
+H ⊗ =H ⊗ ¯H=
+
+H⊗ ¯H:H∈ H, ¯H∈ ¯H
+	
+.
+Lemma D.5.Let H be an arbitrary family of privacy profiles, and consider H( ⊗)(T−2) for some
+T≥2 . For all H ∗ ∈ H( ⊗)(T−2) , for all γmax >0 and all η >0 , there exist T−1 privacy profiles
+H2, H3, . . . , HT ∈ Hsuch that
+sup
+γ∈[0,γmax]
+|(H2 ⊗H 3 ⊗. . .⊗H T )(γ)−H ∗(γ)| ≤η.
+Proof. For clarity, we present the proof for the case T= 4 . The general case involves iteratively
+applying the same kind of argument here.
+Now H ∗ ∈(H ⊗) ⊗. There exists H2 ∈ H and H3×4 ∈ H ⊗ such that H2 ⊗ H3×4 =
+H ∗. Furthermore, there exists an everywhere increasing sequence H3×4,n ∈ H ⊗ such that
+H3×4,n ↗n→∞ H3×4 under all notions of Theorem C.6. By the monotone convergence theo-
+rem, H2 ⊗H 3×4,n ↗n→∞ H2 ⊗ H3×4 point-wise, and hence uniformly over any compact set by
+Theorem C.6. Therefore, there existsn 0 such that
+sup
+γ∈[0,γmax]
+(H2 ⊗H 3×4,n0)(γ)−
+
+H2 ⊗ H3×4
+
+(γ)
+ ≤ η
+2 .
+Now H3×4,n0 ∈ H ⊗. There exists H3 ∈ H and ¯H4 ∈ ¯H such that H3 ⊗ ¯H4 =H 3×4,n0.
+Furthermore, there exists an everywhere increasing sequence H4,k ∈ H such that H4,k ↗k→∞ ¯H4
+under all notions of Theorem C.6. By the monotone convergence theorem, H2 ⊗H 3 ⊗H 4,k ↗k→∞
+H2 ⊗H 3 ⊗ ¯H4 point-wise, and hence uniformly over any compact set by Theorem C.6. Therefore,
+there existsk 0 such that
+sup
+γ∈[0,γmax]
+(H2 ⊗H 3 ⊗H 4,k0)(γ)−
+
+H2 ⊗H 3 ⊗ ¯H4
+
+(γ)
+ ≤ η
+2 .
+SinceH 2 ⊗H 3 ⊗ ¯H4 =H 2 ⊗H 3×4,n0 andH 2 ⊗ H3×4 =H ∗, by the triangle inequality,
+sup
+γ∈[0,γmax]
+|(H2 ⊗H 3 ⊗H 4,k0)(γ)−H ∗(γ)| ≤ η
+2 + η
+2 =η.
+Theorem 3.6.Let F be the family of tight f-DP guarantees of mechanisms available for adaptive
+selection at each step. In fully adaptive composition of up toTsteps, if:
+1. Some mechanism at step 1 is notε-DP for anyε, and
+2.F ( ⊗)(T−2) fails to be a Blackwell chain,
+then thef-DP filter is invalid.
+Proof. Let H be the family of privacy profiles corresponding toF. Let H ∗
+1 , H∗
+2 be the pair of privacy
+profiles that do not have a Blackwell order. The space of ordersγcan be partioned as
+[0,∞) ={H ∗
+1 > H ∗
+2 } ⊔ {H ∗
+1 =H ∗
+2 } ⊔ {H ∗
+1 < H ∗
+2 },
+where ⊔ denotes disjoint union, and all three sets are nonempty. Since [0,∞) = S
+γmax>0 [0, γmax],
+there exists some γmax >0 such that [0, γmax] overlaps with both {H ∗
+1 > H ∗
+2 } and {H ∗
+1 < H ∗
+2 }.
+We apply Lemma D.5 with small η >0 to find H2,1, H3,1, . . . , HT,1 and H2,2, H3,2, . . . , HT,2 that
+respectively approximateH ∗
+1 andH ∗
+2 on[0, γ max]. Onceη >0is chosen small enough, the pair
+˜H ∗
+1 =H 2,1 ⊗H 3,1 ⊗. . .⊗H T,1 ,
+˜H ∗
+2 =H 2,2 ⊗H 3,2 ⊗. . .⊗H T,2
+26
+
+--- PAGE 27 ---
+will not have a Blackwell order either.
+Let f1 ∈ F be the trade-off function corresponding to the mechanism that is not ε-DP for all ε. Let
+H1 be the privacy profile that corresponds to f1, and let (P1, Q1) be a pair of distributions such that
+T[P 1, Q1] =f 1. This failure of ε-DP implies that the likelihood ratio q1(y1)/p1(y1) is not almost surely
+bounded above, or not almost surely bounded below away from 0. Therefore, there exists γ0 >0
+such that 
+γ0
+q1(y1)
+p1(y1)
+
+y1∈O1
+overlaps with both
+n
+˜H ∗
+1 > ˜H ∗
+2
+o
+and
+n
+˜H ∗
+1 < ˜H ∗
+2
+o
+.
+From this, we can construct a counterexample to the f-DP filter validity. For t= 2, . . . , T , let
+(Pt,1, Qt,1) and (Pt,2, Qt,2) be the pairs of distributions that have privacy profiles Ht,1 and Ht,2
+respectively. Choose the adaptive selection rule at stept:
+P (y1,...,yt−1)
+t :=P (y1)
+t =
+(
+Pt,1 ifγ 0
+q1(y1)
+p1(y1) ∈
+n
+˜H ∗
+1 ≥ ˜H ∗
+2
+o
+,
+Pt,2 otherwise,
+Q(y1,...,yt−1)
+t :=Q (y1)
+t =
+(
+Qt,1 ifγ 0
+q1(y1)
+p1(y1) ∈
+n
+˜H ∗
+1 ≥ ˜H ∗
+2
+o
+,
+Qt,2 otherwise.
+This yields the inequality
+Z
+{ ˜H ∗
+1 ≥ ˜H ∗
+2 }
+˜H ∗
+1
+
+γ0
+q1(y1)
+p1(y1)
+
+p1(y1) dy1 +
+Z
+{ ˜H ∗
+1 < ˜H ∗
+2 }
+˜H ∗
+2
+
+γ0
+q1(y1)
+p1(y1)
+
+p1(y1) dy1
+>max
+
+H1 ⊗ ˜H ∗
+1
+
+(γ0),
+
+H1 ⊗ ˜H ∗
+2
+
+(γ0)
+
+.
+Here, the LHS is the true privacy profile of the composition, while the RHS is chosen as the budget
+used in the filter.
+E Fully Adaptive Central Limit Theorem
+E.1 Proof to the Fully Adaptivef-DP Central Limit Theorem
+First, we present the martingale Berry–Esseen theorem from Fan (2019).
+Theorem E.1.Let (Ω,G, P) be a probability space and let G1 ⊂ G2 ⊂. . .⊂ G T ⊂ G be a filtration
+of increasing σ-algebras. Let (ξi)T
+i=1 be a sequence of martingale differences, which means thatPt
+i=1 ξi for t= 1, . . . , T forms a martingale, or equivalently EP [ξi | Gi−1] = 0 for all i. Assume
+that the following holds.
+1. There existsκ∈
+
+0, 1
+4
+
+such that
+PT
+i=1 EP
+
+ξ2
+i | Gi−1
+
+−1
+ ≤κalmost surely.
+2. There existsρ∈
+
+0, 1
+2
+
+such thatE P
+h
+|ξi|3 | Gi−1
+i
+≤ρE P
+
+ξ2
+i | Gi−1
+
+almost surely for alli.
+Then the cdf ofPT
+i=1 ξi satisfies
+sup
+x∈R
+P
+ TX
+i=1
+ξi ≤x
+!
+−Φ(x)
+ ≤C
+
+ρ|lnρ|+ √κ
+
+,
+whereΦis the cdf of the standard Gaussian distribution, andCis a universal constant.
+Note that as T grows, v increases linearly while ρ remains constant, indicating a convergence rate
+of O
+
+lnT√
+T
+
+. Fan (2019) showed that for martingale difference sequences satisfying the conditions
+in Theorem E.1, the order of convergence ρ|lnρ| is optimal. To the best of our knowledge, this
+represents the best convergence rate among existing martingale Berry–Esseen variants, though it is
+weaker than the classical O
+
+1√
+T
+
+rate for i.i.d. sequences due to the martingale setting. Additional
+variants of the martingale Berry–Esseen theorem were derived by Heyde and Brown (1970) and Fan
+and Shao (2017).
+27
+
+--- PAGE 28 ---
+Theorem 4.1.Let P1, . . . , PT and Q1, . . . , QT be adaptive sequences of distributions, where for
+each t, the choices of Pt and Qt may depend on the past realizations y1, . . . , yt−1 drawn under
+P1, . . . , Pt−1 and Q1, . . . , Qt−1, respectively. Define Lt = ln Pt
+Qt
+as the PLRV at step t, and let
+P= QT
+t=1 Pt, Q= QT
+t=1 Qt, and y= (y 1, . . . , yT ). We assume that the following conditions hold
+with probability 1:
+1.
+
+PT
+t=1 Ey∼P [Lt(yt)|y 1:t−1]−m 1
+ ≤η 1,
+2.
+
+PT
+t=1 Ey∼Q[Lt(yt)|y 1:t−1] +m 2
+ ≤η 2,
+3.
+PT
+t=1 Vary∼P [Lt(yt)|y 1:t−1]−v
+ ≤κ,
+4.
+PT
+t=1 Vary∼Q[Lt(yt)|y 1:t−1]−v
+ ≤κ,
+5.E y∼P
+h
+|Lt −E y∼P [Lt(yt)|y 1:t−1]|3
+ y1:t−1
+i
+≤ρ·Var y∼P [Lt(yt)|y 1:t−1]for allt,
+6.E y∼Q
+h
+|Lt −E y∼Q[Lt(yt)|y 1:t−1]|3
+ y1:t−1
+i
+≤ρ·Var y∼Q[Lt(yt)|y 1:t−1]for allt.
+Here, we require that4ρ2 ≤v and 4κ≤v . Under these assumptions, the trade-off function T[P, Q]
+satisfies the following inequalities for allα:
+Gµ+ϕ(α+ ∆)−∆≤T[P, Q](α)≤G µ−ϕ(α−∆) + ∆,
+whereµ= m1+m2√v ,ϕ= η1+η2√v , and∆ =C
+
+ρ√v
+ln ρ√v
+ +p κ
+v
+
+for some universal constantC.
+Proof.We apply Theorem E.1 to the sequences of martingale differences
+Lt(yt)−E y∼P [Lt(yt)|y 1:t−1]√v , y∼Pand Lt(yt)−E y∼Q[Lt(yt)|y 1:t−1]√v , y∼Q
+fort= 1, . . . , Tto arrive at the inequalities
+sup
+x∈R
+P
+"PT
+t=1 Lt(yt)− PT
+t=1 Ey∼P [Lt(yt)|y 1:t−1]√κ ≤x
+#
+−Φ(x)
+ ≤C
+ ρ√v
+ln ρ√v
+ +
+r κ
+v
+
+,
+sup
+x∈R
+Q
+"PT
+t=1 Lt(yt)− PT
+t=1 Ey∼Q[Lt(yt)|y 1:t−1]√κ ≤x
+#
+−Φ(x)
+ ≤C
+ ρ√v
+ln ρ√v
+ +
+r κ
+v
+
+.
+Denote L(y) =PT
+t=1 Lt(yt) and ∆ =C
+
+ρ√v
+ln ρ√v
+ +p κ
+v
+
+. By Conditions 1 and 2, the sums of
+conditional means are almost surely bounded,
+m1 −η 1 ≤
+TX
+t=1
+Ey∼P [Lt(yt)|y 1:t−1]≤m 1 +η 1,
+−m2 −η 2 ≤
+TX
+t=1
+Ey∼Q[Lt(yt)|y 1:t−1]≤ −m 2 +η 2.
+Therefore for allx∈R,
+P
+ L(y)−m 1 +η 1√v ≤x
+
+≤Φ(x) + ∆,(4)
+P
+ L(y)−m 1 −η 1√v ≤x
+
+≥Φ(x)−∆,(5)
+Q
+ L(y) +m 2 +η 1√v ≤x
+
+≤Φ(x) + ∆,(6)
+Q
+ L(y) +m 2 +η 2√v ≤x
+
+≥Φ(x)−∆.(7)
+28
+
+--- PAGE 29 ---
+Now, we convert these inequalities to their trade-off function form. Letα∈(0,1−∆) and let x∈R
+such that the test
+ϕ(y) =
+1ifL(y)≤x,
+0otherwise
+for the hypothesis testing problem H0 :y∼P vs. H1 :y∼Q has an FPR P(L(y)≤x) =α . By
+(5),
+Φ
+ x−m 1 −η 1√v
+
+≤P
+ L(y)−m 1 −η 1√v ≤ x−m 1 −η 1√v
+
++ ∆ =α+ ∆.
+SinceΦ −1 is an increasing function,
+x−m 1 −η 1√v ≤Φ −1(α+ ∆),
+which implies that
+x+m 2 +η 2√v ≤Φ −1(α+ ∆) + m1 +m 2√v + η1 +η 2√v .
+Combining (6) with the fact thatΦis increasing,
+Q(L(y)≤x) =Q
+ L(y) +m 2 +η 2√v ≤ x+m 2 +η 2√v
+
+≤Φ
+ x+m 2 +η 2√v
+
++ ∆
+≤Φ
+
+Φ−1(α+ ∆) + m1 +m 2√v + η1 +η 2√v
+
++ ∆.
+Therefore the FNRQ(L(y)> x)satisfies
+Q(L(y)> x)≥1−Φ
+
+Φ−1(α+ ∆) + m1 +m 2√v + η1 +η 2√v
+
+−∆.
+We modify this into the final expression using the relationship1−Φ(x) = Φ(−x) and Φ−1(α) =
+−Φ−1(1−α),
+Q(L(y)> x)≥Φ
+
+Φ−1(1−(α+ ∆))− m1 +m 2√v − η1 +η 2√v
+
+−∆ =G µ+ϕ(α+ ∆)−∆,
+where µ= m1+m2√v and ϕ= η1+η2√v . Finally, T[P, Q](α) =Q(L(y)> x) by the Neyman-Pearson
+lemma, so we conclude
+T[P, Q](α)≥G µ+ϕ(α+ ∆)−∆for allα∈[0,1−∆].
+The bound is extended from α∈(0,1−∆) to α∈[0,1−∆] due to the continuity of trade-off
+functions. The proof for the remaining bound T[P, Q](α)≤G µ+ϕ(α−∆) + ∆ is identical, which
+utilizes the remaining inequalities (4) and (7).
+E.2 Proofs for Demonstration of Approximate GDP Filter
+The limit conditions in Theorem 4.2 are:
+1. Near˜q= 0,T¯q 2 = Θ(1)as¯q→0.
+2. Near˜q= 1,T 1
+¯σ2 = Θ(1)andˆq= 1−¯q=O
+ 1
+¯σ2
+
+as¯σ→ ∞.
+Theorem 4.2.Under the above scaling assumptions, the composition of subsampled Gaussian
+mechanisms produced by Algorithm 2 satisfies:
+1. Near˜q= 0:∆-approx.
+√
+2B+O(¯q)
+
+-GDP , with an error∆ =O( √¯q)as¯q→0.
+2. Near˜q= 1:∆-approx.
+√
+2B+O(¯σ−2)
+
+-GDP , with an error∆ =O
+ ln ¯σ
+¯σ
+
+as¯σ→ ∞.
+Proof. Fix a remove pairS, S− that differs in some datapointX. After T steps, the sum of conditional
+expectations of PLRVs betweenSandS − may remain belowB, because
+29
+
+--- PAGE 30 ---
+1. The filter takes into account an amount of 1
+2 q2
+t
+
+e
+1
+σ2
+t −1
+
+or 1
+2 q2
+t
+1
+σ2
+t
+, which upper bounds
+the actual amount 1
+2 q2
+t
+
+e
+∥`gt(X)∥
+σ2 −1
+
+or 1
+2 q2
+t
+∥`gt(X)∥
+σ2
+t
+spent by theS, S −.
+2. AfterTsteps, the total budget accounted for may not have reachedB.
+In this case, we can artificially create an extra mechanism MT+1 at step T+ 1 , tailored to the pair
+S, S−, that adaptively consumes the remaining budget, and then apply projection as a post-processing
+to extract the first T outputs from T+ 1 outputs. Therefore, w.l.o.g. we can assume that the total
+budgetBis almost surely exhausted byS, S − afterTsteps.
+We apply Theorem 4.1 in combination with Theorems F.1 and F.2 to the pairS, S−:
+1. In the regime near˜q= 0, as¯q→0, the approximate GDP guarantee is
+B+B√
+2B
++T·O
+
+¯q3
+=
+√
+2B+O(¯q),
+with∆-error
+O(¯q)|lnO(¯q)|+
+r
+T·O(¯q 3)
+2B =O
+√¯q
+
+.
+2. In the regime near˜q= 1, as¯σ→ ∞the approximate GDP guarantee is
+B+B√
+2B
++Tˆq·O
+ 1
+¯σ4
+
++T·O
+
+ˆq2
+=
+√
+2B+O
+ 1
+¯σ2
+
+,
+with∆-error
+O
+ 1
+¯σ
+lnO
+ 1
+¯σ
+ +
+s
+Tˆq·O
+ 1
+¯σ4
+
++T·O(ˆq 2)
+2B =O
+ln ¯σ
+¯σ
+
+.
+Since the ∆-approximate µ-GDP guarantee is symmetric, the privacy guarantees above apply to both
+trade-off functionsT[M 1:t(S),M 1:t(S−)]andT[M 1:t(S−),M 1:t(S)].
+Theorem 4.3.Suppose the initial individual budgets are uniform, i.e. Bj =B for all j= 1, . . . , n .
+Then Algorithm 3 satisfies identical asymptotic privacy guarantees as stated in Theorem 4.2.
+Proof. The proof mirrors the proof idea of Feldman and Zrnic (2021). Fix a remove pair S=
+(X1, . . . , Xn, X) and S− = (X 1, . . . , Xn). At each step t, the subset of datapoints in the input
+dataset that have positive remaining budget, and thus are still participating as proper inputs, is called
+the active subset. Denote ˜St the active subset ofSat stept, and denote ˜S−
+t that ofS −.
+At step t, conditioned on a given sequence of previous outputs y1:t−1, the total budget spent so far for
+each individual Xj can be computed, and hence it is deterministic which datapoint remains in ˜St and
+˜S−
+t . Consequently, ˜St and ˜S−
+t are either identical, or differ only in the datapointX.
+Therefore, the pair of PLRVs of S, S− at step t, conditioned on a given sequence of previous outputs
+y1:t−1, is the pair of PLRVs of ˜St, ˜S−
+t , which implies that Theorems F.1 and F.2 still apply. We then
+apply Theorem 4.1 and obtain identical results to Theorem 4.2.
+This proof can be seen as an extension of the proof to Theorem 4.2 by allowing the pair of active
+subsets adaptively shrink through composition.
+F Privacy Loss Moments: Approximations
+For a subsampled Gaussian mechanism M, let P=M(S) and Q=M(S −) denote the output
+distributions for an arbitrary remove pair S, S− differing by a single datapoint X. In the regimes
+30
+
+--- PAGE 31 ---
+q≪1 and q≈1 , the trade-off function is nearly symmetric and close to Gaussian, which gives rise
+to the asymptotic relationships
+EP
+h
+ln P
+Q
+i
+≈ −E Q
+h
+ln P
+Q
+i
+,Var P
+h
+ln P
+Q
+i
+≈Var Q
+h
+ln P
+Q
+i
+,
+and, most notably,
+EP
+h
+ln P
+Q
+i
+VarP
+h
+ln P
+Q
+i ≈
+−EQ
+h
+ln P
+Q
+i
+VarQ
+h
+ln P
+Q
+i ≈ 1
+2 .
+To build intuition, consider each regime in turn. When q≈1 , the subsampled Gaussian mechanism
+is close to the standard Gaussian mechanism, whose PLRV has mean-to-variance ratio exactly1/2.
+When q≪1 , the PLRV mean is small and the varianceVar[L] is well approximated by the second
+moment E[L2]. Setting L= ln P/Q and applying the Taylor expansions ey ≈1 +y+ y2
+2 and
+e−y ≈1−y+ y2
+2 yields
+1 =E P
+h
+Q
+P
+i
+=E P
+
+e−L
+≈1−E P [L] + 1
+2 EP [L2],
+1 =E Q
+h
+P
+Q
+i
+=E Q
+
+eL
+≈1 +E Q[L] + 1
+2 EQ[L2].
+Theorem F.1.Fix a datapoint X. Let h be a deterministic function on datasets with h(∅) = 0 ,
+and let µ=∥h((X))∥ . Let M be the subsampled Gaussian mechanism derived from h, with
+sampling rate q and noise level σ. For an arbitrary remove-neighbor pairS= (X 1, . . . , Xn, X) and
+S− = (X1, . . . , Xn), setP=M(S)andQ=M(S −). Asq→0:
+1.E P
+h
+ln P
+Q
+i
+= 1
+2 q2
+
+eµ2/σ2
+−1
+
++O(q 3),
+2.E Q
+h
+ln P
+Q
+i
+=− 1
+2 q2
+
+eµ2/σ2
+−1
+
++O(q 3),
+3.Var P
+h
+ln P
+Q
+i
+=q 2
+
+eµ2/σ2
+−1
+
++O(q 3),
+4.Var Q
+h
+ln P
+Q
+i
+=q 2
+
+eµ2/σ2
+−1
+
++O(q 3),
+5.E P
+ln P
+Q −E P
+h
+ln P
+Q
+i
+3
+≤q 3
+
+e3µ2/σ2
++ 3eµ2/σ2
++ 1
+
++O(q 4),
+6.E Q
+ln P
+Q −E Q
+h
+ln P
+Q
+i
+3
+≤q 3
+
+e3µ2/σ2
++ 3eµ2/σ2
++ 1
+
++O(q 4).
+Each error termO(q 3)orO(q 4)may depend onq,σ,X, andX 1, . . . , Xn.
+Theorem F.2.Fix a datapoint X. Let h be a summation h(X1, . . . , Xn) = P
+i g(Xi) for some
+function g, and let µ=∥g(X)∥ . Let M be the subsampled Gaussian mechanism derived from h,
+with sampling rate q and noise level σ, and write ˆq= 1−q . For an arbitrary remove-neighbor pair
+S= (X 1, . . . , Xn, X)andS − = (X1, . . . , Xn), setP=M(S)andQ=M(S −). Then:
+1.E P
+h
+ln P
+Q
+i
+= 1
+2 q2 µ2
+σ2 + ˆq·O
+
+σ−4
++O(ˆq2),
+2.E Q
+h
+ln P
+Q
+i
+=− 1
+2 q2 µ2
+σ2 + ˆq·O
+
+σ−4
++O(ˆq2),
+3.Var P
+h
+ln P
+Q
+i
+=q 2 µ2
+σ2 + ˆq·O
+
+σ−4
++O(ˆq2),
+4.Var Q
+h
+ln P
+Q
+i
+=q 2 µ2
+σ2 + ˆq·O
+
+σ−4
++O(ˆq2),
+5.E P
+ln P
+Q −E P
+h
+ln P
+Q
+i
+3
+≤(2−q 3)
+q
+8
+π
+µ3
+σ3 + ˆq·O
+
+σ−4
++O(ˆq2),
+6.E Q
+ln P
+Q −E Q
+h
+ln P
+Q
+i
+3
+≤(2−q 3)
+q
+8
+π
+µ3
+σ3 + ˆq·O
+
+σ−4
++O(ˆq2).
+Here O(ˆq2) is in the limit ˆq→0, and O(σ−4) is in the limit σ→ ∞ . All error terms may depend on
+q,σ,X, andX 1, . . . , Xn.
+F.1 Numerical Illustration of Moment Approximations
+We numerically illustrate the asymptotic approximations of Theorems F.1 and F.2 for the means
+and variances of the PLRVs L= ln(P/Q) of the Poisson subsampled Gaussian mechanism. The
+31
+
+--- PAGE 32 ---
+accurate values are computed by direct numerical integration on a fine grid, using the one-dimensional
+distributionsP=q· N(1, σ 2) + (1−q)· N(0, σ 2)andQ=N(0, σ 2).
+Small-q regime.Figures 7 and 8 illustrate the accuracy of approximations 1. and 3. of Theorem F.1,
+respectively. We plot the relative error between the numerical quantity and itsO(q2) approximation
+as q→0 . As predicted by the theorem, the error decreases polynomially in q, and the accuracy
+improves for larger noise levelsσ.
+Large-q regime.Figures 9 and 10 illustrate the accuracy of approximations 1. and 3. of Theorem F.2.
+Here q is close to 1, and we again plot relative errors as functions of q for several values of σ. As
+predicted by the theorem, the relative error decreases asˆq= 1−q→0andσincreases.
+The numerical illustrations of Figures 7 to 10 confirm that the PLRV mean and variance satisfy
+the predicted scalings, and that the resulting mean-to-variance ratios approach 1/2, as stated by
+Theorems F.1 and F.2.
+0.000 0.025 0.050 0.075 0.100 0.125 0.150 0.175 0.200
+q
+10 5
+10 4
+10 3
+10 2
+Absolute relative error |(accurate approx)/approx|
+Relative error for EP[log(P/Q)] vs. q
+= 2
+= 4
+= 6
+= 8
+= 10
+Figure 7: Relative error of EP [ln(P/Q)] versus the approximation 1
+2 q2(exp(µ2/σ2)−1) as q→0 ,
+illustrating the approximation of 1. in Theorem F.1.
+0.000 0.025 0.050 0.075 0.100 0.125 0.150 0.175 0.200
+q
+10 8
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+Absolute relative error |(accurate approx)/approx|
+Relative error for VarP[log(P/Q)] vs. q
+= 2
+= 4
+= 6
+= 8
+= 10
+Figure 8: Relative error of VarP [ln(P/Q)] versus the approximation q2(exp(µ2/σ2)−1) as q→0 ,
+illustrating the approximation 3. in Theorem F.1.
+32
+
+--- PAGE 33 ---
+0.800 0.825 0.850 0.875 0.900 0.925 0.950 0.975 1.000
+q
+10 7
+10 6
+10 5
+10 4
+10 3
+Absolute relative error |(accurate approx)/approx|
+Relative error for EP[log(P/Q)] vs. q
+= 2
+= 4
+= 6
+= 8
+= 10
+Figure 9: Relative error of EP [ln(P/Q)] versus the approximation 1
+2 q2µ2/σ2 for q≈1 , illustrating
+the approximation 1. in Theorem F.2.
+0.800 0.825 0.850 0.875 0.900 0.925 0.950 0.975 1.000
+q
+10 4
+10 3
+10 2
+Absolute relative error |(accurate approx)/approx|
+Relative error for VarP[log(P/Q)] vs. q
+= 2
+= 4
+= 6
+= 8
+= 10
+Figure 10: Relative error ofVarP [log(P/Q)] versus the approximationq2µ2/σ2 for q≈1 , illustrating
+the approximation 3. in Theorem F.2.
+F.2 Derivations Using Taylor Expansions
+Proof of Theorem F .1.All big-O terms in this proof are taken in the limit q→0 . Throughout we use
+the following notation.
+•P 0 =N(0, σ 2I).
+•a(y) = N(h((X)), σ 2I)(y)
+P0(y) −1.
+•a j(y) = N(h((X j)), σ 2I)(y)
+P0(y) −1,j= 1, . . . , n.
+33
+
+--- PAGE 34 ---
+•b k(y) = N(h((X j1 , Xj2)), σ 2I)(y)
+P0(y) −1 , where Xj1 , Xj2 is an arbitrary distinct pair from
+(X, X1, . . . , Xn). The index k runs from 1 to n(n+1)
+2 to cover all such pairs; by convention,
+k= 1, . . . , n(n−1)
+2 covers pairs that exclude X, and the remaining indices cover pairs that
+includeX.
+Step 1: Density approximations.The density of P=M(S) is a Gaussian mixture whose weights
+depend on q. Applying the Taylor expansion (1−q) α = 1−αq+ α(α−1)
+2 q2 +q 3O(1) gives two
+useful approximations:
+M(S)(y) =
+h
+1 +q
+
+
+nX
+j=1
+aj(y) +a(y)
+
+
++q 2
+
+−n
+nX
+j=1
+aj(y)−na(y) +
+n(n+1)
+2X
+k=1
+bk(y)
+
+ +q 3O(1)
+i
+P0(y),(8)
+M(S)(y) =
+h
+1 +q
+
+
+nX
+j=1
+aj(y) +a(y)
+
+ +q 2O(1)
+i
+P0(y).(9)
+The same expansion applied toQ=M(S −)yields
+M(S−)(y) =
+h
+1 +q
+nX
+j=1
+aj(y)
++q 2
+
+−n
+nX
+j=1
+aj(y) +
+n(n−1)
+2X
+k=1
+bk(y)
+
+ +q 3O(1)
+i
+P0(y),(10)
+M(S−)(y) =
+h
+1 +q
+nX
+j=1
+aj(y) +q 2O(1)
+i
+P0(y).(11)
+Step 2: Approximation ofE P [ln(P/Q)].Using (8), (9), and (10),
+EP
+
+ln P
+Q
+
+=E y∼P0
+ P(y)
+P0(y) ln P(y)
+Q(y)
+
+=E y∼P0
+
+
+
+1 +q
+
+
+nX
+j=1
+aj +a
+
+ +q 2O(1)
+
+
+·ln
+1 +q
+P
+j aj +a
+
++q 2
+
+−nP
+j aj −na+ P n(n+1)
+2
+k=1 bk
+
++q 3O(1)
+1 +qP
+j aj +q 2
+
+−nP
+j aj +P n(n−1)
+2
+k=1 bk
+
++q 3O(1)
+
+ .
+Because Ey∼P0[a(y)] =E y∼P0[aj(y)] =E y∼P0[bk(y)] = 0 for all j, k, the q2 corrections in the
+numerator and denominator contribute zero expectation and may be dropped, giving
+EP
+
+ln P
+Q
+
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+ ln
+1 +q
+P
+j aj +a
+
++q 3O(1)
+1 +qP
+j aj +q 3O(1)
+
+ .
+34
+
+--- PAGE 35 ---
+We simplify the log in two sub-steps.
+1. Apply 1
+1+x = 1−x+x 2 +O(x 3)to the denominator.
+2. Applyln(1 +x) =x− 1
+2 x2 +O(x 3)to the resulting expression.
+Sub-step 1 yields
+EP
+
+ln P
+Q
+
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+
+·ln
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 3O(1)
+
+1−q
+X
+j
+aj +q 2
+
+X
+j
+aj
+
+
+2
++q 3O(1)
+
+
+
+
+
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+ ln
+
+1 +qa(y)−q 2a(y)
+X
+j
+aj(y) +q 3O(1)
+
+
+
+ .
+Sub-step 2 then gives
+EP
+
+ln P
+Q
+
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+ (12)
+·
+
+qa(y)−q 2
+
+a(y)
+X
+j
+aj(y) + 1
+2 a(y)2
+
+ +q 3O(1)
+
+
+
+
+=qE y∼P0[a(y)] + 1
+2 q2 Ey∼P0[a(y)2] +O(q 3)
+= 1
+2 q2 Ey∼P0[a(y)2] +O(q 3)
+= 1
+2 q2
+
+eµ2/σ2
+−1
+
++O(q 3).(13)
+In the second equality we used that O(1) is integrable, so Ey∼P0[q3O(1)] =O(q 3). In the third
+equality we usedE y∼P0[a(y)] = 0.
+The identical argument applied toE Q[ln(P/Q)]yields
+EQ
+
+ln P
+Q
+
+=E y∼P0
+
+
+
+1 +q
+X
+j
+aj +q 2O(1)
+
+
+·
+
+qa(y)−q 2
+
+a(y)
+X
+j
+aj(y) + 1
+2 a(y)2
+
+ +q 3O(1)
+
+
+
+
+=qE y∼P0[a(y)]− 1
+2 q2 Ey∼P0[a(y)2] +O(q 3)
+=− 1
+2 q2
+
+eµ2/σ2
+−1
+
++O(q 3).
+Step 3: Variance.SinceE P [ln(P/Q)] =O(q 2), we have
+VarP
+
+ln P
+Q
+
+=E P
+"
+ln P
+Q
+2#
+−
+
+EP
+
+ln P
+Q
+2
+=E P
+"
+ln P
+Q
+2#
++O(q 4),
+35
+
+--- PAGE 36 ---
+so it suffices to approximateE P [(ln(P/Q))2]. The same two sub-steps give
+EP
+"
+ln P
+Q
+2#
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+
+·
+
+qa(y)−q 2
+
+a(y)
+X
+j
+aj(y) + 1
+2 a(y)2
+
+ +q 3O(1)
+
+
+2
+
+=E y∼P0
+
+
+
+1 +q
+
+X
+j
+aj +a
+
+ +q 2O(1)
+
+
+q2a(y)2 +q 3O(1)
+
+
+
+=q 2 Ey∼P0[a(y)2] +O(q 3)
+=q 2
+
+eµ2/σ2
+−1
+
++O(q 3).
+Hence VarP [ln(P/Q)] =q 2(eµ2/σ2
+−1) +O(q 3), and the case of VarQ[ln(P/Q)]is identical.
+Step 4: Third absolute central moment.
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+=E y∼P0
+"
+(1 +qO(1))·
+ln
+1 +q(P
+j aj +a) +q 2O(1)
+1 +qP
+j aj +q 2O(1)
+− 1
+2 q2(eµ2/σ2
+−1) +q 3O(1)
+
+3
+=E y∼P0
+h
+(1 +qO(1))
+qa(y) +q 2O(1)
+3i
+=E y∼P0
+hqa(y) +q 2O(1)
+3i
++O(q 4).
+Applying the triangle inequality and using|O(1)|=O(1),
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+≤E y∼P0
+h
+q|a(y)|+q 2|O(1)|
+3i
++O(q 4)
+=q 3 Ey∼P0 |a(y)|3 +O(q 4).
+Applying the triangle inequality once more toa(y) = exp
+
+µ·y
+σ2 − µ2
+2σ2
+
+−1,
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+≤q 3 Ey∼P0
+e
+µ·y
+σ2 − µ2
+2σ2 −1
+
+3
++O(q 4)
+≤q 3 Ey∼P0
+"
+e
+µ·y
+σ2 − µ2
+2σ2 + 1
+3#
++O(q 4)
+=q 3
+
+e3µ2/σ2
++ 3eµ2/σ2
++ 1
+
++O(q 4).
+The case ofE Q|ln(P/Q)−E Q[ln(P/Q)]|3 is identical.
+Proof of Theorem F .2.For clarity we give the proof in the one-dimensional setting, where g outputs
+real numbers; the argument extends to the multidimensional case without essential change.
+All big-O terms are taken in the limit ˆq= 1−q→0 or σ→ ∞ , unless otherwise stated. We
+introduce the following notation.
+•µ=g(X), andµ j =g(X j)forj= 1, . . . , n.
+• ¯P=N
+P
+j µj +µ, σ 2
+
+and ¯Q=N
+P
+j µj, σ 2
+
+.
+36
+
+--- PAGE 37 ---
+• Fori= 1, . . . , n,
+Ai(y) =
+N(P
+j µj +µ−µ i, σ 2)(y)
+¯P(y) −1 = exp
+
+−
+µi(y− P
+j µj −µ)
+σ2 − µ2
+i
+2σ2
+
+−1.
+(14)
+• Similarly,
+A(y) =
+¯Q(y)
+¯P(y) −1 =
+N(P
+j µj, σ 2)(y)
+¯P(y) −1 = exp
+
+−
+µ(y− P
+j µj −µ)
+σ2 − µ2
+2σ2
+
+−1.
+(15)
+• Fori= 1, . . . , n,
+Bi(y) =
+N(P
+j µj −µ i, σ 2)(y)
+¯Q(y) −1 = exp
+
+−
+µi(y− P
+j µj)
+σ2 − µ2
+i
+2σ2
+
+−1.
+Step 1: Density approximations.Applying the Taylor expansion qα = (1−ˆq)α = 1−αˆq+O(ˆq2)
+to the mixture weights gives
+M(S)(y) =
+h
+1 + ˆq
+
+
+nX
+j=1
+Aj(y) +A(y)
+
+ + ˆq2O(1)
+i
+¯P(y),(16)
+M(S−)(y) =
+h
+1 + ˆq
+nX
+j=1
+Bj(y) + ˆq2O(1)
+i
+¯Q(y).(17)
+Step 2: Approximation ofE P [ln(P/Q)].By (16) and (17),
+EP
+
+ln P
+Q
+
+=E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+·
+
+ln
+¯P(y)
+¯Q(y) + ln
+1 + ˆq
+P
+j Aj +A
+
++ ˆq2O(1)
+1 + ˆqP
+j Bj + ˆq2O(1)
+
+
+
+ .
+We split this into two parts,E 1 andE 2.
+PartE 1.
+E1 =E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+ ln
+¯P(y)
+¯Q(y)
+
+
+= µ2
+2σ2 + ˆqEy∼ ¯P
+
+
+
+X
+j
+Aj +A
+
+ ln
+¯P
+¯Q
+
+ +O(ˆq2).
+Expanding Aj, A via (14)–(15) and ex −1 = P∞
+k=1 xk/k!, and using Ey∼ ¯P y= P
+j µj +µ and
+Var¯P y=σ 2, the dominant contribution comes from terms of orderˆq y2/σ4:
+M1 = ˆqEy∼ ¯P
+
+
+
+X
+j
+Aj +A
+
+ ln
+¯P
+¯Q
+
+ = ˆqEy∼ ¯P
+"
+µ(−P
+j µj −µ)y 2
+σ4
+#
++ ˆq·O(σ−4)
+=−ˆq
+µ(P
+j µj +µ)
+σ2 + ˆq·O(σ−4),
+E1 = µ2
+2σ2 −ˆq
+µ(P
+j µj +µ)
+σ2 + ˆq·O(σ−4) +O(ˆq2).(18)
+37
+
+--- PAGE 38 ---
+PartE 2.Applyingln(1 +q) =q+O(q 2)to the second log,
+E2 =E y∼ ¯P
+
+(1 + ˆqO(1))
+
+ˆq
+
+X
+j
+Aj +A−
+X
+j
+Bj
+
+ + ˆq2O(1)
+
+
+
+
+= ˆqEy∼ ¯P
+
+X
+j
+Aj +A−
+X
+j
+Bj
+
+ +O(ˆq2).
+Retaining only the y2/σ4 terms from the Taylor expansion of Aj, A, Bj and using the moments of
+¯P,
+E2 = ˆq
+µP
+j µj
+σ2 + ˆq·O(σ−4) +O(ˆq2).(19)
+Combining (18) and (19),
+EP
+
+ln P
+Q
+
+=E 1 +E 2 = (1−2ˆq) µ2
+2σ2 + ˆq·O(σ−4) +O(ˆq2)
+= (1−ˆq)2 µ2
+2σ2 + ˆq·O(σ−4) +O(ˆq2).
+The case ofE Q[ln(P/Q)]is analogous.
+Step 3: Variance.We approximateE P [(ln(P/Q))2]by splitting it into two parts,V 1 andV 2.
+EP
+"
+ln P
+Q
+2#
+=E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+·
+
+
+
+ln
+¯P
+¯Q
+2
++ 2 ln
+¯P
+¯Q ln
+1 + ˆq
+P
+j Aj +A
+
++ ˆq2O(1)
+1 + ˆqP
+j Bj + ˆq2O(1) + ˆq2O(1)
+
+
+
+ .
+PartV 1.
+V1 =E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+
+ln
+¯P
+¯Q
+2
+
+ (20)
+=E ¯P
+"
+ln
+¯P
+¯Q
+2#
++ ˆq·O(σ−4) +O(ˆq2).(21)
+PartV 2.Retaining only terms of orderˆq y2/σ4,
+V2 =E y∼ ¯P
+"
+(1 + ˆqO(1))·2 ln
+¯P(y)
+¯Q(y) ln
+1 + ˆq(P
+j Aj +A) + ˆq2O(1)
+1 + ˆqP
+j Bj + ˆq2O(1)
+#
+=E y∼ ¯P
+
+2ˆq
+
+ln
+¯P(y)
+¯Q(y)
+
+X
+j
+Aj +A−
+X
+j
+Bj
+
+
+
+ +O(ˆq2)
+= 2ˆqEy∼ ¯P
+"
+µ(−P
+j µj −µ+ P
+j µj)y 2
+σ4
+#
++ ˆq·O(σ−4) +O(ˆq2)
+=−2ˆqµ2
+σ2 + ˆq·O(σ−4) +O(ˆq2).(22)
+38
+
+--- PAGE 39 ---
+Combining (21) and (22),
+VarP
+
+ln P
+Q
+
+=V 1 +V 2 −
+
+EP
+
+ln P
+Q
+2
+=E ¯P
+"
+ln
+¯P
+¯Q
+2#
+−2ˆqµ2
+σ2 −(1−4ˆq)
+ µ2
+2σ2
+2
++ ˆq·O(σ−4) +O(ˆq2)
+=
+ 
+µ2
+σ2 +
+ µ2
+2σ2
+2!
+−2ˆqµ2
+σ2 −
+ µ2
+2σ2
+2
++ ˆq·O(σ−4) +O(ˆq2)
+= (1−2ˆq) µ2
+σ2 + ˆq·O(σ−4) +O(ˆq2) = (1−ˆq)2 µ2
+σ2 + ˆq·O(σ−4) +O(ˆq2).
+The case of VarQ[ln(P/Q)]is identical.
+Step 4: Third absolute central moment.We have
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+=E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+ln
+¯P(y)
+¯Q(y) + ln
+1 + ˆq(P
+j Aj +A) + ˆq2O(1)
+1 + ˆqP
+j Bj + ˆq2O(1)
+−(1−2ˆq) µ2
+2σ2 + ˆq·O(σ−4) + ˆq2O(1)
+
+3#
+=E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
++ˆq
+
+X
+j
+Aj +A−
+X
+j
+Bj + µ2
+σ2 +O(σ −4)
+
+ + ˆq2O(1)
+
+3
+ .
+Applying the triangle inequality, noting|O(1)|=O(1),
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+≤E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+ ·
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+
++ˆq
+
+X
+j
+Aj +A−
+X
+j
+Bj +O(σ −2)
+
++ ˆq2O(1)
+
+
+3
+
+=E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+ ·
+ ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+
+3
++3ˆq
+
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+2
+
+X
+j
+Aj +A−
+X
+j
+Bj +O(σ −2)
+
++ ˆq2O(1)
+
+
+
+ .
+We split this intoT 1 andT 2.
+39
+
+--- PAGE 40 ---
+PartT 1.
+T1 =E y∼ ¯P
+
+
+
+1 + ˆq
+
+X
+j
+Aj +A
+
+ + ˆq2O(1)
+
+
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+
+3
+
+
+=E y∼ ¯P
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+
+3
++ ˆq·O(σ−5) +O(ˆq2)
+=
+q
+8
+π
+µ3
+σ3 + ˆq·O(σ−5) +O(ˆq2).(23)
+PartT 2.Applying the triangle inequality and retaining terms of orderˆq/σ 3,
+T2 =E y∼ ¯P
+
+(1 + ˆqO(1))·3ˆq
+
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+2
+
+X
+j
+Aj +A−
+X
+j
+Bj +O(σ −2)
+
+
+
+=E y∼ ¯P
+
+3ˆq
+
+ln
+¯P(y)
+¯Q(y) − µ2
+2σ2
+2
+
+X
+j
+Aj +A−
+X
+j
+Bj +O(σ −2)
+
+
+ +O(ˆq2)
+≤E y∼ ¯P
+"
+3ˆq
+µ2(y− P
+j µj −µ) 2
+σ4
+−
+µ(y− P
+j µj −µ)
+σ2
+
+#
++ ˆq·O(σ−4) +O(ˆq2)
+=
+3ˆq µ3 Ey∼ ¯P|y− P
+j µj −µ| 3
+σ6 + ˆq·O(σ−4) +O(ˆq2)
+= 3ˆq
+q
+8
+π
+µ3
+σ3 + ˆq·O(σ−4) +O(ˆq2).(24)
+Combining (23) and (24),
+EP
+ln P
+Q −E P
+
+ln P
+Q
+
+3
+≤T 1 +T 2 ≤(1 + 3ˆq)
+q
+8
+π
+µ3
+σ3 + ˆq·O(σ−4) +O(ˆq2)
+= (2−q 3)
+q
+8
+π
+µ3
+σ3 + ˆq·O(σ−4) +O(ˆq2).
+The case ofE Q|ln(P/Q)−E Q[ln(P/Q)]|3 is identical.
+G Further Monte Carlo Simulations for the Approximate GDP Filter
+G.1 Conversion of RDP Order 1 to(ε, δ)-DP
+The standard algebraic conversion from RDP to (ε, δ)-DP (Canonne et al., 2020) is undefined at RDP
+order 1, because the formula involves a factor that diverges there. This is not merely an algebraic
+singularity — the underlying proof breaks down at order 1. We adapt that proof to derive a conversion
+dedicated to RDP order 1. We note that this algebraic conversion is not tight: an optimal conversion
+exists but is numerically unstable, making it less practical. The algebraic conversion is nonetheless
+the standard choice in the literature, and we follow that convention here.
+Theorem G.1.If a mechanism satisfies (1, B)-RDP , then for allε >0 it satisfies (ε, δ)-DP with
+δ=c·B, wherec∈(0,1)is the solution to
+1
+c + lnc= 1 +ε.
+Proof.We find the smallestcsuch that
+1−e ε−l ≤c·lfor alll >0.
+This inequality implies that for every remove pair(P, Q)and PLRVL(y) = ln(P(y)/Q(y)),
+Ey∼P
+h
+1−e ε−L(y)
+i
+≤c·E y∼P [L(y)].
+40
+
+--- PAGE 41 ---
+Taking the supremum over all remove pairs, the left-hand side becomes the tightestδ such that the
+mechanism is (ε, δ)-DP, while the right-hand side becomes the RDP bound at order 1 scaled by c.
+Optimising overl, we solve the system
+1−e ε−l =c·l, e ε−l =c,
+which yields the equation 1/c+ lnc= 1 +εwithc∈(0,1).
+G.2 Details of Monte Carlo Simulations
+We validate the approximate GDP filter for subsampled Gaussian mechanisms through Monte Carlo
+simulations across a range of subsampling rates. All experiments employ the adaptive rule
+σt = clamp
+
+ σ0qP
+i<t y2
+i
+; [σmin, σ 0]
+
+ , C t = C0qP
+i<t y2
+i
+,(25)
+which jointly scales down both σt and Ct by the factor
+qP
+i<t y2
+i . This is an analogue of AdaGrad-
+style step-size decay (Duchi et al., 2011) applied to DP training. As outputs accumulate, P y2
+i grows
+and the clipping bound Ct naturally decreases, reflecting the observation that gradient norms diminish
+as a model approaches convergence (Andrew et al., 2021). The floor σmin prevents the noise scale
+from degenerating asP y2
+i → ∞, and the ceiling σ0 handles the first step where the accumulated
+sum is near zero. Other practical adaptive rules are discussed in (Lécuyer, 2021).
+The common parameters across all experiments are: σ0 = 8.0 (initial noise scale), σmin = 2.0
+(minimum noise floor), and C0 = 1.0, reflecting practical DP-SGD scenarios where noise decreases
+gradually as training progresses. For each subsampling rate, we carefully tune the composition length
+T and budget B so that the filter halts with high probability (≥95% ) after an average of 11–12 active
+epochs.
+We simulate N= 10 6 trajectories of the filter, tracking the privacy loss random variable L(y) =
+ln P(y)
+Q(y) , where P and Q form a remove pair of distributions. For each trajectory, we compute the
+empirical privacy loss distribution and compare it against the theoretical Gaussian approximation—
+namely, the PLD of
+√
+2B-GDP—predicted by Theorem 4.2.
+To evaluate the(ε, δ)-DP curve at privacy levels as small as δ∼10 −7, direct empirical estimation
+from N= 10 6 samples is insufficient: fewer than one trajectory in ten would fall in the relevant tail.
+We therefore augment the empirical distribution with a peaks-over-threshold (POT) tail fit using the
+Generalized Pareto Distribution (GPD). Concretely, for each simulated sample {Li}N
+i=1 (under P
+and under Q separately), we set the threshold u at the empirical 95th percentile, collect the 0.05N
+exceedances {Li −u:L i > u}, and fit a GPD via maximum likelihood to the exceedances, thereby
+obtaining shapeξand scaleσparameters. The resulting tail-probability estimator is
+cPr[L > x] =
+
+
+
+1
+N
+NX
+i=1
+1[Li > x]x≤u,
+ˆpu ·
+
+1 +ξ x−u
+σ
+−1/ξ
+x > u,
+(26)
+where ˆpu =|{i:L i > u}|/N is the empirical exceedance probability.The hockey-stick di-
+vergence is then estimated as ˆδ(ε) = cPrP [L > ε]−e εcPrQ[L > ε] , and for each target level
+δ∗ ∈ {10 −5, . . . ,10−7} the corresponding ε∗ is recovered by binary search (Brent’s method, toler-
+ance 10−9). The fitted GPD shape parameters across all experiments satisfy ξ∈(−0.13,−0.09) ,
+indicating bounded-support tails consistent with the Gaussian approximation, and validating the
+regularity assumption underlying the POT method.
+We present five figures and two summary tables below. Each figure corresponds to a subsampling
+rate q∈ {0.01,0.1,0.199,0.801,0.95} , covering both the low-subsampling ( q <0.2 ) and high-
+subsampling (q >0.8 ) regimes. Within each figure, panels (a)–(b) and (c)–(d) display the CDF
+comparison and CDF discrepancy under the P and Q arms of the remove pair, respectively, along
+with the halting probability and average number of steps and epochs before the filter stops. Panel (e)
+41
+
+--- PAGE 42 ---
+overlays three(ε, δ)-DP curves: the theoretical
+√
+2B-GDP guarantee from Theorem 4.2, the empirical
+simulation, and the (1, B)-RDP conversion (obtained via Theorem G.1 above). Table 2 collects
+the empirical PLRV means and variances across all five settings and compares them against the
+theoretical predictions E[L] =±B and Var[L] = 2B from
+√
+2B-GDP, while Table 3 summarises
+the resulting∆-approximate GDP guarantees.
+The results across all subsampling rates confirm several key findings.
+1. The filter halts with high probability in all experiments (≥98% across all settings) after an
+average of 11–12 active epochs; the high halting probability ensures that the filter governs
+the privacy accounting in the vast majority of trajectories rather than the finite composition
+horizon T , and the sufficient number of active epochs allows the central limit theorem to
+take effect and justify the Gaussian approximation of the PLD.
+2. The empirical PLRV moments match the theoretical predictions closely: means agree with
+±B to within a few percent under both P and Q, and variances similarly match 2B well
+across all settings (Table 2), validating the moment approximations of Theorems F.1 and F.2
+as one key ingredient underpinning the Gaussian convergence.
+3. The CDF discrepancy ∆ between the empirical PLD and the
+√
+2B-GDP Gaussian is small in
+a distributional sense, confirming that the Gaussian approximation is accurate; nonetheless,
+even modest values of ∆ can translate into non-negligible slack in the resulting (ε, δ)-DP
+guarantee, and so minimising ∆ remains practically important. Encouragingly, ∆ decreases
+as q→0 or q→1 (Table 3), where the per-step mechanism concentrates in the low- or
+high-subsampling limit and CLT convergence is fastest.
+4. Panel (e) of each figure shows that the (1, B)-RDP conversion yields dramatically looser
+(ε, δ)-DP curves than the empirical simulation in all cases, confirming that RDP accounting
+is highly suboptimal here. Our
+√
+2B-GDP guarantee is optimistic relative to the empirical
+curves for intermediate subsampling rates, but the gap narrows as q→0 or q→1 where
+the Gaussian CLT approximation is most accurate. At q= 0.95 in particular, the
+√
+2B-GDP
+curve and the empirical curve cross each other, reflecting that the Gaussian approximation
+becomes accurate enough that the GDP guarantee is no longer uniformly conservative.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0 (c)
+Under Q
+Simulated PLD
+PLD of 2B-GDP
+0.72 0.74 0.76 0.78 0.80 0.82 0.84 0.86 0.88
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+(e)
+2B-GDP
+Empirical
+(1, B)-RDP
+0.4
+ 0.2
+ 0.0 0.2 0.4
+Privacy Loss
+0.0000
+0.0005
+0.0010
+0.0015
+0.0020
+0.0025
+0.0030
+CDF Error
+(b)
+= 0.0032
+0.4
+ 0.2
+ 0.0 0.2 0.4
+Privacy Loss
+0.0000
+0.0005
+0.0010
+0.0015
+0.0020
+0.0025
+0.0030
+(d)
+= 0.0030
+Figure 11: Parameters: q= 0.01 , T= 1200 , B= 20000·Budg(0, q, σ 0,1)≈0.01575 . Final
+guarantee of 0.003182-approximate 0.1775-GDP.(a)–(b):Under y∼P : filter halts with 100.00%
+probability after an average of 1111.2 steps (11.11 epochs); empirical PLD mean 0.01591, variance
+0.03151; CDF discrepancy ∆≈0.003182 .(c)–(d):Under y∼Q : filter halts with 100.00%
+probability after an average of1111.2 steps (11.11 epochs); empirical PLD mean −0.01549, variance
+0.03113; CDF discrepancy ∆≈0.003019 .(e): (ε, δ)-DP curves comparing
+√
+2B-GDP guarantee,
+empirical simulation, and(1, B)-RDP conversion.
+42
+
+--- PAGE 43 ---
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0 (c)
+Under Q
+Simulated PLD
+PLD of 2B-GDP
+2.8 2.9 3.0 3.1 3.2
+10 8
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+(e)
+2B-GDP
+Empirical
+(1, B)-RDP
+1
+ 0 1
+Privacy Loss
+0.000
+0.002
+0.004
+0.006
+0.008
+0.010
+0.012
+CDF Error
+(b)
+= 0.0125
+1
+ 0 1
+Privacy Loss
+0.0000
+0.0025
+0.0050
+0.0075
+0.0100
+0.0125
+0.0150
+(d)
+= 0.0146
+Figure 12: Parameters: q= 0.1 , T= 120 , B= 2000·Budg(0, q, σ 0,1)≈0.1575 . Final
+guarantee of 0.01464-approximate 0.5612-GDP.(a)–(b):Under y∼P : filter halts with 98.86%
+probability after an average of 113.1 steps (11.31 epochs); empirical PLD mean 0.1526, variance
+0.314; CDF discrepancy ∆≈0.01247 .(c)–(d):Under y∼Q : filter halts with 98.80% probability
+after an average of 113.1 steps (11.31 epochs); empirical PLD mean −0.1494, variance 0.2912;
+CDF discrepancy ∆≈0.01464 .(e): (ε, δ)-DP curves comparing
+√
+2B-GDP guarantee, empirical
+simulation, and(1, B)-RDP conversion.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0 (c)
+Under Q
+Simulated PLD
+PLD of 2B-GDP
+3.9 4.0 4.1 4.2 4.3 4.4 4.5
+10 8
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+10 1
+(e)
+2B-GDP
+Empirical
+(1, B)-RDP
+1
+ 0 1 2
+Privacy Loss
+0.000
+0.005
+0.010
+0.015
+CDF Error
+(b)
+= 0.0182
+2
+ 1
+ 0 1
+Privacy Loss
+0.000
+0.005
+0.010
+0.015
+0.020
+0.025
+(d)
+= 0.0261
+Figure 13: Parameters: q= 0.199 , T= 65 , B= 1000·Budg(0, q, σ 0,1)≈0.3118 . Final
+guarantee of 0.02606-approximate 0.7897-GDP.(a)–(b):Under y∼P : filter halts with 99.24%
+probability after an average of 58.0 steps (11.53 epochs); empirical PLD mean 0.2972, variance
+0.6176; CDF discrepancy ∆≈0.01818 .(c)–(d):Under y∼Q : filter halts with 99.13% probability
+after an average of 58.0 steps (11.54 epochs); empirical PLD mean −0.2835, variance 0.5469;
+CDF discrepancy ∆≈0.02606 .(e): (ε, δ)-DP curves comparing
+√
+2B-GDP guarantee, empirical
+simulation, and(1, B)-RDP conversion.
+43
+
+--- PAGE 44 ---
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0 (c)
+Under Q
+Simulated PLD
+PLD of 2B-GDP
+7.4 7.6 7.8 8.0 8.2
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+10 1
+(e)
+2B-GDP
+Empirical
+(1, B)-RDP
+2
+ 0 2 4
+Privacy Loss
+0.000
+0.002
+0.004
+0.006
+CDF Error
+(b)
+= 0.0068
+4
+ 2
+ 0 2
+Privacy Loss
+0.0000
+0.0025
+0.0050
+0.0075
+0.0100
+0.0125
+0.0150 (d)
+= 0.0146
+Figure 14: Parameters: q= 0.801 , T= 20 , B= 200·Budg(0, q, σ 0,1)≈1.003 . Final guarantee of
+0.01463-approximate 1.416-GDP.(a)–(b):Under y∼P : filter halts with98.61% probability after an
+average of 14.8 steps (11.85 epochs); empirical PLD mean 1.006, variance 2.093; CDF discrepancy
+∆≈0.006753 .(c)–(d):Under y∼Q : filter halts with 98.07% probability after an average
+of 14.8 steps (11.88 epochs); empirical PLD mean −0.9704, variance 1.862; CDF discrepancy
+∆≈0.01463 .(e): (ε, δ)-DP curves comparing
+√
+2B-GDP guarantee, empirical simulation, and
+(1, B)-RDP conversion.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+CDF
+(a)
+Under P
+Simulated PLD
+PLD of 2B-GDP
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0 (c)
+Under Q
+Simulated PLD
+PLD of 2B-GDP
+7.2 7.4 7.6 7.8
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+10 1
+(e)
+2B-GDP
+Empirical
+(1, B)-RDP
+2
+ 0 2 4
+Privacy Loss
+0.0000
+0.0005
+0.0010
+0.0015
+0.0020
+CDF Error
+(b) = 0.0022
+4
+ 2
+ 0 2
+Privacy Loss
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+(d)
+= 0.0048
+Figure 15: Parameters: q= 0.95 , T= 20 , B= 150·Budg(0, q, σ 0,1)≈1.058 . Final guarantee
+of 0.004807-approximate 1.454-GDP.(a)–(b):Under y∼P : filter halts with 99.98% probability
+after an average of 11.8 steps (11.22 epochs); empirical PLD mean 1.058, variance 2.134; CDF
+discrepancy ∆≈0.002208 .(c)–(d):Under y∼Q : filter halts with 99.97% probability after an
+average of 11.9 steps (11.29 epochs); empirical PLD mean −1.047, variance 2.064; CDF discrepancy
+∆≈0.004807 .(e): (ε, δ)-DP curves comparing
+√
+2B-GDP guarantee, empirical simulation, and
+(1, B)-RDP conversion.
+44
+
+--- PAGE 45 ---
+Table 2: Empirical vs. theoretical PLRV moments across subsampling rates. Theoretical mean is +B
+underPand−BunderQ; theoretical variance is2Bunder both.
+Theoretical Empirical underPEmpirical underQ
+q BMean Variance Mean Variance Mean Variance
+0.01 0.01575±0.01575 0.0315 0.01591 0.03151−0.01549 0.03113
+0.1 0.1575±0.1575 0.315 0.1526 0.314−0.1494 0.2912
+0.199 0.3118±0.3118 0.6236 0.2972 0.6176−0.2835 0.5469
+0.801 1.003±1.003 2.005 1.006 2.093−0.9704 1.862
+0.95 1.058±1.058 2.115 1.058 2.134−1.047 2.064
+Table 3: Empirical ∆-divergence error and resulting privacy guarantees. The reported ∆ is the
+maximum CDF discrepancy between the empirical PLD and the
+√
+2B-GDP Gaussian; the final
+guarantee takes∆ = max(∆ P ,∆ Q).
+q∆underP∆underQFinal∆
+√
+2B-GDP
+0.01 0.003182 0.003019 0.003182 0.1775
+0.1 0.01247 0.01464 0.01464 0.5612
+0.199 0.01818 0.02606 0.02606 0.7897
+0.801 0.006753 0.01463 0.01463 1.416
+0.95 0.002208 0.004807 0.004807 1.454
+45

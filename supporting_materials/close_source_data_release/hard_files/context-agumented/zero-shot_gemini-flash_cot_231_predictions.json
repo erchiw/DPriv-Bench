@@ -1,0 +1,128 @@
+[
+  {
+    "question_id": 109,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "PATE"
+  },
+  {
+    "question_id": 110,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "PATE"
+  },
+  {
+    "question_id": 91,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "output perturbation"
+  },
+  {
+    "question_id": 92,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "output perturbation"
+  },
+  {
+    "question_id": 39,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 106,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 124,
+    "pred": 0,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 125,
+    "pred": 0,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 6,
+    "pred": 0,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 15,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 131,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 74,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 28,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 66,
+    "pred": 0,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 47,
+    "pred": 0,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 127,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "Smooth_sensitivity"
+  },
+  {
+    "question_id": 129,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "Smooth_sensitivity"
+  },
+  {
+    "question_id": 113,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "PTR"
+  }
+]

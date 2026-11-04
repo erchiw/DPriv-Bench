@@ -1,0 +1,1017 @@
+--- PAGE 1 ---
+Better Gaussian Mechanism using Correlated Noise
+Christian Janos Lebeda ∗
+Inria, University of Montpellier
+Abstract
+We present a simple variant of the Gaussian mechanism for answering differentially private queries when the
+sensitivity space has a certain common structure. Our motivating problem is the fundamental task of answering
+d counting queries under the add/remove neighboring relation. The standard Gaussian mechanism solves this
+task by adding noise distributed as a Gaussian with variance scaled byd independently to each count. We
+show that adding a random variable distributed as a Gaussian with variance scaled by(
+√
+d + 1)/4 to all counts
+allows us to reduce the variance of the independent Gaussian noise samples to scale only with(d +
+√
+d)/4. The
+total noise added to each counting query follows a Gaussian distribution with standard deviation scaled by
+(
+√
+d + 1)/2 rather than
+√
+d. The central idea of our mechanism is simple and the technique is flexible. We
+show that applying our technique to another problem gives similar improvements over the standard Gaussian
+mechanism.
+1 Introduction
+The Gaussian mechanism is one of the most important tools in differential privacy. In its most basic form, the
+mechanism first computes the answer tod real-valued queries. The output is then perturbed by adding noise
+sampled from a zero-mean Gaussian distribution independently to the answer of each query. The magnitude of
+the Gaussian noise required to satisfy differential privacy depends on the desired privacy parameters and theℓ2
+sensitivity of the queries. The mechanism is used as a key subroutine in a long list of more complicated differential
+privacy mechanisms such as DP-SGD [ACG+16] and the Census TopDown Algorithm [AAC+22] to name just two
+examples (The TopDown Algorithm uses the discrete variant of the Gaussian mechanism [CKS20]).
+The Gaussian mechanism was introduced in some of the earliest work on differential privacy [DMNS06,
+DKM+06]. Since then, the mechanism has been subject to a lot of study due to its importance. Notable results
+include a tight analysis under approximate differential privacy [BW18] as well as other definitions of differential
+privacy [BS16, Mir17, DRS22]. An adjacent line of work has improved the analysis of mechanisms where additive
+Gaussian noise is a key element. Recent results include an exact analysis of the Gaussian Sparse Histogram
+Mechanism [WKZK24] and development of numerical tools that allow for tighter privacy accounting used for
+DP-SGD (e.g. [SMM19, KJH20, KJPH21, ZDW22]). These results give stronger privacy guarantees of mechanisms
+for various settings, which imply an improved privacy-utility trade-off. Improving the Gaussian mechanism and its
+variants by even small constant factors can have a significant impact on downstream applications. One notable
+such example is the accuracy of models trained with DP-SGD which can vary significantly based on the amount of
+noise (see e.g. [DBH+22, Figure 1]).
+As mentioned above, the standard Gaussian mechanism privately releases queries by adding noise with
+magnitude scaled to the ℓ2 sensitivity. The ℓ2 sensitivity is defined as the biggest distance in theℓ2 norm
+between the query outputs for any pair of neighboring datasets. If we have no guarantees on theℓ2 norm of
+the query outputs we can clip data points before adding noise. This is common practice for several tasks such
+as approximating gradients for private machine learning (e.g. [ACG+16, KMS+21]) and mean estimation (e.g.
+[BDKU20, HLY21, ALNP24]). The Gaussian mechanism can be applied to many settings because we only need to
+bound the ℓ2 sensitivity to privately release an estimate to any real-value queries. However, in some cases we can
+achieve better accuracy by utilizing the structure of the queries.
+∗This work was carried out when Lebeda was at the IT University of Copenhagen.
+arXiv:2408.06853v3  [cs.CR]  18 Mar 2025
+
+--- PAGE 2 ---
+In this work we focus on settings where we want to estimate the sum of all data points in a dataset. We
+refer to the set of all possible differences between the non-private sums for neighboring dataset as the sensitivity
+space. We utilize a simple structure of the sensitivity space present for certain queries. Our technique reduces the
+magnitude of noise for such queries over the standard Gaussian mechanism that only considers the maximumℓ2
+norm of the sensitivity space. The structure we consider most naturally occurs under the add/remove neighboring
+relation.
+Before presenting our technique it is worth considering a query where the structure we utilize is not present.
+We compare the sensitivity under the add/remove and replacement neighboring relations. For many tasks, theℓ2
+sensitivity under the replacement neighboring relation is twice that of the add/remove relation. For example, if we
+clip the ℓ2 norm of data points inRd to some valueC > 0 the ℓ2 sensitivity is clearlyC under the add/remove
+relation. But theℓ2 sensitivity is2C under replacement because we can replace any vectorx ∈ Rd where ∥x∥2 = C
+with −x. The magnitude of noise added by the standard Gaussian mechanism therefore differs by a factor of 2
+between the two neighboring relations.
+In contrast to the example above, consider the task of answeringd counting queries. Here each data point is in
+{0, 1}d. The ℓ2 distance between neighboring datasets under add/remove is maximized when adding or removing
+the vector of all ones (which we denote1d). Under the replacement neighboring relation the distance is maximized
+by replacing any data point with one that disagrees on all coordinates. In both cases theℓ2 sensitivity is
+√
+d. The
+standard Gaussian mechanism therefore adds noise with the same magnitude under either neighboring relation.
+Our main result is to show that adding the same sample from a Gaussian distribution to all counts allows us to
+reduce the magnitude of the independent noise added to each query under the add/remove neighboring relation.
+Theorem 3.1 (simplified). Let f(X) ∈ Nd be the answer tod counting queries on datasetX. Define random
+variables such thatη ∼ N (0,
+√
+d+1
+4µ2 ), Z ∼ N (0, d+
+√
+d
+4µ2 Id), and W ∼ N (0, d
+µ2 Id) for any µ > 0. Then the mechanism
+that outputs f(X)+ η1d + Z has the same differential privacy guarantees under the add/remove neighboring relation
+as the mechanism that outputsf(X) + W.
+The value ofµ depends on the desired privacy guarantees. For simplicity of presentation we assume here
+that µ = 1. The error of each counting query in our mechanism depends on the sum of two zero-mean Gaussian
+noise samples. The error is distributed asN (0, d+2
+√
+d+1
+4 ) and as such the standard deviation of our mechanism is
+(
+√
+d + 1)/2 while the standard deviation for the standard Gaussian mechanism is
+√
+d. Note that in general we
+cannot hope to add Gaussian noise under add/remove for any query with less than half the magnitude required
+under replacement. The group privacy property of differential privacy allows us to use any mechanism designed for
+add/remove under the replacement relation (see e.g. [DRS22, BS16]). Our mechanism adds near-optimal Gaussian
+noise even for a more restrictive setting which we discuss in Section 4.1.
+Many data analysis tasks depend on the size of the input datasetn. However, since the size of neighboring
+datasets differ by1 under the add/remove neighboring relation we cannot release the exact size under differential
+privacy. This is often disregarded as a technical detail because we can estimate the size of the dataset using
+additional privacy budget. Some private algorithms explicitly assume that we have access to either an estimate or
+a bound ofn (see e.g. [DL09, NTZ16]). Other mechanisms implicitly rely on an estimate of the dataset size such
+as some versions of DP-SGD [ACG+16] since gradients are usually normalized based on the expected batch size
+which is a function ofn. Our mechanism also relies on an estimate of the dataset size but we do not assume that an
+estimate is known. We instead use part of our privacy budget to compute an estimate. There is a trade-off between
+the accuracy of this estimate and the error for each query which we discuss in Section 3.1. If we have access to an
+estimate of the dataset size we can reduce the magnitude of noise added to each query from(
+√
+d + 1)/2 to
+√
+d/2.
+Our mechanism is simple and it is likely to be easily implementable in libraries that already support the
+standard Gaussian mechanism. We argue that simplicity is a desirable feature of practical differentially private
+mechanisms. In many cases (e.g. the 2020 US Census [AAC+22]) the privately released data will be used by data
+analysts who might not be familiar with the theory behind differential privacy. It is easier to communicate how
+the data was protected when the differentially private mechanism is simple. It is also easier to take the effect of
+introduced noise into account for any downstream analysis. Furthermore, it is well known that implementations
+of even basic concepts and mechanisms from differential privacy requires care to avoid privacy issues (See
+e.g. [Mir12, CSVW22, HDH+22]). We discuss some considerations for implementation at the end of Section 3. We
+believe that our technique has the potential to improve mechanisms for other settings apart from counting queries.
+In Section 4 we adapt our core idea to a setting where we add noise with a smaller magnitude than the standard
+
+--- PAGE 3 ---
+Gaussian mechanism under both the add/remove and replacement neighboring relations. We conclude our paper
+by discussing related work in Section 5 and potential future directions in Section 6.
+2 Preliminaries
+Setup of this paper.The Gaussian mechanism is used to privately estimate any real-valued function of a dataset
+X ∈ U N. We focus on settings where a datasetX = (x1, x2, . . . , xn) consists of n data points wherexi ∈ Rd and
+we want to estimate the sum of all data pointsf(X) =Pn
+i=1 xi. Throughout this paper we write[m] to denote
+the set {1, 2, . . . , m} for any m ∈ N, we denote byrd the d dimensional vector where all entries equal some value
+r ∈ R, and we writeId to denote thed × d identity matrix.
+Differential Privacy. Differential privacy [DMNS06] is a statistical property of a randomized mechanism.
+Intuitively, a randomized mechanism satisfies differential privacy if the output distribution of the mechanism is not
+affected significantly by any individual. The notion of neighboring datasets is used to model the impact of any one
+individual’s data. The two most commonly used definitions are the add/remove and replacement variants defined
+below. We consider both definitions in this paper but focus mainly on the add/remove neighboring relation.
+Definition 2.1. (Neighboring datasets (denoted X ∼ X ′)) Let X = (x1, x2, . . . , xn) be a dataset of size
+n. If X and X ′ are neighboring datasets under the add/remove neighboring relation then there exists ani such
+that either X ′ = (x1, . . . , xi−1, xi+1, . . . , xn) or X = (x′
+1, . . . , x′
+i−1, x′
+i+1, . . . , xn+1). If X and X ′ are neighboring
+datasets under the replacement neighboring relation we have|X| = |X ′| and there exists ani such that xj = x′
+j for
+all j ̸= i.
+We present our mechanism in terms of Gaussian differential privacy (µ-GDP) [DRS22]. Informally, an algorithm
+satisfies µ-GDP if the output distributions for any neighboring datasets are at least as similar as two Gaussian
+distributions. This is more precisely defined in Definition 2.2. Note that none of our results relies on Gaussian
+differential privacy. In the remark below we discuss how to easily translate our results to some other popular
+definitions of differential privacy by replacingµ with an appropriate value.
+Definition 2.2. (Gaussian differential priv acy [DRS22, Definition 4]) For any randomized mechanism
+M: U N → R satisfying µ-GDP it holds for all neighboring datasetsX ∼ X ′ that
+T (M(X), M(X ′)) ≥ T (N (0, 1), N (µ, 1)) .
+Here T (P, Q) : [0, 1] → [0, 1] denotes a trade-off function as defined below, and the inequality in Definition 2.2
+must hold for all inputs to the functions (any0 ≤ α ≤ 1). The trade-off function gives a lower bound on the type
+II error achievable for any level of type I error. We note that understanding the technical details of the trade-off
+function and µ-GDP is not required to follow the proofs in this paper. For more background on trade-off functions
+and f-differential privacy, we refer interested readers to Definitions 2 and 3 of [DRS22].
+Definition 2.3. (Trade-off function) Let P and Q be any two probability distributions defined on the same
+space. The trade-off functionT (P, Q) : [0, 1] → [0, 1] is defined as
+T (P, Q)(α) = inf{βϕ : αϕ ≤ α} ,
+where the infimum is taken over all (measurable) rejection rules. For a rejection ruleϕ, the values ofαϕ and βϕ
+denotes the type I and type II error rates, respectively.
+Remark Let f : U N → R be a function with sensitivity1. Let σ > 0 be large enough such thatf(X)+ N (0, σ2)
+satisfies either(ε, δ)-differential privacy [BW18, Theorem 8],(α, ε)-RDP [Mir17, Corollary 3], orρ-zCDP [BS16,
+Proposition 1.6]. Then all mechanisms presented in this paper satisfy the desired differential privacy guarantee if
+1/µ2 is replaced byσ2.
+The ℓ2 sensitivity of a function as defined below is a bound on the distance between the output for any pair of
+neighboring datasets. More generally, the sensitivity space is the set of all possible differences between outputs for
+neighboring datasets. The ℓ2 sensitivity equals the maximumℓ2 norm for any element in the sensitivity space.
+
+--- PAGE 4 ---
+Definition 2.4. ( ℓ2 sensitivity) The ℓ2 sensitivity of a functionf : U N → Rd is
+∆f = max
+X∼X ′
+∥f(X) − f(X ′)∥2 ,
+where ∥x∥2 =
+qPd
+i=1 x2
+i denotes the ℓ2 norm of anyx ∈ Rd.
+Definition 2.5. (Sensitivity space) The sensitivity space of a functionf : U N → Rd is the set
+{f(X) − f(X ′) ∈ Rd|X ∼ X ′} .
+The magnitude of noise added by the Gaussian mechanism scales linearly in theℓ2 sensitivity and a value
+based on the desired privacy guarantees. Lemma 2.1 gives the privacy guarantees of the Gaussian mechanism. We
+refer to this variant as the standard Gaussian mechanism throughout the paper.
+Lemma 2.1. (The Gaussian mechanism [DRS22]) Let f : U N → Rd be a function withℓ2 sensitivity ∆f. Then
+the mechanism that outputsf(X) + Z where Z ∼ N (0, (∆f)2/µ2Id) satisfies µ-GDP.
+The last tool we need from the differential privacy literature is the fact that the privacy guarantees of a
+mechanism are never negatively affected by post-processing.
+Lemma 2.2. (Post-processing [DRS22, Proposition 4]) Let M: U N → R denote any mechanism satisfying
+µ-GDP. Then for any (randomized) functiong : R → R ′ the composed mechanismg ◦ M: U N → R ′ also satisfies
+µ-GDP.
+3 Algorithm
+In this section we present our main contribution. The pseudo-code for our mechanism is in Algorithm 1. Throughout
+the section we present multiple equivalent representations of our mechanism. Each of these representations has
+its benefits. The error guarantees are trivial to analyze in first representation while the privacy guarantees are
+easier to analyze in the second. We present a third representation of the mechanism in Corollary 3.1, and finally
+in Section 3.1 we use yet another representation when discussing the trade-off between two sources of error. It is
+sometimes subjective which representation is preferred for a specific task. We hope that by presenting our work in
+multiple ways, the core idea behind our technique will become more intuitive to readers with various backgrounds.
+Algorithm 1: Gaussian Mechanism using Correlated Noise
+Input : Dataset X = (x1, x2, . . . , xn) where xi ∈ [0, 1]d.
+Output : µ-GDP estimates off(X) :=Pn
+i=1 xi and n under add/remove.
+1 Sample η ∼ N (0,
+√
+d+1
+4µ2 ).
+2 foreach i ∈ [d] do
+3 Sample zi ∼ N (0, d+
+√
+d
+4µ2 ).
+4 Let ˜xi ← f(X)i + η + zi.
+5 return ˜x, n + 2η.
+The motivating problem of our work is to released counting queries under differential privacy. However, we
+present our mechanism in the more general setting of answeringd queries with a real value from the interval
+[0, 1]. That is, a dataset X consists of n data points such thatxi ∈ [0, 1]d. A pair of datasets, X ∼ X ′, are
+neighboring if we can obtainX ′ from X by either adding or removing one data point. As such, we either have
+that (1) |X ′| = n − 1 and f(X) − f(X ′) ∈ [0, 1]d or (2) |X ′| = n + 1 and f(X) − f(X ′) ∈ [−1, 0]d.
+The core idea of our mechanism is to take advantage of the structure of this sensitivity space. Theℓ2 sensitivity
+of f is
+√
+d. However, notice that the vectorf(X) − f(X ′) always has ℓ2 distance at most
+√
+d/2 to either 1
+2
+d
+or
+− 1
+2
+d
+(recall that 1
+2
+d
+denotes the d dimensional vector where all coordinates are1/2). Our mechanism spends part
+of the privacy budget on adding noise along1d. The idea is to hide the difference betweenf(X) − 1
+2
+d
+, f(X), and
+f(X) + 1
+2
+d
+. This allows us to add noise with smaller magnitude to each query. A visualization of the geometric
+intuition behind this idea ford = 2 is shown in Figure 1. Next, we discuss the properties of our mechanism.
+
+--- PAGE 5 ---
+Figure 1: 2D geometric intuition of our technique. Each data point is in[0, 1] × [0, 1]. The red cross marksf(X)
+in all figures. The two left figures depict the shape of noise for the standard Gaussian mechanism. Informally,
+the mechanism is private iff(X ′) always is inside the blue circle with radius
+√
+2. The value off(X ′) under the
+replacement neighboring relation can be anywhere in the grey box in the first figure. That is, the box shows the
+result of adding any point from the sensitivity space tof(X). The boxes in the second figure similarly depict the
+sensitivity space under the add/remove neighboring relation. In general, there are2d possible values forf(X ′)
+that touch the hypersphere under replacement, but only2 such values under add/remove for anyd. In the third
+figure we focus on the case where we add a data point toX to construct X ′. Notice that the orange circle with
+radius
+√
+2/2 centered at f(X) + (0.5, 0.5) contains the box. We spend part of the privacy budget to add noise
+along the yellow diagonal. The resulting noise is elliptical and contains the sensitivity space under add/remove as
+seen in the last figure.
+Lemma 3.1. Algorithm 1 estimates each query with error distributed asN (0, d+2
+√
+d+1
+4µ2 ).
+Proof. It is easy to see on Line 4 of Algorithm 1 that the error for the estimate of thei’th query depends only
+on the value ofη and zi for any i ∈ [d]. Since η and zi are independent samples from zero-mean Gaussians their
+sum is distributed as a zero-mean Gaussian with varianced+
+√
+d
+4µ2 +
+√
+d+1
+4µ2 = d+2
+√
+d+1
+4µ2 . Furthermore, the standard
+deviation is
+
+(d + 2
+√
+d + 1)/(4µ2)
+1/2
+= (
+√
+d + 1)/(2µ).
+It remains for us to prove the privacy guarantees of Algorithm 1. To do so, we first introduce another
+mechanism. We use a simple injective function to map each data point ofX to a point inRd+1. We then release
+an estimate of the sum of all data points in this new representation underµ-GDP using the standard Gaussian
+mechanism. Finally, we prove that Algorithm 1 is equivalent to post-processing the output of this new mechanism
+for a fixed parameter.
+We construct fromX a new dataset ˆX = (ˆx1, ˆx2, . . . ,ˆxn) of n data points whereˆxi ∈ Rd+1. For eachi ∈ [n]
+and j ∈ [d] we define ˆxi,j = 2 · xi,j − 1 and we letˆxi,d+1 = C for some parameterC > 0. Finally, we defineg as
+the function that computes the sum of all data points in this new representation such thatg(X) =Pn
+i=1 ˆxi. The
+following two lemmas show that we can estimateg(X) under µ-GDP using the standard Gaussian mechanism.
+Lemma 3.2. The ℓ2 sensitivity of g is ∆g =
+√
+d + C 2.
+Proof. Fix any pair of neighboring datasetsX ∼ X ′ and let xi denote the data point that is either added to or
+removed from X to obtain X ′. It is easy to see that eitherg(X) − g(X ′) = ˆxi or g(X ′) − g(X) = ˆxi. By the
+definition of ˆxi we have thatˆxi,j is in the interval[−1, 1] for any j ∈ [d]. The ℓ2 sensitivity of g is thus bounded
+by ∥g(X) − g(X ′)∥2 = ∥ˆxi∥2 =
+qPd+1
+j=1 ˆx2
+i,j =
+qPd
+j=1(2 · xi,j − 1)2 + C 2 ≤
+qPd
+j=1 12 + C 2 =
+√
+d + C 2.
+Lemma 3.3. The mechanism that outputsg(X) + Z where Z ∼ N (0, d+C2
+µ2 Id+1) satisfies µ-GDP.
+Proof. It follows directly from Lemmas 2.1 and 3.2.
+Next, we show that Algorithm 1 and the mechanism from Lemma 3.3 are equivalent under post-processing
+when setting C = d1/4. We setC = d1/4 because that choice ofC minimizes the error for each query. We discuss
+the effect of using other values for the parameter in more detail in Section 3.1.
+
+--- PAGE 6 ---
+We recover a private estimate off(X) from the private estimate ofg(X) by inverting the transformation
+we performed when constructing ˆX from X. Notice that f(X)i = (g(X)i − g(X)d+1/C)/2 which allows us to
+estimate f(X)i using the private estimates ofg(X)i and g(X)d+1. Since post-processing does not affect the privacy
+guarantees (Lemma 2.2), it follows directly from Lemma 3.3 and 3.4 that Algorithm 1 satisfiesµ-GDP.
+Lemma 3.4. Let M denote Algorithm 1 and letM′ denote the mechanism described in Lemma 3.3 with parameter
+C = d1/4. Then there exists a bijectionh: Rd → Rd+1 such thath(M(X)) is distributed asM′(X) and h−1(M′(X))
+is distributed asM(X).
+Proof. By definition of the functiong we have thatg(X)i = 2 · f(X)i − n for alli ∈ [d] and g(X)d+1 = Cn = d1/4n.
+Let ˜x, ˜n denote the output ofM(X). Then for i ∈ [d] we estimate thei’th value ofg(X) as
+h(M(X))i = 2 · ˜xi − ˜n = 2 · (f(X)i + η + zi) − (n + 2η) = g(X) + 2zi .
+Since zi ∼ N (0, d+
+√
+d
+4µ2 ) we have that2 · zi and Zi are both distributed asN (0, d+C2
+µ2 ) = N (0, d+
+√
+d
+µ2 ). We can
+estimate the final entry ofg(X) as
+h(M(X))d+1 = d1/4˜n = d1/4(n + 2η) = g(X)d+1 + d1/42η .
+Both d1/42η and Zd+1 are distributed asN (0, d+
+√
+d
+µ2 ). Since the noise terms of all these estimates are independent
+h(M(X)) is distributed asM′(X).
+Similarly, if ˜y denotes the output ofM′(X) we can estimatef(X) and n using the inverse ofh. We estimate
+the value ofn as
+h−1(M′(X))d+1 = ˜yd+1/d1/4 = (g(X)d+1 + Zd+1)/d1/4 = n + Zd+1/d1/4 ,
+and we estimate thei’th entry off(X) as
+h−1(M′(X))i = ˜yi/2+ ˜yd+1/(2d1/4) = (g(X)i+Zi)/2+( g(X)d+1+Zd+1)/(2d1/4) = f(X)i+Zi/2+ Zd+1/(2d1/4) ,
+where Zi/2 is distributed as N (0, d+
+√
+d
+4µ2 ). As such, h−1(M′(X)) has the same distribution as M(X) where
+Zd+1/(2d1/4) = η is the correlated noise added to all entries in Algorithm 1.
+We are now ready to summarize the properties of our mechanism.
+Theorem 3.1. Let f(X) :=Pn
+i=1 xi denote the sum of the rows in a datasetX ∈ [0, 1]n×d. The mechanism that
+outputs f(X) + η1d + Z and n + 2η where η ∼ N (0,
+√
+d+1
+4µ2 ) and Z ∼ N (0, d+
+√
+d
+4µ2 Id) satisfies µ-GDP under the
+add/remove neighboring relation. The error of each query is distributed as a zero-mean Gaussian with standard
+deviation (
+√
+d + 1)/(2µ).
+Proof. The mechanism is Algorithm 1. The error guarantees follow from Lemma 3.1. The privacy guarantees
+follow from Lemmas 3.3, and 3.4.
+Algorithm 1 relies ond + 1 independent samples from Gaussian distributions. Alternatively, we can view
+the mechanism as outputting an estimate off(X) and n by sampling ad + 1 dimensional multivariate Gaussian
+distribution. The entries of the covariance matrix contain one of4 distinct values depending on (1) whether or
+not it is on the diagonal and (2) whether or not it is in the final row or column. This representation might be
+useful for data analysts for estimating the effect of noise. We use this representation again in Section 3.1 where we
+discuss different values for the parameterC.
+Corollary 3.1. Let X, n, and f(X) be defined as in Theorem 3.1 except thatf(X)d+1 = n. Then the mechanism
+that outputs f(X) + Z where Z ∼ N (0, Σ/µ2) satisfies µ-GDP under the add/remove neighboring relation where
+the covariance matrixΣ ∈ R(d+1)×(d+1) has the following structure
+Σ =
+
+
+d+2
+√
+d+1
+4
+√
+d+1
+4 . . .
+√
+d+1
+4
+√
+d+1
+2√
+d+1
+4
+d+2
+√
+d+1
+4 . . .
+√
+d+1
+4
+√
+d+1
+2
+... ... ... ... ...
+√
+d+1
+4
+√
+d+1
+4 . . . d+2
+√
+d+1
+4
+√
+d+1
+2√
+d+1
+2
+√
+d+1
+2 . . .
+√
+d+1
+2
+√
+d + 1
+
+
+
+--- PAGE 7 ---
+Note for practitioners In this section we have presented multiple representations of our mechanism. In
+Lemma 3.4 we showed that Algorithm 1 is equivalent to applying the standard Gaussian mechanism to a different
+representation of the dataset which we denoteˆX. However, both of these mechanisms are defined for arbitrary
+real-valued input and output, and as such any implementation of either representation must be an approximation
+of the idealized algorithm.
+Real values are often approximated in computers using floating-point representation and it is well-known
+that naive implementations can break the formal privacy guarantees [Mir12]. Additive noise mechanisms such as
+the Laplace mechanism [DMNS06] and the Gaussian mechanism [DKM+06] are typically defined as releasing the
+sum of a non-private query output and a sample from a distribution. This can be problematic if the mechanism
+is implemented using floating-point arithmetics because the output domains might differ between neighboring
+datasets (see [HDH+22, Theorem 2]). To mitigate this issue [HDH+22] present a technique for mechanisms that
+add a single noisy value to the true output.
+However, in Line 4 of Algorithm 1 we add two noise samples to the query output which likely causes similar
+issues if floating-point representations are used. To the best of our knowledge, it has not been studied whether
+implementations of mechanisms that rely on elliptical Gaussian noise suffer from floating-point vulnerabilities. As
+such, implementing the version of our mechanism from Lemma 3.3 might be preferred for production code. The
+values of f(X) and n can then be estimated using post-processing as described in the proof of Lemma 3.4. For
+counting queries and other discrete input we can also use the discrete Gaussian mechanism [CKS20] to estimate
+g(X), although we might need to change the value ofC slightly when d1/4 is not an integer or rational number. In
+Section 3.1 we discuss the effect of the value ofC on the private estimates.
+3.1 More accurate estimate of the dataset size Our mechanism outputs estimates of bothf(X) and the
+size of the datasetn = |X|. So far we have ignored the accuracy of the estimate forn. However, some tasks
+require an accurate estimate orn. Here we discuss how we can release a more accurate estimate ofn and reduce
+the correlated noise at the cost of increasing the magnitude of the independent noise added to each query.
+An alternative way of viewing our mechanism is that instead of estimating the value of each queryf(X)i
+independently, we privately estimate the difference betweenf(X)i and n/2 for each i ∈ [d]. We can estimate this
+value more accurately becausef(X)i has sensitivity1 but f(X)i − n/2 only has sensitivity1/2. Given an estimate
+of n/2, we can then recover an estimate off(X)i. Let ˜x, ˜n denote the output of Algorithm 1. If we subtract˜n/2
+from all outputs we find that˜xi − ˜n/2 = f(X)i − n/2 + zi is an estimate of the difference betweenf(X)i and n/2
+and ˜n − ˜n/2 = n/2 + η is our estimate ofn/2. The value ofn/2 itself has a sensitivity of1/2. If we computed a
+new estimate forn/2 for each query the error would match the standard Gaussian mechanism. The advantage of
+our approach is that we can reuse the same private estimate ofn/2 for all d queries.
+It is easy to see that the error for thei’th query using this representation depends on our estimates of both
+f(X)i − n/2 and n/2. We can balance the amount of noise for each estimate which is reflected in the parameterC
+in the representation ofˆX introduced earlier in this section. The magnitude of noise we use to estimate the value
+of f(X)i − n/2 is exactly C times larger than the noise for estimatingn/2. The following lemma gives the error
+for the final estimate off(X)i.
+Lemma 3.5. Let M(X) := g(X) + Z where g(X) =Pn
+i=1 ˆxi and Z ∼ N (0, d+C2
+µ2 Id+1). Then M satisfies µ-GDP
+under the add/remove neighboring relation. Furthermore, if we estimate the entries off(X) by post-processing the
+output of M(X) similar to Lemma 3.4 the total variance of the noise for each query is(d + C 2 + d/C 2 + 1)/(4µ2).
+Proof. The privacy guarantee follows from Lemma 3.3. LetB = (d + C 2)/µ2 and A = B/C 2 = (d/C 2 + 1)/µ2.
+Then the variance of our estimate ofn/2 (that is M(X)d+1/(2C)) is A/4. The variance off(X)i − n/2 (that is
+M(X)i/2) is B/4. If we estimatef(X)i as M(X)i/2 + M(X)d+1/(2C) then the variance is(A + B)/4.
+Notice that the dependence onC for the variance in Lemma 3.5 is(C 2 + d/C 2)/4. Since C > 0, the global
+minimum of (C 2 + d/C 2)/4 is at C = d1/4 which is the value we use in Lemma 3.4 and for Algorithm 1. The
+variable A used in the proof is decreasing inC which implies that we can get a more accurate estimate of the
+dataset size by increasing the value ofC. However, this will in turn increase the error of the estimate off(X)i − n/2
+because the variableB is increasing inC.
+Figure 2 shows the effect of varyingC when d = 10000. As stated above the total variance of each query is
+minimized for C = d1/4 = 10. However, the accuracy of our estimate ofn improves asC increases. The plot shows
+
+--- PAGE 8 ---
+0 20 40 60 80 100
+C
+2000
+2500
+3000
+3500
+4000
+4500
+5000Variance
+Total variance of noise for each query as a function of C for d=10000
+Σ =
+
+
+A+B
+4
+A
+4 . . . A
+4
+A
+2
+A
+4
+A+B
+4 . . . A
+4
+A
+2
+... ... ... ... ...
+A
+4
+A
+4 . . . A+B
+4
+A
+2
+A
+2
+A
+2 . . . A
+2 A
+
+
+Figure 2: The plot shows the effect of changing the parameterC for datasets withd = 10000. On the right,
+we show the covariance matrix similar to Corollary 3.1. All entries in the matrix should be scaled by1/µ2. For
+simplicity we considerµ = 1. We have thatA = d/C 2 + 1 = 104/C 2 + 1 and B = d + C 2 = 104 + C 2. The plot
+depicts the value of(A + B)/4 as a function ofC.
+that we can get a much more accurate estimate ofn while still outperforming the standard Gaussian mechanism
+in terms of the total variance. Even if we setC = d1/2 = 100 such that we get an estimate ofn with variance only
+A = 2/µ2 the variance for each query is(d + 1)/(2µ2) = 5000.5/µ2 which is roughly half when compared with
+d/µ2 = 10000/µ2 for the standard Gaussian mechanism.
+For many problems the choice ofC = d1/4 is preferred because it gives the best estimate off(X)i. We get no
+benefit from setting the parameterC < d 1/4 because the increased magnitude of the correlated noise results in
+worse estimates both ofn and f(X)i. However, if we want a better estimate of the dataset size and reduce the
+magnitude of correlated noise we can increase the value ofC. This can be beneficial for tasks that heavily rely an
+the accuracy of the estimate forn. It can also be useful if the downstream impact of correlated noise is either
+difficult to analyze or control. Due to diminishing returns we likely never want to use a value ofC larger than
+√
+d.
+By setting C =
+√
+d we already get an estimate of the dataset size that is independent ofd as discussed above. The
+optimal choice ofC depends on the exact use case.
+In this subsection we discussed the trade-off between the private estimate for the size of the input dataset and
+the error of each query. Throughout this paper we have assumed that we are not given an estimate ofn and we
+explicitly use part of our privacy budget to find such an estimate. However, sometimes we actually have access to
+an estimate ofn. This is for example the case if the mechanism is used as a subroutine in a bigger system where
+we already computed a private estimated the dataset size. In such cases, we are not required to spend any privacy
+budget on finding a new estimate.
+Lemma 3.6. Let f(X) := Pn
+i=1 xi denote the sum of the rows in a dataset X ∈ [0, 1]n×d. Assume that
+we have access to an estimate of the dataset size which we denote ˜n. Then the mechanism that outputs
+f(X) − n1d/2 + ˜n1d/2 + Z where Z ∼ N (0, d
+4µ2 Id) satisfies µ-GDP under the add/remove neighboring relation.
+Proof. It follows from Lemma 2.1 because theℓ2 sensitivity of g(X) := f(X) − n1d/2 is
+√
+d/2.
+4 Other settings
+In the previous section we presented a simple technique for added elliptical noise for the fundamental task of
+privately answeringd queries from [0, 1] under the add/remove neighboring relation. This problem setting was the
+primary motivation for our work. However, we believe that our technique has the potential to improve the accuracy
+of differentially private mechanisms for other settings as well. To justify this claim we consider an extension of the
+setting from the previous section. We improve the variance compared to the standard Gaussian mechanism for this
+
+--- PAGE 9 ---
+Algorithm 2: Correlated Gaussian Mechanism for disjoint queries
+Input : Dataset X = (x1, x2, . . . , xn) where xi ∈ [0, 1]m×d and for eachi ∈ [n] it
+holds that |{j : xi,j ̸= 0d}| ≤ 1.
+Output : µ-GDP estimates off(X) :=Pn
+i=1 xi and the count for each row.
+1 foreach j ∈ [m] do
+2 Sample ηj ∼
+(
+N (0,
+√
+d+1
+4µ2 ) under the add/remove neighboring relation,
+N (0, 4
+µ2 ) under the replacement neighboring relation.
+3 foreach k ∈ [d] do
+4 Sample zj,k ∼
+(
+N (0, d+
+√
+d
+4µ2 ) under the add/remove neighboring relation,
+N (0, d
+µ2 ) under the replacement neighboring relation.
+5 Let ˜xj,k ← f(X)j,k + ηj + zj,k.
+6 ˜yj ← |{xi : xi,j ̸= 0d}| + 2ηj.
+7 return ˜x, ˜y.
+problem under both the add/remove and the replacement neighboring relation. We end the section by comparing
+our technique with a recent result from related work. In Section 6 we discuss potential future extensions.
+We consider a setting where a datasetX consists of n data points wherexi ∈ [0, 1]m×d. The input is restricted
+such that each data point has non-zero entries in only a single row, that is|{j : xi,j ̸= 0d}| ≤ 1. As such we have
+that ∥xi∥2 = (Pm
+j=1
+Pd
+k=1 x2
+i,j,k)1/2 ≤
+√
+d. This kind of simple hierarchical data is relevant if we are answeringd
+queries and the outputs are grouped based on some property of the data points. Two such examples would be to
+group users based on location or time when their data was reported. We first consider how the standard Gaussian
+mechanism estimates f(X) :=Pn
+i=1 xi under either neighboring relation.
+Lemma 4.1. The mechanism that adds noise independently to each entry off(X) distributed as N (0, d/µ2)
+satisfies µ-GDP under the add/remove neighboring relation. The same mechanism satisfiesµ-GDP under the
+replacement neighboring relation when the noise is distributed asN (0, 2d/µ2).
+Proof. Since ∥xi∥2 ≤
+√
+d the ℓ2 sensitivity of f(X) is clearly
+√
+d under the add/remove neighboring relation.
+Under the replacement neighboring relationf(X) and f(X ′) differs in at most2d entries by at most1 and as such
+∥f(X) − f(X ′)∥2 ≤
+√
+2d. The privacy guarantees then follow from Lemma 2.1.
+Next, we consider how to adapt our mechanism to this setting. The main idea of Algorithm 1 is to add the
+same noise sample to all queries. This allows us to reduce the magnitude of the independent noise samples for
+each query when the sensitivity is concentrated along1d as shown ford = 2 in Figure 1. In this setting we do not
+benefit much from adding the same noise sample to all queries. Instead we sample correlated noise for each row.
+We also release an estimate of the number of data points with non-zero entries for each row instead of releasing an
+estimate of n. The pseudo-code is shown in Algorithm 2. We prove the privacy guarantees next.
+Lemma 4.2. Algorithm 2 satisfiesµ-GDP.
+Proof. In the case of the add/remove relationf(X) and f(X ′) only differ in one row. Algorithm 2 essentially runs
+Algorithm 1 independently for each row. The privacy guarantees follow from the same proof as Lemma 3.4.
+We prove that the privacy guarantees holds under replacement using an alternative representation ofX similar
+to Lemma 3.3 for the setting of Section 3. Defineˆxi ∈ Rm×(d+1) such thatˆxi,j,k = 0 for allk ∈ [d+1] if ∥xi,j∥2 = 0.
+By definition of the problem setup we have∥xi,j∥2 = 0 for all but one row for eachi ∈ [n]. For the rowj ∈ [m]
+where ∥xi,j∥2 > 0 we define ˆxi,j,k = 2 · xi,j,k − 1, and ˆxi,j,d+1 = d1/2. We define the functiong(X) :=Pn
+i=1 ˆxi.
+Let xi denote the data point we replace withx′
+i to obtain X ′ from X and fix the rowj ∈ [m] such that
+∥xi,j∥2 > 0. We have two cases to consider (1) If the non-zero entries ofx′
+i are also in rowj (that is, ∥x′
+i,j∥2 > 0)
+then ˆxi,j,k and ˆx′
+i,j,k differ by at most2 for each k ∈ [d] for row j and all other entries ofˆxi are unchanged. As
+such we have∥g(X) − g(X ′)∥2 = ∥ˆxi,j − ˆx′
+i,j∥2 ≤
+√
+d · 22 = 2
+√
+d. (2) If the non-zero entries ofx′
+i are in another
+
+--- PAGE 10 ---
+0 200 400 600 800 1000
+k
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0expected squared 2 norm ratio
+Ellipse vs. 2 Ball
+Count Ellipse [JY24]
+Algorithm 1 (this work)
+0 200 400 600 800 1000
+k
+0
+200
+400
+600
+800
+1000variance
+Ellipse vs. 2 Ball
+Count Ellipse [JY24]
+Algorithm 1 (this work)
+2 Ball
+Figure 3: Comparison of error for the bounded Count problem ford = 1000. Note that the optimal Count ellipse
+by [JY24] requires k ≤ d/2. The left plot corresponds to the right plot in [JY24, Figure 1] where we included our
+mechanism for k > d/ 2. The line for theℓ2 Ball represents the standard Gaussian mechanism in this setting.
+row j′ the entries ofg(X) and g(X ′) differ only in these two rows. Each entry is zero for at least one ofˆxi and ˆx′
+i.
+In this case we have that∥g(X) − g(X ′)∥2 = ∥ˆxi − ˆx′
+i∥2 ≤ (2 · (Pd
+k=1 12 + (d1/2)2))1/2 =
+√
+4d = 2
+√
+d.
+As such, theℓ2 sensitivity of g under the replacement neighboring relation is2
+√
+d and we can releaseg(X)
+under µ-GDP by adding noise fromN (0, 4d/µ2) independently to each entry. The proof that Algorithm 2 is
+equivalent to post-processing the above mechanism follows the steps of the proof for Lemma 3.4 applied to each
+row for C = d1/2.
+For certain tasks we want an accurate estimate of the number of data points in each row. We can get a
+better estimate of the count for data points in each row (˜y ∈ Rm) under the add/remove neighboring relation by
+balancing the different sources of noise similar to Section 3.1.
+4.1 Bounded density Here we consider a setting where each data point contributes to a bounded number
+of queries. This setting was recently studied by [JY24]. They gave efficient constructions for adding elliptical
+Gaussian noise to two classes of queries. The relevant query for this paper is theCount problem, which is equivalent
+to the setting from Section 3 with the additional constraint that each data point has at mostk ≤ d non-zero entries.
+Under this restricted setting the standard Gaussian mechanism adds noise to each query where the variance scales
+only by k rather than d. Similar to Algorithm 1, the mechanism by [JY24] adds additional noise along1d. They
+give closed-form solutions for the shape of the optimal ellipse minimizing expected squaredℓ2 norm. However,
+their result only applies whenk ≤ d/2. The setting we considered in Section 3 corresponds to the case where
+k = d. A natural question is whether the error can be improved for the ranged/2 < k < d . It turns out that there
+is almost no room for improvement. In fact, our mechanism is almost optimal for anyk ≥ d/2 as we show below.
+In Figure 3 we recreated a plot from Figure 1 of [JY24]. They plot the error relative to the standard Gaussian
+mechanism. The improvement increases withk, but their mechanism is undefined fork > d/ 2. We extended the
+line with our mechanism fork > d/ 2 showing the improvement from elliptical noise for all values ofk. We also
+plot all three mechanisms without normalizing the variance. From that plot it is clear that their mechanism should
+be used for smallk while our mechanism is preferred for anyk > d/ 2. Next, we bound the difference in variance
+between our mechanism and the optimal general Gaussian mechanism for anyd/2 ≤ k ≤ d.
+We first restate a result of [JY24] since the variance of their mechanism is optimal among Gaussian mechanisms
+for any k ≤ d/2. Here we are interesting in the variance of their mechanism with the least restrictive parameter,
+that is k = ⌊d/2⌋. They do not explicitly state the variance in their paper, but we can calculate it from their
+closed form expressions describing the shape of the Count ellipse. For simplicity of presentation we only consider
+even values ofd. The equation for the variance of their mechanism whend is odd (andk = (d − 1)/2) is more
+complicated, and we do not need it to show that our mechanism is close to optimal for anyd.
+
+--- PAGE 11 ---
+Lemma 4.3. The Count ellipse mechanism by [JY24] with parametersk = d/2 (where d is even) andρ = µ2/2
+satisfies µ-GDP. The mechanism estimates each query with error distributed as
+N
+
+0, d + 2
+√
+d − 1
+4µ2
+
+.
+Proof. We do not prove the privacy guarantees of their mechanism and we only sketch the proof for the variance.
+For more rigorous details about the mechanism we refer to their paper and references within. For simplicity,
+we assume without loss of generality thatµ = 1. In the proof of [JY24, Theorem 9.9] we find their closed form
+expressions for variablesa1 and a2. We do not repeat the expressions here and refer interested readers to their
+paper. The mechanism adds zero-mean Gaussian noise in the shape of an ellipse with an axis along1d of length a1.
+The remaining d − 1 axis lengths are all equal toa2. The expected squaredℓ2 norm of the noise isa2
+1 + (d − 1) · a2
+2,
+and the variance of the error for each query is(a2
+1 + (d − 1) · a2
+2)/d. By setting k = d/2 in the expressions fora1
+and a2 and simplifying we have that(a2
+1 + (d − 1)a2
+2)/d = (d + 2
+√
+d − 1)/4. Here we left out the steps to simplify
+the expression for brevity.
+Recall from Lemma 3.1 that the variance of Algorithm 1 is(d + 2
+√
+d + 1)/(4µ). The variance achieved by
+[JY24] is optimal among general Gaussian mechanisms for anyk ≤ ⌊d/2⌋. The variance of an optimal mechanism
+is non-decreasing ink. As such, the variance of our mechanism is almost optimal for anyk ≥ d/2.
+Lemma 4.4. Let OP T denote the minimum variance for any general Gaussian mechanism underµ-GDP for any
+d and parameter k ≥ d/2. Then the variance of Algorithm 1 is at mostOP T + 2
+√
+3/(4µ2) < OP T + 0.87/µ2.
+Proof. We first consider even values ofd and the gap to the optimal variance fork = d/2. We then bound the
+error when d is odd. If d is even the difference in variance between our mechanism and the optimal Count ellipse is
+d + 2
+√
+d + 1
+4µ2 − d + 2
+√
+d − 1
+4µ2 = 1 + 2
+√
+d − 2
+√
+d − 1
+4µ2 .
+This function is decreasing ind and as such it is maximized ford = 2 where (1 + 2
+√
+2 − 2√2 − 1)/(4µ2) ≤ 0.46/µ2.
+Since the variance for the Count ellipse mechanism with parameterk = d/2 is a lower bound onOP T for any
+k ≥ d/2, this is an upper bound on the gap to the optimal variance for all evend.
+When d > 2 is odd (in the special case ofd = 1 the variance is optimal) we can bound the error using the
+triangle inequality. The difference in variance of Algorithm 1 ford and d − 1 is
+d + 2
+√
+d + 1
+4µ2 − (d − 1) + 2
+p
+(d − 1) + 1
+4µ2 = 1 + 2
+√
+d − 2
+√
+d − 1
+4µ2 .
+The value ofOP T when d is odd andk > d/ 2 is lower bounded by the value ofOP T for parameters d − 1 and
+k = (d − 1)/2 that we discussed above. As such, the variance of Algorithm 1 is upper bounded by
+OP T + 1 + 2
+√
+d − 1 − 2
+p
+(d − 1) − 1
+4µ2 + 1 + 2
+√
+d − 2
+√
+d − 1
+4µ2 = OP T + 2 + 2
+√
+d − 2
+√
+d − 2
+4µ2 .
+This gap for the bound is again decreasing ind and the bound is exact for the degenerate case ofd = 3 and
+k = 1. When k = 1 the optimal mechanism is the standard Gaussian mechanism which adds spherical Gaussian
+noise with variance1/µ2. We have that Algorithm 1 achieves variance(4 + 2
+√
+3)/(4µ2) for k = d = 3.
+We leave finding the exact value ofOP T for k > d/ 2 as an open problem. As a small note, we point out that
+the mechanism of [JY24] does not include an estimate of the dataset size. The optimal ellipse might differ slightly
+if we want to return an estimate ofn similar to Algorithm 1. It is also worth noting that it is likely possible to
+slightly reduce the variance even fork = d if we do not care about the estimate ofn. Notice that there is a small
+gap between the corners of the sensitivity space and our ellipse in Figure 1. If we instead add Gaussian noise in
+the shape of a tighter ellipse we would reduce the variance slightly. We do not consider that in this paper because
+our mechanism is simpler, and we can return an estimate of the dataset size at almost no cost for largerd as
+shown above in Lemma 4.4. Any improvement in variance will only be noticeable for tiny values ofd.
+
+--- PAGE 12 ---
+5 Related work
+The Gaussian mechanism satisfies several definitions of differential privacy. Exact bounds are known of(ε, δ)-
+DP [BW18], (α, ε)-RDP [Mir17], ρ-zCDP [BS16], and µ-GDP [DRS22]. Our privacy guarantees follow from a
+reduction to the standard Gaussian mechanism. As such, our results apply to any of the above definitions of
+differential privacy. We choose to present our mechanism in terms ofµ-GDP because this definition exactly
+describes the privacy guarantees of the Gaussian mechanism. For all problems we consider in this paper our
+privacy guarantees for worst-case pairs of neighboring datasets exactly match those of the standard Gaussian
+mechanism. In technical terms, this means that there exist pairs of neighboring datasets for which the privacy loss
+random variable of our mechanism is distributed asN (µ2/2, µ2). That is also the case for the standard Gaussian
+mechanism. We refer to [Ste22, Proposition 3] for a discussion of the privacy loss distribution of additive Gaussian
+noise.
+[SU16] gave a lower bound on the sample complexity for answeringd counting queries under(ε, δ)-differential
+privacy. They show that the Gaussian mechanism has asymptotical optimalℓ1 error under reasonable assumptions
+on δ. The input domain in their paper is{−1, 1}d rather than {0, 1}d. They only consider the replacement
+neighboring relation and in that setting the counting query problem is equivalent for the two domains. It is easy to
+translate any estimate from one domain to the other using a simple post-processing step assuming that0 should
+be mapped −1. In contrast, the problem differs between the two domains under the add/remove neighboring
+relation. We cannot directly translate an estimate from one domain to the other using post-processing since the
+size of datasets is not fixed. However, the representation of the problem in the domain[−1, 1] plays a key role in
+the privacy proof for our mechanism.
+The mechanism we present in this paper adds unbiased correlated Gaussian noise designed to fit the structure
+of the queries. Adapting Gaussian noise to the shape of the sensitivity space is not a novel concept. We refer
+to mechanisms that add (possibly correlated) unbiased noise as general Gaussian mechanisms. [NTZ16] gave an
+algorithm for answering any set of linear queries under approximate differential privacy. Linear queries are a broad
+class of queries that includes all problems considered in this paper. They give an algorithm for choosing the shape
+of Gaussian noise for any linear query by fitting an ellipse to the convex hull of the sensitivity space. [NT24]
+considered the problem of mean estimation under the replacement neighborhood when data points are from some
+bounded domain. They show that the general Gaussian mechanism achieves near-optimal error among all unbiased
+mechanisms for a broad class of error measures in that setting. However, their algorithm for computing the shape
+of noise for arbitrary queries can be inefficient.
+In contrast to the general results of [NTZ16, NT24], we only consider a subset of linear queries whose sensitivity
+space has a certain structure. This allows us to tailor our mechanism specifically towards that structure. Concurrent
+with our work, [JY24] gave efficient constructions for adding elliptical Gaussian noise to two types of linear queries.
+They present closed-form solutions for the shape of the optimal ellipse forCount and Vote queries. Most relevant
+to this paper is the Count problem which we discuss in more detail in Section 4.1. They consider the problem
+where entries are in[0, b] rather than [0, 1]. Note that the task of privately estimating the sum is equivalent for
+both settings as we can simply scale the input by a factor ofb.
+A recent result by [KSW24] improved the constant for private mean estimation under the add/remove
+neighboring relation. Their technique also includes an estimate ofn and an embedding of the sum in a space
+using an additional dimension. However, their setting differs significantly from ours and they only consider
+one-dimensional data making our results incomparable.
+Concurrent to this work, [FHSS24] also considered the task of privately estimating sums and dataset size, with
+the goal of outputting a private mean. Their technique also relies on an embedding of the data points using an
+additional dimension. Similar to our mechanism, they return a private estimate of the dataset size at no additional
+privacy cost. They explore multiple settings in their paper. In the case of Gaussian noise for one dimensional data
+(xi ∈ [0, 1]), the error of their mechanism is identically distributed to Algorithm 1. Although highly subjective,
+their technique is arguably preferred whend = 1 because their privacy proof is simple and very intuitive (see
+Figure 1 of their paper). However, they do not reduce the error for the sums whend > 1, which is the main
+contribution of our work.
+Our mechanism relies on an intermediate representation of the query outputs which can be privately estimated
+using the standard Gaussian mechanism. An estimate of the original queriesf(X) can then be recovered using
+post-processing. This technique is similar to the matrix mechanism [LMH+15] used for optimizing the error of
+differentially private linear queries. The mechanism works by factorizing a query matrix into two new matrices.
+
+--- PAGE 13 ---
+The first matrix is then applied to the input dataset and either the standard Laplace or Gaussian mechanism
+is used to privately release the output. The other matrix is then used to recover an estimate of the original
+query matrix. The technique has been used to improve mechanisms in various settings such as computing prefix
+sums (e.g. [HUU23, MRT22, LUZ24]).
+[LT23] gave an(ε, δ)-differentially private mechanism for releasing a Misra-Gries sketch. At a high level, their
+mechanism is very similar to ours. They exploit the structure of the sensitivity space of the Misra-Gries sketch and
+add much less noise compared to standard techniques that scale the noise by theℓ1 or ℓ2 sensitivity. They add the
+same noise sample to all counters in the sketch to handle a special case where all counters differ by1 between some
+pairs of neighboring datasets. This allows them to reduce the magnitude of noise significantly because Misra-Gries
+sketches for neighboring datasets only differ by1 in a single counter except for this special case. They present
+some intuition behind the privacy guarantees in the technical overview of their paper using ad + 1 representation
+which is similar to the one we use in Lemma 3.3. However, the structure of the sensitivity space for the queries we
+consider is different than the structure for the Misra-Gries sketch.
+6 Conclusion and future work
+In this paper we presented a simple variant of the general Gaussian mechanism for the fundamental task of
+answering d independent queries in[0, 1] under the add/remove neighboring relation. In Section 4 we extended
+our mechanism to a setting where queries are divided intom groups that form a partition of all queries and
+each data point only contributes to a single group. The general idea in this work is to take advantage of the
+hierarchical structure of these queries. Adding the same noise sample to all queries in a group allows us to reduce
+the noise added independently to each query. We believe this technique can be used to design differentially
+private mechanisms for other problems with similar structures. For example, we could consider settings where the
+groups of queries partially overlap instead of forming a partition. Alternatively, data points might contribute to a
+bounded number of groups instead of only one. In such settings we might need to increase the magnitude of
+correlated noise. Another interesting avenue to explore is whether correlated noise can improve constants for the
+Gaussian Sparse Histogram Mechanism [WKZK24]. Finally, it is worth noting that we presented our work as a
+variant of the Gaussian mechanism, but the technique can be adapted to other mechanisms such as the Laplace
+mechanism for pure differential privacy.
+Acknowledgments This work was carried out when the author was at the IT University of Copenhagen.
+We thank Joel Daniel Andersson and other members of the Providentia project at University of Copenhagen for
+helpful discussions. We thank anonymous reviewers for suggestions that helped improve the paper.
+References
+[AAC+22] John M. Abowd, Robert Ashmead, Ryan Cumings-Menon, Simson L. Garfinkel, Micah Heineck, Christine Heiss,
+Robert Johns, Daniel Kifer, Philip Leclerc, Ashwin Machanavajjhala, Brett Moran, William Sexton, Matthew Spence,
+and Pavel Zhuravlev. The 2020 census disclosure avoidance system topdown algorithm.Harvard Data Science Review,
+2, 2022.
+[ACG+16] Martín Abadi, Andy Chu, Ian J. Goodfellow, H. Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang.
+Deep learning with differential privacy. InCCS, pages 308–318. ACM, 2016.
+[ALNP24] Martin Aumüller, Christian Janos Lebeda, Boel Nelson, and Rasmus Pagh. PLAN: variance-aware private mean
+estimation. Proc. Priv. Enhancing Technol., 2024(3):606–625, 2024.
+[BDKU20] Sourav Biswas, Yihe Dong, Gautam Kamath, and Jonathan Ullman. CoinPress: Practical Private Mean and
+Covariance Estimation.Advances in Neural Information Processing Systems, 33:14475–14485, 2020.
+[BS16] Mark Bun and Thomas Steinke. Concentrated differential privacy: Simplifications, extensions, and lower bounds.
+In Theory of Cryptography Conference, pages 635–658. Springer, 2016.
+[BW18] Borja Balle and Yu-Xiang Wang. Improving the gaussian mechanism for differential privacy: Analytical calibration
+and optimal denoising. InICML, volume 80 ofProceedings of Machine Learning Research, pages 403–412. PMLR,
+2018.
+[CKS20] Clément L. Canonne, Gautam Kamath, and Thomas Steinke. The discrete gaussian for differential privacy. In
+Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems
+2020, NeurIPS 2020, December 6-12, 2020, virtual, 2020.
+
+--- PAGE 14 ---
+[CSVW22] Sílvia Casacuberta, Michael Shoemate, Salil P. Vadhan, and Connor Wagaman. Widespread underestimation of
+sensitivity in differentially private libraries and how to fix it. InProceedings of the 2022 ACM SIGSAC Conference on
+Computer and Communications Security, CCS 2022, Los Angeles, CA, USA, November 7-11, 2022, pages 471–484.
+ACM, 2022.
+[DBH+22] Soham De, Leonard Berrada, Jamie Hayes, Samuel L Smith, and Borja Balle. Unlocking high-accuracy
+differentially private image classification through scale.arXiv preprint arXiv:2204.13650, 2022.
+[DKM+06] Cynthia Dwork, Krishnaram Kenthapadi, Frank McSherry, Ilya Mironov, and Moni Naor. Our data, ourselves:
+Privacy via distributed noise generation. InAdvances in Cryptology - EUROCRYPT 2006, 25th Annual International
+Conference on the Theory and Applications of Cryptographic Techniques, St. Petersburg, Russia, May 28 - June 1,
+2006, Proceedings, volume 4004 ofLecture Notes in Computer Science, pages 486–503. Springer, 2006.
+[DL09] Cynthia Dwork and Jing Lei. Differential privacy and robust statistics. InProceedings of the 41st Annual ACM
+Symposium on Theory of Computing, STOC 2009, Bethesda, MD, USA, May 31 - June 2, 2009, pages 371–380. ACM,
+2009.
+[DMNS06] Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam D. Smith. Calibrating noise to sensitivity in private
+data analysis. InTheory of Cryptography, Third Theory of Cryptography Conference, TCC 2006, New York, NY, USA,
+March 4-7, 2006, Proceedings, volume 3876 ofLecture Notes in Computer Science, pages 265–284. Springer, 2006.
+[DRS22] Jinshuo Dong, Aaron Roth, and Weijie J Su. Gaussian differential privacy.Journal of the Royal Statistical Society:
+Series B (Statistical Methodology), 84(1):3–37, 2022.
+[FHSS24] Jack Fitzsimons, James Honaker, Michael Shoemate, and Vikrant Singhal. Private means and the curious incident
+of the free lunch.CoRR, abs/2408.10438, 2024.
+[HDH+22] Samuel Haney, Damien Desfontaines, Luke Hartman, Ruchit Shrestha, and Michael Hay. Precision-based attacks
+and interval refining: how to break, then fix, differential privacy on finite computers.CoRR, abs/2207.13793, 2022.
+[HLY21] Ziyue Huang, Yuting Liang, and Ke Yi. Instance-optimal Mean Estimation Under Differential Privacy.Advances
+in Neural Information Processing Systems, 34:25993–26004, 2021.
+[HUU23] Monika Henzinger, Jalaj Upadhyay, and Sarvagya Upadhyay. Almost tight error bounds on differentially private
+continual counting. InProceedings of the 2023 ACM-SIAM Symposium on Discrete Algorithms, SODA 2023, Florence,
+Italy, January 22-25, 2023, pages 5003–5039. SIAM, 2023.
+[JY24] Matthew Joseph and Alexander Yu. Some constructions of private, efficient, and optimal k-norm and elliptic
+gaussian noise. InThe Thirty Seventh Annual Conference on Learning Theory, June 30 - July 3, 2023, Edmonton,
+Canada, volume 247 ofProceedings of Machine Learning Research, pages 2723–2766. PMLR, 2024.
+[KJH20] Antti Koskela, Joonas Jälkö, and Antti Honkela. Computing tight differential privacy guarantees using fft. In
+Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, volume 108 of
+Proceedings of Machine Learning Research, pages 2560–2569. PMLR, 26–28 Aug 2020.
+[KJPH21] Antti Koskela, Joonas Jälkö, Lukas Prediger, and Antti Honkela. Tight differential privacy for discrete-valued
+mechanisms and for the subsampled gaussian mechanism using FFT. InAISTATS, volume 130 ofProceedings of
+Machine Learning Research, pages 3358–3366. PMLR, 2021.
+[KMS+21] Peter Kairouz, Brendan McMahan, Shuang Song, Om Thakkar, Abhradeep Thakurta, and Zheng Xu. Practical
+and private (deep) learning without sampling or shuffling. InProceedings of the 38th International Conference on
+Machine Learning, ICML 2021, 18-24 July 2021, Virtual Event, volume 139 ofProceedings of Machine Learning
+Research, pages 5213–5225. PMLR, 2021.
+[KSW24] Alex Kulesza, Ananda Theertha Suresh, and Yuyan Wang. Mean estimation in the add-remove model of
+differential privacy. InForty-first International Conference on Machine Learning, 2024.
+[LMH+15] Chao Li, Gerome Miklau, Michael Hay, Andrew McGregor, and Vibhor Rastogi. The matrix mechanism:
+optimizing linear counting queries under differential privacy.VLDB J., 24(6):757–781, 2015.
+[LT23] Christian Janos Lebeda and Jakub Tetek. Better differentially private approximate histograms and heavy hitters
+using the misra-gries sketch. InProceedings of the 42nd ACM SIGMOD-SIGACT-SIGAI Symposium on Principles of
+Database Systems, PODS 2023, Seattle, WA, USA, June 18-23, 2023, pages 79–88. ACM, 2023.
+[LUZ24] Jingcheng Liu, Jalaj Upadhyay, and Zongrui Zou. Optimality of matrix mechanism on ℓp
+p-metric. CoRR,
+abs/2406.02140, 2024.
+[Mir12] Ilya Mironov. On significance of the least significant bits for differential privacy. InProceedings of the 2012
+ACM Conference on Computer and Communications Security, CCS ’12, page 650–661, New York, NY, USA, 2012.
+Association for Computing Machinery.
+[Mir17] Ilya Mironov. Rényi differential privacy. In2017 IEEE 30th computer security foundations symposium (CSF),
+pages 263–275. IEEE, 2017.
+[MRT22] Brendan McMahan, Keith Rush, and Abhradeep Guha Thakurta. Private online prefix sums via optimal matrix
+factorizations. CoRR, abs/2202.08312, 2022.
+[NT24] Aleksandar Nikolov and Haohua Tang. General gaussian noise mechanisms and their optimality for unbiased mean
+estimation. In 15th Innovations in Theoretical Computer Science Conference, ITCS 2024, January 30 to February 2,
+
+--- PAGE 15 ---
+2024, Berkeley, CA, USA, volume 287 ofLIPIcs, pages 85:1–85:23. Schloss Dagstuhl - Leibniz-Zentrum für Informatik,
+2024.
+[NTZ16] Aleksandar Nikolov, Kunal Talwar, and Li Zhang. The geometry of differential privacy: The small database and
+approximate cases.SIAM Journal on Computing, 45(2):575–616, 2016.
+[SMM19] David M. Sommer, Sebastian Meiser, and Esfandiar Mohammadi. Privacy loss classes: The central limit theorem
+in differential privacy.Proc. Priv. Enhancing Technol., 2019(2):245–269, 2019.
+[Ste22] Thomas Steinke. Composition of differential privacy & privacy amplification by subsampling.arXiv preprint
+arXiv:2210.00597, 2022.
+[SU16] ThomasSteinkeand JonathanR.Ullman. Betweenpureandapproximate differential privacy. J. Priv. Confidentiality,
+7(2), 2016.
+[WKZK24] Arjun Wilkins, Daniel Kifer, Danfeng Zhang, and Brian Karrer. Exact privacy analysis of the gaussian sparse
+histogram mechanism.Journal of Privacy and Confidentiality, 14(1), Feb. 2024.
+[ZDW22] Yuqing Zhu, Jinshuo Dong, and Yu-Xiang Wang. Optimal accounting of differential privacy via characteristic
+function. In Proceedings of The 25th International Conference on Artificial Intelligence and Statistics, volume 151 of
+Proceedings of Machine Learning Research, pages 4782–4817. PMLR, 28–30 Mar 2022.

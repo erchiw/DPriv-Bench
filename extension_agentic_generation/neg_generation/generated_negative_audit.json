@@ -1,0 +1,569 @@
+{
+  "pipeline": "fresh_two_isolated_codex_agents",
+  "source_file": "new_negative/accepted_positive_questions.json",
+  "source_sha256": "18a9f309bdda960c7a2c3fae5932b8f14c807ff85df27567949664ca3ee53845",
+  "target_source_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "coverage_complete": true,
+  "agent_a_manifest_sha256": "5c51fa0880bd1dd0bf0aa2e51d5afe01c0eabc694fd4138dde431cfab7e19b1d",
+  "generator_authorship_sha256": "e2081585ad547d544dfade559ddbf183f90c530e630c051f87f6911360bfe9db",
+  "generator_checkpoint_sha256": "99e789ab608cca728a18f8e6527da44f8081e7084b85fd506d2f2f4cd1812789",
+  "verifier_checkpoint_sha256": "dd3ac9b0ca64621a6d33568fea04e01ee3922ebe94c972f6f7dcf54ce10619c5",
+  "acceptance_rule": {
+    "claim_assessment": "FALSE",
+    "single_component_change": true,
+    "novelty_status": [
+      "NOVEL",
+      "NOVEL_BUT_RELATED"
+    ],
+    "verification_status": "VERIFIED",
+    "final_decision": "ACCEPT",
+    "uncertainties": []
+  },
+  "counts": {
+    "target_sources": 10,
+    "generator_candidates": 10,
+    "verifier_results": 10,
+    "accepted": 9,
+    "rejected": 1,
+    "human_review": 0
+  },
+  "derived_artifact_sha256": {
+    "generated_negative_candidates.json": "a2301f43252dc81b5f25a3c5f5944d4451171a9aa7805615641465bc75c4670e",
+    "generated_negative_human_review.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "records": [
+    {
+      "candidate_id": "newneg_source_1_assumption_1",
+      "source_question_id": 1,
+      "mutation_type": "assumption_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_1_assumption_1",
+        "source_question_id": 1,
+        "mutation_type": "assumption_perturbation",
+        "question_tex": "Let $X\\sim X'$ denote neighboring datasets under a fixed add/remove or replace-one adjacency relation. Let $m\\in\\mathbb N$, $[m]=\\{1,\\ldots,m\\}$, and let $f_i$ be real-valued scores satisfying $|f_i(X)-f_i(X')|\\le 1$ for every $i\\in[m]$ and every $X\\sim X'$. Let $Z_1,\\ldots,Z_m$ be identically distributed real noises with common density $p$, and define $M(X)=\\operatorname*{arg\\,max}_{i\\in[m]}\\{f_i(X)+Z_i\\}$ using fixed data-independent tie-breaking. For distributions $P,Q$ with densities $p_P,p_Q$, define the hockey-stick divergence $H_{e^t}(P\\|Q)=\\int [p_P(y)/p_Q(y)-e^t]_+p_Q(y)\\,dy$, where $[u]_+=\\max\\{u,0\\}$. Define $\\delta_2(t)=\\sup_{|a-a'|\\le 2}H_{e^t}(\\operatorname{Law}(a+Z_1)\\|\\operatorname{Law}(a'+Z_1))$. Is it true that, for every $t\\in\\mathbb R$ and every $X\\sim X'$, one has $H_{e^t}(M(X)\\|M(X'))\\le m\\,\\delta_2(t)$?",
+        "mutation": {
+          "component": "assumption",
+          "before": "i.i.d. real noises",
+          "after": "identically distributed real noises",
+          "targeted_dependency_id": "independent_noise_conditioning",
+          "reason_for_mutation": "The winning-probability comparison conditions on one noise while integrating over an unchanged independent law for all competitors; identical marginals alone do not provide that conditional structure."
+        },
+        "source_proof_summary": "The positive argument shifts the selected coordinate's noise by 2 and compares conditional winning probabilities, then applies the perspective/Jensen bound and sums the one-dimensional divergence over output indices.",
+        "expected_failure": "Perfect dependence can make the common noise cancel from every score comparison even when its marginal shift divergence is arbitrarily small.",
+        "proposed_falsification_strategy": "Take m=2, let Z_1=Z_2=Z with Z distributed as N(0,s^2), and use neighboring score vectors (1,0) and (0,1). The output is deterministically 1 on the first dataset and 2 on the second, so at t=0 the left side is 1. For the Gaussian marginal, delta_2(0)=2 Phi(1/s)-1. With s=10, the right side is 2(2 Phi(0.1)-1), which is less than 0.16, giving a concrete violation while both noises have the same stated density.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_1_assumption_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL_BUT_RELATED",
+        "verification_status": "VERIFIED",
+        "proof_type": "explicit_counterexample",
+        "full_proof": "Take m=2 and a domain containing neighboring X,X'. Set (f_1(X),f_2(X))=(1,0) and (f_1(X'),f_2(X'))=(0,1); each retained score-sensitivity bound is exactly 1. Let Z_1=Z_2=Z with Z distributed as N(0,100). Thus both noises have the required common density, although they are dependent. Fixed tie-breaking is irrelevant: M(X)=1 and M(X')=2 almost surely. At t=0 the two point masses have H_1=1. For Gaussian marginals, the largest H_1 over shifts at distance at most 2 is their total variation delta_2(0)=2 Phi(0.1)-1. Moreover Phi(0.1)-1/2=integral_0^0.1 phi(u)du < 0.1/sqrt(2 pi)<0.04, so 2 delta_2(0)<0.16<1. Hence H_1(M(X)||M(X'))=1>2 delta_2(0), disproving the asserted bound while preserving every other assumption.",
+        "remaining_assumptions_checked": [
+          "m=2 is a positive integer and fixed tie-breaking is immaterial",
+          "both score coordinates have sensitivity at most 1 on the chosen neighboring pair",
+          "Z_1 and Z_2 have the same N(0,100) density and t=0 is in the quantified domain"
+        ],
+        "closest_existing_negatives": [
+          "generated:fresh_run:19"
+        ],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_2_conclusion_1",
+      "source_question_id": 2,
+      "mutation_type": "conclusion_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_2_conclusion_1",
+        "source_question_id": 2,
+        "mutation_type": "conclusion_perturbation",
+        "question_tex": "Fix $\\gamma\\in(0,1)$ and $\\eta\\in(-1,\\infty)$. Let $K\\in\\mathbb N$ have the truncated negative-binomial law $D_{\\eta,\\gamma}$ defined, for $k\\in\\mathbb N$, by $\\Pr(K=k)=\\frac{(1-\\gamma)^k}{\\gamma^{-\\eta}-1}\\prod_{i=0}^{k-1}\\frac{i+\\eta}{i+1}$ when $\\eta\\ne0$, and by $\\Pr(K=k)=\\frac{(1-\\gamma)^k}{k\\log(1/\\gamma)}$ when $\\eta=0$. A selection algorithm $A$ draws $K$ independently, runs a base mechanism $Q$ on the same dataset $K$ times, and releases the run with the best value in a fixed ordered quality-score space. Under the paper's neighboring-dataset relation, suppose $Q$ is $\\varepsilon$-differentially private, meaning $\\Pr(Q(X)\\in E)\\le e^\\varepsilon\\Pr(Q(X')\\in E)$ for all neighboring $X,X'$ and measurable $E$. Is $A$ necessarily $(\\eta+1)\\varepsilon$-differentially private?",
+        "mutation": {
+          "component": "conclusion",
+          "before": "$(\\eta+2)\\varepsilon$-differentially private",
+          "after": "$(\\eta+1)\\varepsilon$-differentially private",
+          "targeted_dependency_id": "profile_shift_budget",
+          "reason_for_mutation": "The privacy-profile substitution needs t=(eta+2)epsilon so that subtracting the (eta+1)epsilon selection shift leaves the base profile evaluated at epsilon."
+        },
+        "source_proof_summary": "The positive proof inserts the pure-DP zero of the base privacy profile into the selection profile bound; the stated privacy parameter is exactly the value that makes the shifted argument equal epsilon.",
+        "expected_failure": "Reducing the conclusion by one epsilon can understate the privacy loss of selecting the best among a random number of runs.",
+        "proposed_falsification_strategy": "Set eta=0, gamma=1/2, epsilon=log 2, and let Q be binary randomized response: the probability of quality 1 is 2/3 on X and 1/3 on X', with 1 ranked above 0. This Q is epsilon-DP. For the eta=0 log-series law, its probability generating function is g(z)=-log(1-z/2)/log 2. The event that A outputs 0 has probabilities g(1/3) and g(2/3), so the X'-to-X ratio is log(3/2)/log(6/5), approximately 2.224, strictly exceeding exp(epsilon)=2. Thus the mutated epsilon-DP conclusion fails.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_2_conclusion_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL_BUT_RELATED",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_privacy_loss_calculation",
+        "full_proof": "Choose eta=0, gamma=1/2, and epsilon=log 2, all in the retained domains. On neighboring X,X', let one run Q output quality 1 with probabilities 2/3 and 1/3 respectively, and rank 1 above 0. The probabilities of each binary outcome have ratios at most 2 in both directions, so Q is epsilon-DP. For the stated log-series K law, its probability generating function is g(z)=sum_{k>=1}(z/2)^k/(k log 2)=-log(1-z/2)/log 2. The selected output is 0 exactly when all K runs output 0. Therefore its probabilities on X and X' are g(1/3)=log(6/5)/log 2 and g(2/3)=log(3/2)/log 2. Their X'-to-X ratio is log(3/2)/log(6/5)>2 because 3/2>(6/5)^2=36/25. This exceeds exp((eta+1)epsilon)=2, so the claimed pure-DP conclusion fails.",
+        "remaining_assumptions_checked": [
+          "eta=0 and gamma=1/2 satisfy the truncated negative-binomial parameter domains",
+          "K is independent and supported on positive integers under the displayed log-series law",
+          "the binary base mechanism is pure log(2)-DP in both neighboring directions",
+          "selection uses the same dataset and the fixed order 1 greater than 0"
+        ],
+        "closest_existing_negatives": [
+          "generated:fresh_uncovered_run:2"
+        ],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_3_algorithm_1",
+      "source_question_id": 3,
+      "mutation_type": "algorithm_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_3_algorithm_1",
+        "source_question_id": 3,
+        "mutation_type": "algorithm_perturbation",
+        "question_tex": "Let $d,n\\in\\mathbb N$, $\\mu>0$, $X=(x_1,\\ldots,x_n)$ with $x_i\\in[0,1]^d$, and $f(X)=\\sum_{i=1}^n x_i$. Let $\\mathbf 1_d$ be the all-ones vector in $\\mathbb R^d$. Independently sample $\\eta\\sim\\mathcal N(0,(\\sqrt d+1)/(4\\mu^2))$ and $Z\\sim\\mathcal N(0,((d-\\sqrt d)/(4\\mu^2))I_d)$, where $I_d$ is the $d\\times d$ identity. If the released query vector is $\\widetilde f=f(X)+\\eta\\mathbf 1_d+Z$, is the error in every coordinate distributed as $\\mathcal N(0,(d+2\\sqrt d+1)/(4\\mu^2))$, with standard deviation $(\\sqrt d+1)/(2\\mu)$?",
+        "mutation": {
+          "component": "algorithm",
+          "before": "$Z\\sim\\mathcal N(0,((d+\\sqrt d)/(4\\mu^2))I_d)$",
+          "after": "$Z\\sim\\mathcal N(0,((d-\\sqrt d)/(4\\mu^2))I_d)$",
+          "targeted_dependency_id": "coordinate_variance_addition",
+          "reason_for_mutation": "The claimed coordinate variance is obtained by adding the displayed variances of the two independent Gaussian summands."
+        },
+        "source_proof_summary": "Each coordinate error is the sum of two independent centered Gaussians, and the positive result follows by adding their variances and taking the positive square root.",
+        "expected_failure": "The altered idiosyncratic-noise variance makes the coordinate variance (d+1)/(4 mu^2), not the variance retained in the conclusion.",
+        "proposed_falsification_strategy": "Use d=1. Then the altered Z covariance is zero, while eta has variance 2/(4 mu^2). Hence every coordinate error equals eta almost surely and has variance 1/(2 mu^2), whereas the conclusion claims variance 1/mu^2. Comparing these variances directly falsifies both the claimed distribution and standard deviation.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_3_algorithm_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_variance_calculation",
+        "full_proof": "Take d=4 and any n in N and mu>0. The altered covariance is positive: each Z_j has variance (4-2)/(4 mu^2)=1/(2 mu^2), while eta has variance (2+1)/(4 mu^2)=3/(4 mu^2). Independence, which remains explicitly assumed, makes the coordinate error eta+Z_j a centered Gaussian with variance 3/(4 mu^2)+1/(2 mu^2)=5/(4 mu^2), and hence standard deviation sqrt(5)/(2 mu). The retained conclusion instead asserts variance (4+4+1)/(4 mu^2)=9/(4 mu^2) and standard deviation 3/(2 mu). Since 5/(4 mu^2) is not 9/(4 mu^2), the claimed distribution and standard deviation are both false. The dataset and statistic only translate the release and do not affect this error law.",
+        "remaining_assumptions_checked": [
+          "d=4 and arbitrary n are in the stated natural-number domains",
+          "mu is positive and both altered Gaussian covariances are nonnegative",
+          "eta and Z remain independent centered Gaussians",
+          "x_i in [0,1]^d and f(X) only determine the canceled location"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_4_algorithm_1",
+      "source_question_id": 4,
+      "mutation_type": "algorithm_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_4_algorithm_1",
+        "source_question_id": 4,
+        "mutation_type": "algorithm_perturbation",
+        "question_tex": "Let $d,n\\in\\mathbb N$, $\\mu>0$, $X=(x_1,\\ldots,x_n)$ with $x_i\\in[0,1]^d$, $f(X)=\\sum_{i=1}^n x_i$, and let $\\mathbf 1_d$ and $I_d$ denote the all-ones vector and identity matrix. Two datasets are add/remove neighbors if one is obtained from the other by adding or removing one row. Independently sample $\\eta\\sim\\mathcal N(0,(\\sqrt d+1)/(4\\mu^2))$ and $Z\\sim\\mathcal N(0,((d+\\sqrt d)/(4\\mu^2))I_d)$, and release $A(X)=(f(X)+\\eta\\mathbf 1_d+Z,\\ n+\\eta)$. For distributions $P,Q$, let $T(P,Q)$ be their hypothesis-testing trade-off function; a mechanism is $\\mu$-GDP if $T(A(X),A(X'))\\ge T(\\mathcal N(0,1),\\mathcal N(\\mu,1))$ pointwise for every neighboring $X,X'$. Does $A$ satisfy $\\mu$-GDP under add/remove adjacency?",
+        "mutation": {
+          "component": "algorithm",
+          "before": "$A(X)=(f(X)+\\eta\\mathbf 1_d+Z,\\ n+2\\eta)$",
+          "after": "$A(X)=(f(X)+\\eta\\mathbf 1_d+Z,\\ n+\\eta)$",
+          "targeted_dependency_id": "bijective_gaussian_isotropy",
+          "reason_for_mutation": "The factor 2 in the released count is required for the data-independent linear bijection to produce equal independent Gaussian variances in all transformed coordinates."
+        },
+        "source_proof_summary": "The positive proof applies a bijection to identify the release exactly with an isotropic Gaussian mechanism whose sensitivity-to-noise ratio is mu.",
+        "expected_failure": "Changing only the coefficient of eta in the count release increases the Mahalanobis separation of a neighboring output pair beyond mu.",
+        "proposed_falsification_strategy": "Take d=1 and add a row x=0. After the mutation, the two-dimensional output covariance is mu^{-2} times C=[[1,1/2],[1/2,1/2]], and the neighboring mean displacement is v=(0,1). Since C^{-1}=[[2,-2],[-2,4]], the squared Mahalanobis distance is mu^2 v^T C^{-1}v=4 mu^2. Equal-covariance Gaussian experiments have trade-off G_r at Mahalanobis distance r, so this pair has trade-off G_{2 mu}, which is strictly below G_mu for mu>0 at, for example, type-I error 1/2.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_4_algorithm_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL_BUT_RELATED",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_gaussian_tradeoff_counterexample",
+        "full_proof": "Set d=1 and consider an add/remove pair obtained by adding the valid row x=0. With the mutated count release, the output mean displacement is v=(0,1). Independence and the retained variances give common covariance Sigma=mu^{-2} C, where C=[[1,1/2],[1/2,1/2]]: the first noise is eta+Z, the second is eta. Since C^{-1}=[[2,-2],[-2,4]], the squared Mahalanobis distance is v^T Sigma^{-1}v=4 mu^2. Thus this neighboring Gaussian experiment has trade-off G_{2mu}. At type-I error 1/2, G_r(1/2)=Phi(-r), so for every mu>0 its trade-off is Phi(-2mu)<Phi(-mu)=G_mu(1/2). It therefore violates the pointwise lower bound required for mu-GDP. The row bound, add/remove adjacency, independence, and all unchanged noise parameters are satisfied.",
+        "remaining_assumptions_checked": [
+          "d=1, mu>0, and the added row x=0 lies in [0,1]",
+          "the datasets are add/remove neighbors and their count coordinates differ by one",
+          "eta and Z retain the stated independent Gaussian laws",
+          "the common covariance is positive definite"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [
+          "newneg_source_3_algorithm_1"
+        ],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_5_assumption_1",
+      "source_question_id": 5,
+      "mutation_type": "assumption_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_5_assumption_1",
+        "source_question_id": 5,
+        "mutation_type": "assumption_perturbation",
+        "question_tex": "Let $S,S^-$ be remove-neighboring datasets, and let $M(S)$ be a distribution on an output space. For distributions $P,Q$, define the trade-off function $T[P,Q](\\alpha)=\\inf_{\\phi}\\{1-\\mathbb E_Q[\\phi]:\\mathbb E_P[\\phi]\\le\\alpha\\}$, where the infimum ranges over measurable randomized tests $\\phi$ taking values in $[0,1]$. A mechanism is $f$-DP if both $T[M(S),M(S^-)]\\ge f$ and $T[M(S^-),M(S)]\\ge f$ pointwise for every remove pair. For $\\varepsilon\\ge0$ and $\\delta\\in[0,1]$, define $f_{\\varepsilon,\\delta}(\\alpha)=\\max\\{0,1-\\delta-e^\\varepsilon\\alpha,e^{\\varepsilon}(1-\\delta-\\alpha)\\}$. Is $M$ $(\\varepsilon,\\delta)$-DP in both directions for every remove pair if and only if it is $f_{\\varepsilon,\\delta}$-DP?",
+        "mutation": {
+          "component": "assumption",
+          "before": "$f_{\\varepsilon,\\delta}(\\alpha)=\\max\\{0,1-\\delta-e^\\varepsilon\\alpha,e^{-\\varepsilon}(1-\\delta-\\alpha)\\}$",
+          "after": "$f_{\\varepsilon,\\delta}(\\alpha)=\\max\\{0,1-\\delta-e^\\varepsilon\\alpha,e^{\\varepsilon}(1-\\delta-\\alpha)\\}$",
+          "targeted_dependency_id": "reverse_dp_tradeoff_scaling",
+          "reason_for_mutation": "Rearranging the reverse DP inequality divides by exp(epsilon), so the third supporting line of the trade-off lower bound requires exp(-epsilon)."
+        },
+        "source_proof_summary": "The two directed DP inequalities yield two affine lower bounds on type-II error, one of which comes from dividing the reverse inequality by exp(epsilon); deterministic event tests recover the DP inequalities in the converse direction.",
+        "expected_failure": "The altered third affine term can exceed the universal upper bound 1 for a trade-off function even for a perfectly private mechanism.",
+        "proposed_falsification_strategy": "Let M be a constant mechanism, take epsilon=log 2 and delta=0, and evaluate at alpha=0. The mechanism is (epsilon,0)-DP in both directions. Under the mutated definition, f_{epsilon,0}(0)=max{0,1,exp(epsilon)}=2, but every hypothesis-testing trade-off function is at most 1. Therefore the constant mechanism cannot be f_{epsilon,0}-DP under the altered formula.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_5_assumption_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL",
+        "verification_status": "VERIFIED",
+        "proof_type": "explicit_tradeoff_counterexample",
+        "full_proof": "Let M be a constant mechanism on every dataset, take epsilon=log 2 and delta=0, and consider any remove-neighboring pair. Its two output laws are identical, so it is (0,0)-DP and therefore is (epsilon,0)-DP in both directions. For identical laws P=Q, the constraint E_P[phi]<=alpha also gives E_Q[phi]<=alpha, and equality is attainable by a constant randomized test; hence T[P,P](alpha)=1-alpha. In particular T[P,P](0)=1. Under the mutated displayed definition, however, f_{epsilon,0}(0)=max{0,1,e^epsilon}=2. Consequently T[P,P](0)=1<2, so even this perfectly private mechanism is not f_{epsilon,0}-DP. This directly disproves the claimed equivalence without changing the test class, neighbor relation, or either directed requirement.",
+        "remaining_assumptions_checked": [
+          "epsilon=log(2) is nonnegative and delta=0 lies in [0,1]",
+          "the constant mechanism is DP for every remove-neighboring pair in both directions",
+          "alpha=0 is a valid trade-off-function argument",
+          "randomized tests still take values in [0,1]"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_6_conclusion_1",
+      "source_question_id": 6,
+      "mutation_type": "conclusion_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_6_conclusion_1",
+        "source_question_id": 6,
+        "mutation_type": "conclusion_perturbation",
+        "question_tex": "For distributions $P,Q$, let $T[P,Q]$ denote their hypothesis-testing trade-off function. For $\\mu\\ge0$, define the Gaussian trade-off function $G_\\mu=T[\\mathcal N(0,1),\\mathcal N(\\mu,1)]$. For trade-off functions represented as $f_1=T[P_1,Q_1]$ and $f_2=T[P_2,Q_2]$, define their tensor product by $f_1\\otimes f_2=T[P_1\\times P_2,Q_1\\times Q_2]$. For every $\\mu_1,\\mu_2\\ge0$, is $G_{\\mu_1}\\otimes G_{\\mu_2}=G_{\\mu_1+\\mu_2}$?",
+        "mutation": {
+          "component": "conclusion",
+          "before": "G_{\\sqrt{\\mu_1^2+\\mu_2^2}}",
+          "after": "G_{\\mu_1+\\mu_2}",
+          "targeted_dependency_id": "orthogonal_mean_norm",
+          "reason_for_mutation": "The rotation argument preserves the Euclidean norm of the two-dimensional mean shift, which composes by the square root of the sum of squares rather than by scalar addition."
+        },
+        "source_proof_summary": "The product experiment is a two-dimensional Gaussian shift, and an orthogonal rotation reduces it to a one-dimensional shift whose magnitude is the Euclidean norm of the mean vector.",
+        "expected_failure": "For two positive shifts, the retained tensor product has a smaller Gaussian separation than the scalar sum asserted by the mutation.",
+        "proposed_falsification_strategy": "Set mu_1=mu_2=1. Directly rotate the product experiment to obtain G_{sqrt(2)}. At type-I error alpha=1/2, the Gaussian trade-off is G_r(1/2)=Phi(-r), so the left side equals Phi(-sqrt(2)) while the mutated right side equals Phi(-2). Strict monotonicity of Phi gives unequal values.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_6_conclusion_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_gaussian_tradeoff_calculation",
+        "full_proof": "Set mu_1=mu_2=1, which satisfies both nonnegative parameter domains. By the given tensor definition, the left side is the trade-off between N(0,I_2) and N((1,1),I_2). An orthogonal rotation sends (1,1) to (sqrt(2),0), preserves both covariance and testing trade-off, and leaves the second coordinate uninformative. Hence the left side is exactly G_{sqrt(2)}. At type-I error alpha=1/2, the Gaussian trade-off satisfies G_r(1/2)=Phi(-r). The mutated right side is G_2 and has value Phi(-2), whereas the left side has value Phi(-sqrt(2)). Strict monotonicity of Phi and sqrt(2)<2 make these values unequal. Therefore the asserted identity with scalar addition is false, while all definitions and product independence are retained.",
+        "remaining_assumptions_checked": [
+          "mu_1=mu_2=1 satisfy mu_i>=0",
+          "the tensor product is exactly the independent product experiment in the question",
+          "the orthogonal transformation is a measurable data-independent bijection",
+          "alpha=1/2 is within the testing trade-off domain"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_7_conclusion_1",
+      "source_question_id": 7,
+      "mutation_type": "conclusion_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_7_conclusion_1",
+        "source_question_id": 7,
+        "mutation_type": "conclusion_perturbation",
+        "question_tex": "Let neighboring datasets use replacement adjacency. For $\\alpha>1$, define the Renyi divergence $D_\\alpha(P\\|Q)=\\frac{1}{\\alpha-1}\\log\\int (dP/dQ)^\\alpha\\,dQ$. Suppose a randomized mechanism $A$ is $\\rho$-zCDP for some $\\rho\\ge0$, meaning that $D_\\alpha(A(X)\\|A(X'))\\le\\rho\\alpha$ for every $\\alpha>1$ and every neighboring $X,X'$. For every $\\delta\\in(0,1)$, is $A$ necessarily $(2\\sqrt{\\rho\\log(1/\\delta)},\\delta)$-differentially private?",
+        "mutation": {
+          "component": "conclusion",
+          "before": "$(\\rho+2\\sqrt{\\rho\\log(1/\\delta)},\\delta)$-differentially private",
+          "after": "$(2\\sqrt{\\rho\\log(1/\\delta)},\\delta)$-differentially private",
+          "targeted_dependency_id": "renyi_order_offset",
+          "reason_for_mutation": "Writing alpha=1+u leaves an unavoidable additive rho term in the optimized privacy-loss threshold."
+        },
+        "source_proof_summary": "A Markov bound on the privacy-loss moment gives a threshold rho alpha plus log(1/delta)/(alpha-1); optimizing after alpha=1+u produces the additive rho and the square-root term.",
+        "expected_failure": "A Gaussian mechanism saturating the zCDP Rényi bound can require the omitted additive rho in its approximate-DP parameter.",
+        "proposed_falsification_strategy": "Use a one-record binary dataset and define A(x)=N(sqrt(20)x,1) for x in {0,1}. For every alpha>1, each directed neighboring Rényi divergence is alpha(20)/2=10 alpha, so A is 10-zCDP. Set delta=0.1 and epsilon=2 sqrt(10 log 10). For the event attaining the Gaussian hockey-stick divergence, the exact deficit is Phi(sqrt(20)/2-epsilon/sqrt(20))-exp(epsilon)Phi(-sqrt(20)/2-epsilon/sqrt(20)), approximately 0.449. Since this exceeds 0.1, the required (epsilon,0.1)-DP inequality is violated.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_7_conclusion_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL_BUT_RELATED",
+        "verification_status": "VERIFIED",
+        "proof_type": "explicit_gaussian_dp_counterexample",
+        "full_proof": "Use a one-record bit dataset with replacement adjacency and A(x)=N(sqrt(200)x,1). For either ordered neighboring pair and every alpha>1, the Gaussian-shift Renyi divergence is alpha*(200)/2=100 alpha, so A is 100-zCDP exactly. Choose delta=1/2; the mutated epsilon is 2 sqrt(100 log 2)=20 sqrt(log 2)<17. For E=[sqrt(50),infinity), under x=1 we have P(E)=Phi(sqrt(50))>1-e^{-25}, while under x=0 the Gaussian tail bound gives Q(E)=Phi(-sqrt(50))<e^{-25}. Therefore e^epsilon Q(E)+delta<e^{-8}+1/2<0.501, whereas P(E)>1-e^{-25}>0.999. The required (20 sqrt(log 2),1/2)-DP event inequality fails. The adjacency, all Renyi orders, and the quantified delta domain are explicitly satisfied.",
+        "remaining_assumptions_checked": [
+          "rho=100 is nonnegative and delta=1/2 lies in (0,1)",
+          "the two one-record bit datasets are replacement neighbors",
+          "both directed Gaussian Renyi divergences equal 100 alpha for every alpha>1",
+          "the displayed event is measurable and uses the unchanged DP definition"
+        ],
+        "closest_existing_negatives": [
+          "generated:category_2:1"
+        ],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_8_assumption_1",
+      "source_question_id": 8,
+      "mutation_type": "assumption_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_8_assumption_1",
+        "source_question_id": 8,
+        "mutation_type": "assumption_perturbation",
+        "question_tex": "Let $n\\in\\mathbb N$, $X=(x_1,\\ldots,x_n)\\in(\\mathbb R^d)^n$, $\\gamma\\in[1/3,1]$, $m=\\lceil\\gamma n\\rceil$, and $\\nu\\ge0$. Define $N_i^X(\\nu)=|\\{j\\in[n]:\\|x_j-x_i\\|_2\\le\\nu\\}|$ and $N_X(\\nu)=\\frac1m\\max_{I\\subseteq[n],\\,|I|=m}\\sum_{i\\in I}N_i^X(\\nu)$. If replacement-neighboring datasets $X,X'$ differ in one sample, is $|N_X(\\nu)-N_{X'}(\\nu)|\\le3$?",
+        "mutation": {
+          "component": "assumption",
+          "before": "$\\gamma\\in[1/2,1]$",
+          "after": "$\\gamma\\in[1/3,1]$",
+          "targeted_dependency_id": "subset_fraction_sensitivity_cap",
+          "reason_for_mutation": "The final sensitivity bound is 1+1/gamma, and the lower endpoint gamma=1/2 is what makes that expression at most 3."
+        },
+        "source_proof_summary": "Replacing one point can change its own neighbor count by n and each of the other selected counts by 1; normalization yields at most 1+n/m, which is bounded using m at least gamma n.",
+        "expected_failure": "At gamma=1/3, a changed point can simultaneously lose all of its neighbors while every other selected center loses that point, producing normalized change greater than 3.",
+        "proposed_falsification_strategy": "Take n=9, d=8, gamma=1/3, m=3, and nu=1. Let x_1=0 and x_2 through x_9 be the eight standard basis vectors. Then N_1=9 and every other N_i=2, so N_X=(9+2+2)/3=13/3. Replace x_1 by a point farther than 1 from every basis vector and from 0. In X', all nine neighbor counts equal 1, so N_{X'}=1. The absolute difference is 10/3, which exceeds 3.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_8_assumption_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL",
+        "verification_status": "VERIFIED",
+        "proof_type": "explicit_sensitivity_counterexample",
+        "full_proof": "Take n=9, d=8, gamma=1/3, m=ceil(gamma n)=3, and nu=1. Let x_1=0 and x_{i+1}=e_i for i=1,...,8. The origin is within distance 1 of every point, while distinct basis vectors are at distance sqrt(2)>1. Hence N_1^X=9, every other count is 2, and N_X=(9+2+2)/3=13/3. Form replacement neighbor X' by replacing 0 with w=(3,...,3). This w is farther than 1 from every basis vector, and without the origin distinct basis vectors remain farther than 1 apart. Thus all nine counts in X' equal 1 and N_{X'}=1. The difference is 13/3-1=10/3>3. All points are in R^8, nu is nonnegative, and the datasets differ in exactly one sample.",
+        "remaining_assumptions_checked": [
+          "n=9 and d=8 are natural numbers",
+          "gamma=1/3 lies in the mutated interval and m=3",
+          "nu=1 is nonnegative",
+          "X and X' are replacement neighbors in (R^8)^9",
+          "the maximizing subsets have the required cardinality m"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    },
+    {
+      "candidate_id": "newneg_source_9_algorithm_1",
+      "source_question_id": 9,
+      "mutation_type": "algorithm_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_9_algorithm_1",
+        "source_question_id": 9,
+        "mutation_type": "algorithm_perturbation",
+        "question_tex": "Fix either add/remove or swap adjacency. Let $\\|\\cdot\\|$ be a norm on $\\mathbb R^d$, let $T$ be a statistic with sensitivity $\\Delta$, meaning $\\|T(X)-T(X')\\|\\le\\Delta$ for all neighboring $X,X'$, and let $\\sigma>0$. Define the $K$-norm mechanism $M$ to have conditional density $f_X(y)=Z^{-1}\\exp(-2\\|y-T(X)\\|/\\sigma)$ on $\\mathbb R^d$, where $Z$ is the translation-invariant normalizing constant. Is $M$ $(\\Delta/\\sigma)$-differentially private?",
+        "mutation": {
+          "component": "algorithm",
+          "before": "$f_X(y)=Z^{-1}\\exp(-\\|y-T(X)\\|/\\sigma)$",
+          "after": "$f_X(y)=Z^{-1}\\exp(-2\\|y-T(X)\\|/\\sigma)$",
+          "targeted_dependency_id": "pointwise_density_ratio_scale",
+          "reason_for_mutation": "The reverse-triangle density-ratio calculation multiplies sensitivity by the coefficient of the norm in the exponent."
+        },
+        "source_proof_summary": "Translation invariance cancels the normalizer, and the reverse triangle inequality bounds the log density ratio by Delta divided by sigma.",
+        "expected_failure": "Doubling the exponent coefficient doubles the attainable privacy loss while the claimed privacy parameter is unchanged.",
+        "proposed_falsification_strategy": "Take d=1 with the absolute-value norm and neighboring statistic values T(X)=0 and T(X')=Delta, where Delta>0. The altered noise is Laplace with scale sigma/2. For E=(-infinity,0], P(M(X) in E)=1/2 and P(M(X') in E)=(1/2)exp(-2 Delta/sigma). Their ratio is exp(2 Delta/sigma), strictly larger than exp(Delta/sigma), directly violating the claimed DP inequality.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_9_algorithm_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "DUPLICATE",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_privacy_loss_calculation",
+        "full_proof": "Take d=1 with the absolute-value norm and a two-dataset adjacency domain for which T(X)=0 and T(X')=Delta>0; this attains and therefore respects the stated sensitivity. The altered density is a Laplace density with location T(X) and scale sigma/2, and translation invariance gives the same normalizer on both datasets. For E=(-infinity,0], P_X(E)=1/2, whereas P_{X'}(E)=(1/2)exp(-2 Delta/sigma). Thus P_X(E)/P_{X'}(E)=exp(2 Delta/sigma)>exp(Delta/sigma), directly violating the claimed pure (Delta/sigma)-DP inequality. The claim is mathematically false, but its doubled exponent, exact Laplace privacy-loss violation, and sensitivity-attaining shift duplicate the visible existing negative generated:fresh_uncovered_run:5.",
+        "remaining_assumptions_checked": [
+          "d=1 and the absolute value define a norm",
+          "sigma and Delta are positive",
+          "the chosen statistic has sensitivity exactly Delta",
+          "the normalizing constant is translation invariant under both adjacent laws"
+        ],
+        "closest_existing_negatives": [
+          "generated:fresh_uncovered_run:5"
+        ],
+        "closest_generated_negatives": [],
+        "uncertainties": [],
+        "final_decision": "REJECT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": false,
+        "verification_is_verified": true,
+        "verifier_accepts": false,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "REJECTED"
+    },
+    {
+      "candidate_id": "newneg_source_10_algorithm_1",
+      "source_question_id": 10,
+      "mutation_type": "algorithm_perturbation",
+      "generator_candidate": {
+        "candidate_id": "newneg_source_10_algorithm_1",
+        "source_question_id": 10,
+        "mutation_type": "algorithm_perturbation",
+        "question_tex": "Let $d\\in\\mathbb N$ and $\\sigma>0$. The $d$-dimensional $\\ell_2$ mechanism releases $T(X)+Y$, where $Y\\in\\mathbb R^d$ has density proportional to $\\exp(-\\|y\\|_2^2/\\sigma)$. Is its mean squared $\\ell_2$ error equal to $\\mathbb E\\|Y\\|_2^2=d(d+1)\\sigma^2$?",
+        "mutation": {
+          "component": "algorithm",
+          "before": "$\\exp(-\\|y\\|_2/\\sigma)$",
+          "after": "$\\exp(-\\|y\\|_2^2/\\sigma)$",
+          "targeted_dependency_id": "gamma_radial_moment",
+          "reason_for_mutation": "The Gamma radial law and its d(d+1)sigma^2 second moment depend on an exponent linear in the radius."
+        },
+        "source_proof_summary": "Spherical coordinates turn the linear radial exponential density into a Gamma distribution with shape d and scale sigma, whose second moment is d(d+1)sigma squared.",
+        "expected_failure": "The squared-radius exponent defines an isotropic Gaussian-type law with a different second moment.",
+        "proposed_falsification_strategy": "Normalize the altered density coordinatewise: exp(-||y||_2^2/sigma) is the density kernel of N(0,(sigma/2)I_d). Therefore E||Y||_2^2 is the trace of its covariance, d sigma/2. Taking d=1 and sigma=1 gives actual mean squared error 1/2, whereas the retained conclusion claims 2.",
+        "preliminary_novelty_matches": []
+      },
+      "verifier_result": {
+        "candidate_id": "newneg_source_10_algorithm_1",
+        "claim_assessment": "FALSE",
+        "single_component_change": true,
+        "novelty_status": "NOVEL_BUT_RELATED",
+        "verification_status": "VERIFIED",
+        "proof_type": "exact_moment_calculation",
+        "full_proof": "The altered kernel factorizes as exp(-sum_{j=1}^d y_j^2/sigma). Comparing it with the Gaussian kernel exp(-sum_j y_j^2/(2 tau^2)) shows that Y is exactly N(0,(sigma/2)I_d), since sigma>0 makes the density normalizable. Consequently E||Y||_2^2=sum_j E[Y_j^2]=trace((sigma/2)I_d)=d sigma/2. In particular, choose the permitted values d=1 and sigma=1. The actual mean squared l2 error is 1/2, while the retained conclusion asserts d(d+1)sigma^2=2. Translation by T(X) does not alter the error Y. Thus the changed radial exponent alone falsifies the claimed moment, with the dimension and scale domains and every unchanged aspect of the mechanism respected.",
+        "remaining_assumptions_checked": [
+          "d=1 is a natural number and sigma=1 is positive",
+          "the altered density is finite and normalizable on R^d",
+          "the mechanism's error remains exactly the additive vector Y",
+          "translation by T(X) does not change the squared error moment"
+        ],
+        "closest_existing_negatives": [],
+        "closest_generated_negatives": [
+          "newneg_source_3_algorithm_1"
+        ],
+        "uncertainties": [],
+        "final_decision": "ACCEPT"
+      },
+      "acceptance_rule_checks": {
+        "claim_is_false": true,
+        "single_component_change": true,
+        "novelty_is_valid": true,
+        "verification_is_verified": true,
+        "verifier_accepts": true,
+        "uncertainties_are_empty": true
+      },
+      "human_review_triggers": [],
+      "final_disposition": "ACCEPTED"
+    }
+  ]
+}

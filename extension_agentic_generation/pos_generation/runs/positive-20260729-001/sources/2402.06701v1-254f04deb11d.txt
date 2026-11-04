@@ -1,0 +1,1739 @@
+--- PAGE 1 ---
+Privacy Profiles for Private Selection
+Antti Koskela1, Rachel Redberg 2, Yu-Xiang Wang 2
+1 Nokia Bell Labs
+2 UC Santa Barbara
+Abstract
+Private selection mechanisms (e.g., Report Noisy Max, Sparse Vector) are fundamental primitives
+of differentially private (DP) data analysis with wide applications to private query release, voting, and
+hyperparameter tuning. Recent work (Liu and Talwar, 2019; Papernot and Steinke, 2022) has made significant
+progress in both generalizing private selection mechanisms and tightening their privacy analysis using modern
+numerical privacy accounting tools, e.g., Rényi differential privacy (RDP). But Rényi DP is known to be lossy
+when (ϵ, δ)-DP is ultimately needed, and there is a trend to close the gap by directly handling privacy profiles,
+i.e., δ as a function ofϵ or its equivalent dual form known asf-DPs. In this paper, we work out an easy-to-use
+recipe that bounds the privacy profiles of ReportNoisyMax and PrivateTuning using the privacy profiles of
+the base algorithms they corral. Numerically, our approach improves over the RDP-based accounting in all
+regimes of interest and leads to substantial benefits in end-to-end private learning experiments. Our analysis
+also suggests new distributions, e.g., binomial distribution for randomizing the number of rounds that leads
+to more substantial improvements in certain regimes.
+1 Introduction
+Differential privacy (DP) bounds the privacy loss incurred when an algorithm is run on a dataset. While the
+analysis of this bound is often quite nuanced, the rough tally is that whenever the algorithm accesses the data,
+it incurs a privacy cost.
+By this rule of thumb, data privacy for modern machine learning (ML) applications is in trouble. Most modern
+ML algorithms are notoriously finicky and require extensive hyperparameter tuning in order to achieve good
+performance. In the context of data privacy, this means that the evaluation of every additional hyperparameter
+candidate could cost something.
+Using composition theorems, running an (ϵ, δ)-DP algorithm k times incurs a cost of (kϵ, kδ)-DP or
+( ˜O(
+√
+kϵ), O(δ))-DP. This naïve analysis assumes a meta-algorithm that outputs ak-tuple of results over allk
+runs of the(ϵ, δ)-DP base algorithm. But for applications such as hyperparameter tuning, the meta-algorithm
+need only output the “best” output over allk runs. Thus, a tighter analysis may often be available for this class
+of private selectionmechanisms which choose from a set of candidates the item which approximately maximizes
+a given quality score.
+The aim of our work is to improve the privacy analysis of private hyperparameter tuning algorithms for
+machine learning algorithms. Previous studies (Chaudhuri and Vinterbo, 2013) have already addressed the
+DP cost of hyperparameter tuning. Improving upon this, Liu and Talwar (2019) proposed black-box tuning
+methods for which they showed that private selection fromϵ-DP base mechanisms can be3ϵ-DP, and also gave
+1
+arXiv:2402.06701v1  [cs.CR]  9 Feb 2024
+
+--- PAGE 2 ---
+approximate (ϵ, δ)-DP results. Mohapatra et al. (2022) gave adaptive tuning methods and showed that for a
+reasonable number of privately chosen candidates, naïve accounting via Rényi differential privacy (RDP) often
+yields tighter DP bounds than private selection using the methods by Liu and Talwar (2019). We base our
+approach on the results of Papernot and Steinke (2022) which build on Liu and Talwar (2019)’s work. Papernot
+and Steinke (2022) provided logarithmically scaling RDP bounds for black-box tuning algorithms in relation to
+the number of model evaluations.
+What is missing from the private selection and private hyperparameter tuning line of work, are bounds that
+would directly use the privacy profiles of the base mechanisms as building blocks and would also be capable of
+taking advantage of numerical accounting methods (e.g., the recent work of Koskela et al., 2021; Zhu et al.,
+2022; Gopi et al., 2021). In this work we address this shortfall. Our proposed bounds utilize only point-wise
+information about the(ϵ, δ)-profile of the base mechanism, similarly to bounds given by Liu and Talwar (2019).
+As one application of our results we consider Differentially Private Stochastic Gradient Descent (DP-
+SGD) (Abadi et al., 2016), a popular technique for training machine learning models with DP. DP-SGD
+introduces extra hyperparameters such as the noise levelσ and clipping constantC; factors like the subsampling
+ratio q and the training duration also affect both the privacy and accuracy of the methods. As demonstrated
+by Papernot and Steinke (2022), tweaking DP-SGD’s hyperparameters often relies on using sensitive data which
+require privacy protection. The risk of data leakage from hyperparameters is arguably smaller than from model
+parameters, but developing methods with low privacy costs has proven challenging. The leading algorithms
+proposed by Papernot and Steinke (2022) still incur a significant privacy cost overhead. Our aim is to further
+lower this overhead.
+As another application of our analysis we consider Generalized Propose-Test-Release (Redberg et al., 2023),
+which broadens the reach of the Propose-Test-Release (PTR) framework by allowing it to handle queries with
+unbounded sensitivity, making it applicable to problems such as linear regression. The method proposed
+by Redberg et al. (2023) gives point-wise(ϵ, δ)-privacy guarantees for generalized PTR. Thus, in order to account
+for the privacy cost of tuning the hyperparameters of the underlying queries, we can directly use our analysis for
+which point-wise(ϵ, δ)-guarantees are sufficient. We show that our bounds are considerably tighter than those
+of Liu and Talwar (2019), the only previous applicable results. We also empirically illustrate that compared to
+well-established non-adaptive methods, our bounds considerably improve the privacy-utility trade-off for linear
+regression problems.
+2 Preliminaries
+We first give the basic definitions. An input dataset containingn data points is denoted asX = {x1, . . . , xn}.
+Denote the set of all possible datasets byX. We sayX and X ′ are neighbors if we get one by adding or removing
+one data element to or from the other, or by replacing one data element in the other (denotedX ∼ X ′). Consider
+a randomized mechanismM : X → O , where O denotes the output space. The(ϵ, δ)-definition of DP can be
+given as follows (Dwork, 2006).
+Definition 2.1.Let ϵ > 0 and δ ∈ [0, 1]. We say that a mechanismM is (ϵ, δ)-DP, if for all neighboring datasets
+X and X ′ and for every measurable setE ⊂ O we have:
+Pr(M(X) ∈ E) ≤ e ϵPr(M(X ′) ∈ E) + δ.
+We state many of our results for generalf-divergences. For a convex functionf : [0, ∞) → R, we define the
+f-divergence between distributionsP and Q taking values inY as
+Hf(P ||Q) =
+Z
+Y
+f
+ P (y)
+Q(y)
+
+Q(y) dy.
+2
+
+--- PAGE 3 ---
+Notice that we do not require the normalizationf(1) = 0 often used in the so-called Czsisár divergences (Liese
+and Vajda, 2006). Especially, our aim is to find tight bounds for the hockey stick divergence, i.e., when
+f(z) = [ z − e ϵ]+ for some ϵ ∈ R. This is due to the fact that tight(ϵ, δ)-bounds can be obtained using the
+hockey-stick-divergence:
+Lemma 2.2(Balle et al. 2018, Theorem 1). A mechanism M satisfies (ϵ, δ)-DP if and only if,
+max
+X∼X ′
+Hf(M(X)||M(X ′)) ≤ δ
+for f(z) = [z − e ϵ]+.
+We denote the hockey stick divergence determined byϵ ∈ R by He ϵ throughout the paper, and will refer to
+δM(ϵ) := max
+X∼X ′
+Heϵ(M(X)||M(X ′))
+as theprivacy profileof mechanism M.
+We will also use the Rényi differential privacy (RDP) (Mironov, 2017) which is defined as follows. Rényi
+divergence of orderα > 1 between two distributionsP and Q is defined as
+Dα(P ||Q) = 1
+α − 1 log
+Z  P (t)
+Q(t)
+α
+Q(t) dt (2.1)
+and we say that a mechanismM is (α, ϵ)-RDP, if for all neighboring datasetsX and X ′, the output distributions
+of M(X) and M(X ′) have Rényi divergence of orderα > 1 at most ϵ, i.e., if
+max
+X∼X ′
+Dα
+
+M(X)||M(X ′)
+
+≤ ϵ.
+To convert from RDP to(ϵ, δ)-DP, we use the formula given in Appendix (D.1).
+Notice that the Rényi divergence of orderα > 1 is a scaled logarithm of anf-divergence determined by
+f(z) = zα. Existing RDP analyses for RNM and private selection use the factf(u, v) = ( u
+v )αv is a jointly convex
+function for u and v. We formulate many of our results for generalf-divergences, and the following technical
+result will then be central (see e.g., Ch. 3, Boyd and Vandenberghe, 2004).
+Lemma 2.3. If f : R+ → R+ is a convex function, then the functionf
+
+x
+y
+
+y is jointly convex forx ≥ 0 and
+y > 0.
+For the analysis of private selection algorithms, the number of timesK that the base algorithm is evaluated
+is a random variable. To analyze different alternatives for choosingK, we will need the concept of probability
+generating functions.
+Definition 2.4. Let K be a random variable taking values inN ∪ {0}. The probability generating function
+(PGF) of K, φ : [0 , 1] → [0, 1] is defined as
+φ(z) =
+∞X
+k=0
+P(K = k) · zk.
+Our main result Thm. 4.1 is stated for a general PGFφ and we use it obtain method-specific bounds.
+Throughout the paper, we will denotem = E[K].
+3
+
+--- PAGE 4 ---
+3 Report Noisy Max for Additive Noise Mechanisms
+As a first application of the hockey-stick divergence-based analysis, we consider the Report Noisy Max (RNM)
+of 1-dimensional additive noise mechanisms. This will serve as a segue into the more involved analysis of private
+selection, where we also obtain bigger gains compared to the previous results. Our analysis here is based on the
+RDP analysis by Zhu and Wang (2022). We mention that recent applications of RNM include private in-context
+learning of LLMs (Wu et al., 2024; Tang et al., 2024).
+Let X = {x1, x2, . . . , xN }, where xi ∈ X for all i ∈ [N], be a data set and consider the mechanism
+M(X) = arg max{M1(X), . . . ,Mm(X)}, (3.1)
+where for everyi ∈ [m],
+Mi(X) = f(X) + Zi,
+for some functionfi : X → R such that
+max
+X∼X ′
+|fi(X) − fi(X ′)| ≤ 1
+and where the noisesZi, i ∈ [m], are i.i.d. We have the following existing RDP bound.
+Theorem 3.1(Zhu and Wang 2022, Theorem 8). Let α > 1. The mechanism M(X) is (α, ϵ′)-RDP for
+ϵ′ = ϵ + log m
+α − 1 , (3.2)
+where ϵ denotes the RDP guarantee of orderα for an additive noise mechanism with noiseZ and sensitivity 2.
+Theorem 3.2. Let X ∼ X ′ and ϵ ∈ R. We have:
+He ϵ
+
+M(X)||M(X ′)
+
+≤ m · δ(ϵ), (3.3)
+where δ(ϵ) is the privacy profile of the additive noise mechanism with sensitivity 2. If we assume monotonicity,
+i.e., if fi(X) ≥ fi(X ′) (or vice versa) for alli ∈ [m], then the sensitivity of 2 can be replaced with a sensitivity
+of 1.
+Theorem 3.3. For an adaptive composition ofk mechanisms of the form(3.1), we get the privacy profile upper
+bound mk · δ(ϵ), where δ(ϵ) is the privacy profile of anm-wise composition of an additive noise mechanism with
+noise Z and sensitivity 2.
+The RDP analysis of the private selection provided by Papernot and Steinke (2022) shows that the RDP
+guarantees grow essentially aslog m, where m is the expected number of candidates for the private selection
+algorithm. In case Z is normally distributed, we directly see from our analysis that for a fixedδ the ϵ-values of
+the private selection algorithm grow as1
+σ log
+1
+2 m
+δ . This result is obtained for the RNM using a simple tail bound
+of the Gaussian.
+Corollary 3.4. Consider the mechanism M defined in Eq. 3.1 and supposeZ is normally distributed with
+variance σ2. Let δ > 0. Then M is (ϵ, δ)-DP for
+ϵ = 2
+σ2 + 2
+σ
+r
+2 log m
+δ
+As Figure 1 shows, with the bound given in Thm. 3.2 we observe differences one usually observes between
+the accurate hockey stick and Rényi divergence bounds (for comparisons, see, e.g. Canonne et al., 2020). When
+considering the private selection problem where the number of candidates is randomized, we obtain larger
+differences. Also, theϵ-growth order O( 1
+σ log
+1
+2 m
+δ ) is retained. All of this is discussed in the next two sections.
+4
+
+--- PAGE 5 ---
+101 102 103 104 105
+m
+2.6
+2.8
+3.0
+3.2
+3.4
+3.6ϵ
+2
+σ2 + 2
+σ
+√
+2logm
+δ , Cor. 3.4
+RDP bound, Thm. 3.1
+HS bound, Thm. 3.2
+Figure 1: Comparison of the(ϵ, δ)-bounds for the RNM mechanism(3.1) when the base mechanismsMi, i ∈ [m],
+are 1-d Gaussian mechanisms with sensitivity 1 and noise scaleσ = 4.0, and whenδ = 10−6. Also plotted is the
+bound of Corollary 3.4.
+4 General Bound for Private Selection
+We use the notation and setting of Papernot and Steinke (2022). This means that the tuning algorithmA
+outputs both the argument of the maximizer (the best hyperparameters or the index) and the output of the base
+mechanism (e.g., the model trained with the best hyperparameters).
+Let Y denote the finite and ordered output space (the quality score),Q(y) the density function of the quality
+score of the base mechanism taking values inY, K the random variable for the number of times the base
+mechanism is run andA(y) the density function of the tuning algorithm that outputs the best one of theK
+alternatives. Let A and A′ denote the output distributions of the tuning algorithm evaluated on neighboring
+datasets X and X ′, respectively. Then, thef-divergence between A and A′ can be bounded using the following
+result. We use the proof technique of Papernot and Steinke (2022) and similarly invoke the argument that our
+proof for finiteY can be extended to the general case.
+Theorem 4.1. Let X ∼ X ′ and let A and A′ be the density functions of the hyperparameter tuning algorithm
+as defined above, evaluated onX and X ′, respectively. LetQ and Q′ be the density functions of the quality score
+of the base mechanism, evaluated onX and X ′, respectively. LetK be random variable for the times the base
+mechanism is run andφ(z) the PGF ofK. Let f : [0 , ∞) → R be a convex function. Then,
+Hf(A||A′) ≤
+X
+y∈Y
+f
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y)
+
+· Q′(y)φ′(q′
+y),
+where for eachy ∈ Y, qy and q′
+y are obtained by applying the samey-dependent post-processing function toQ
+and Q′, respectively.
+Looking at the bound given by Thm. 4.1, we can decompose the right-hand side in casef corresponds to the
+Rényi divergence and obtain (Lemma 7, Papernot and Steinke, 2022) as a corollary.
+5
+
+--- PAGE 6 ---
+Remark 4.2. Let f(z) = zα for some α > 1. Then, by Thm. 4.1,
+e(α−1)Dα(A||A′) = Hf(A||A′)
+≤
+X
+y∈Y
+ Q(y)
+Q′(y)
+α
+Q′(y) ·
+ φ′(qy)
+φ′(q′y)
+α
+φ′(q′
+y)
+≤
+
+X
+y∈Y
+ Q(y)
+Q′(y)
+α
+Q′(y)
+
+
+ φ′(q)
+φ′(q′)
+α
+φ′(q′),
+(4.1)
+for some q and q′ that are obtained by applying the same post-processing function toQ and Q′, respectively.
+Taking the logarithm and dividing byα − 1, we obtain (Lemma 7, Papernot and Steinke, 2022).
+In case of RDP analysis, the bounds for the randomized private selection algorithms (see Theorems 5.1
+and 5.6) allow optimizing the bound(4.1) with respect to the privacy profile ofQ. For example: asq is a result
+of post-processing ofQ, we have that for allϵ ≥ 0
+q ≤ e ϵq′ + δ(ϵ),
+where δ(ϵ) gives the privacy profile ofQ, and we can carry out an optimization of the bound(4.1) individually
+for each RDP orderα w.r.t. ϵ. In case the functionf in Thm. 4.1 corresponds to the hockey stick divergence,
+the best we can have is a uniform bound for the ratioφ′(qy)
+φ′(q′y) which uses the boundqy ≤ e ϵq′
+y + δ(ϵ) with the
+same value ofϵ for each y ∈ Y. As a result there is one degree of freedom less to optimize in the upper bounds
+we obtain using the hockey stick divergence. Nevertheless, the analysis with the hockey stick divergence becomes
+much simpler and the resulting(ϵ, δ)-DP bounds for the private selection become tighter.
+5 Distribution Specific Bounds for Private Selection
+We next consider privacy profile bounds for two specific choices of the distributionK, the truncated negative
+binomial distribution and the binomial distribution. As we show, in both cases the bounds allow evaluating a
+considerably larger number of private candidates than the state-of-the-art bounds. The bounds for the binomial
+distribution generalize the bounds for the Poisson distribution and improve the state-of-the-art bounds for the
+Poisson distribution and also allow concentratingK further.
+5.1 Truncated Negative Binomial Distribution
+Suppose the number of trialsK is distributed according to the truncated negative binomial distributionDη,γ
+which is determined byγ ∈ (0, 1) and η ∈ (−1, ∞) and by the probabilities (k ∈ N) for η ̸= 0 by
+P(K = k) = (1 − γ)k
+γ−η − 1
+k−1Y
+i=0
+ i + η
+i + 1
+
+.
+and for η = 0 by
+P(K = k) = (1 − γ)k
+k · log 1/γ .
+6
+
+--- PAGE 7 ---
+It holds that whenη ̸= 0,
+EK = η(1 − γ)
+γ(1 − γη)
+and when η = 0,
+EK = 1/γ − 1
+log 1/γ .
+The derivative of the corresponding probability generating function is given by
+φ′(z) =
+
+1 − (1 − γ)z
+−η−1
+· γη+1 · EK. (5.1)
+As a baseline, we consider the following RDP bound.
+Theorem 5.1(Papernot and Steinke 2022). Let Q satisfy
+
+α, ϵ
+
+-RDP and
+
+bα,bϵ
+
+-RDP for someα ∈ (1, ∞) and
+bα ∈ [1, ∞). Draw K from a truncated negative binomial distribution distributionDη,γ, where γ ∈ (0, 1) and
+η ∈ (−1, ∞). Run Q(X) for K times. Then A(X) returns the best value of thoseK runs (also Q’s output).
+Then A satisfies
+
+α, ϵ′(α)
+
+-RDP, where
+ϵ′(α) = ϵ(α) + (η + 1)
+
+1 − 1
+bα
+
+bϵ + (1 + η) · log(1/γ)
+ˆα + log m
+α − 1 .
+Using the PGF(5.1) and our general result Thm.4.1, we obtain the following bound using the hockey-stick
+divergence.
+Theorem 5.2. Let K ∼ D η,γ and let δ(ϵ1), ϵ1 ∈ R, define the privacy profile of the base mechanismQ. Then,
+for A and A′, the output distributions of the selection algorithm evaluated on neighboring datasetsX and X ′,
+respectively, and for allϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ)
+where
+bϵ = ϵ − (η + 1) log
+
+e ϵ1 + 1 − γ
+γ · δ(ϵ1)
+
+.
+We directly obtain the following pureϵ-DP result from Thm. 5.2. Notice that it includes Theorem 1.3
+(3ϵ-bound) by Liu and Talwar (2019) as a special case.
+Corollary 5.3. Let K ∼ D η,γ. If the base mechanismQ is ϵ-DP, then the selection algorithmA is (η + 2)ϵ-DP.
+For η = 1 we get Theorem 1.3 of (Liu and Talwar, 2019).
+The following (ϵ, δ)-DP result is also a straightforward corollary of Thm. 5.2.
+Corollary 5.4. Let K ∼ D η,γ. If the base mechanismQ is (ϵ, δ)-DP, then then the selection algorithmA is
+(η + 2)ϵ + γ−1δ, mδ
+
+-DP.
+Notice that for the geometric distribution (η = 1), Cor. 5.4 implies that if Q is (ϵ, δ)-DP, then A is
+3ϵ + m δ, m δ
+
+-DP.
+We can show that for a fixedδ the ϵ-value of the private selection algorithm isO(log
+1
+2 m
+δ ), in case the base
+mechanism is Gaussian differentially private (Dong et al., 2022).
+7
+
+--- PAGE 8 ---
+Corollary 5.5(ϵ-values when Q is GDP). Let K ∼ D η,γ. Suppose the base mechanism is dominated by the
+Gaussian mechanism with noise parameterσ > 0 and L2-sensitivity 1. Then, for a fixedδ > 0, the private
+selection algorithm A is (ϵ, δ)-DP for
+ϵ = (η + 2)
+ 1
+2σ2 + 1
+σ
+r
+2 log 1
+γ · δ
+
++ δ.
+Figure 2 illustrates the various bounds for the truncated negative binomial distribution withη = 1 when
+the base mechanism is the Gaussian mechanism withσ = 4 and L2-sensitivity 1, whenm = 30, 300 and 3000.
+Figure 3 shows the increase of theϵ-values for a fixed value ofδ and the bound of Lemma 5.5 for comparison.
+0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0
+ϵ
+10 10
+10 8
+10 6
+10 4
+10 2
+100
+δ RDP bound, Thm. 5.1, m=30
+RDP bound, Thm. 5.1, m=300
+RDP bound, Thm. 5.1, m=3000
+HS bound, Thm. 5.2, m=30
+HS bound, Thm. 5.2, m=300
+HS bound, Thm. 5.2, m=3000
+Priv. Profile of Base Mechanism
+Figure 2: Comparison of various(ϵ, δ)-bounds when K ∼ D η,γ with η = 1 (the geometric distribution,m = γ−1)
+and m = 30, 300, 3000. The base mechanism is the Gaussian mechanism withL2-sensitivity 1 and noise parameter
+σ = 4.
+5.2 Binomial Distribution
+For choosing the distribution forK, we consider another alternative that is suitable for smaller number of
+candidates. Papernot and Steinke (2022) consider as an alternative for the distribution ofK the Poisson
+distribution which is more concentrated than the truncated negative binomial distribution and thus gives an
+attractive choice from the practical point of view. By consideringK to be binomially distributed,K ∼ Bin(n, p),
+we can still further concentrate the distribution ofK, with a small additional privacy cost. The hockey stick-
+based approach simplifies the analysis such that when compared to the RDP bounds for the case whereK is
+Poisson distributed, we essentially get much more concentratedK for the same privacy cost using the binomial
+distribution.
+Our bound forK ∼ Bin(n, p) is a strict generalization of the Poisson distribution case, as we get the result
+for the Poisson distribution as a limit whenp → 0. The RDP bound to compare is the one given by Papernot
+and Steinke (2022).
+Theorem 5.6(Papernot and Steinke 2022). Let Q satisfy
+
+α, ϵ
+
+-RDP and (bϵ,bδ)-DP for someα ∈ (1, ∞) and
+ϵ,bϵ,bδ ≥ 0. Draw K from a Poisson distribution with meanm. Run Q(X) for K times. Then A(X) returns the
+8
+
+--- PAGE 9 ---
+101 102 103 104 105
+m
+2.0
+2.5
+3.0
+3.5
+4.0
+4.5
+5.0
+5.5ϵ
+3 ·
+( 1
+2σ2 + 1
+σ
+√
+2logm
+δ
+)
+, Cor. 5.5
+RDP bound, Thm. 5.1
+HS bound, Thm. 5.2
+Figure 3: Growth ofϵ-values for δ = 10−6 for the RDP and hockey stick divergence based bounds as a function
+of m, when K ∼ D η,γ with η = 1 and the base mechanism is the Gaussian mechanism withL2-sensitivity 1 and
+noise parameter σ = 4. The privacy profile bound given by Thm. 5.2 retains theO(log
+1
+2 m
+δ ) growth of ϵ-values
+from the DP RNM (See Fig. 1).
+best value of thoseK runs (also Q’s output). IfK = 0, A(X) returns some arbitrary output. Ife bϵ ≤ 1 + 1
+α−1,
+then A satisfies
+
+α, ϵ′(α)
+
+-RDP, where
+ϵ′(α) = ϵ + m ·bδ + log m
+α − 1 .
+For a hockey-stick divergence bound, we consider the binomially distributedK which is a strict generalization
+of the Poisson case and includes its privacy profile bound as a special case. We can derive the following result
+from Thm. 4.1 when using the PGF of the binomial distribution.
+Theorem 5.7. Let K ∼ Bin(n, p) for some n ∈ N and 0 < p < 1, and let δ(ϵ1), ϵ1 ∈ R, define the privacy
+profile of the base mechanismQ. Suppose
+ϵ1 ≥ log
+
+1 + p
+1 − p · δ(ϵ1)
+
+.
+Then, for A and A′, the output distributions of the selection algorithm evaluated on neighboring datasetsX and
+X ′, respectively, for allϵ > 0 and for all ϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ), (5.2)
+where
+bϵ = ϵ − (n − 1) log
+
+1 + p · (e ϵ1 − 1) + p · δ(ϵ1)
+
+.
+We get the hockey-stick divergence bound for the caseK ∼ Poisson(m) as a corollary of Thm. 5.7.
+9
+
+--- PAGE 10 ---
+Corollary 5.8.Let K ∼ Poisson(m) for some m ∈ N, and letδ(ϵ1), ϵ1 ∈ R, define the privacy profile of the base
+mechanism Q. Then, for A and A′, the output distributions of the selection algorithm evaluated on neighboring
+datasets X and X ′, respectively, and for allϵ > 0 and for all ϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ), (5.3)
+where
+bϵ = ϵ − m · (e ϵ1 − 1) − m · δ(ϵ1).
+The proof of Cor. 5.8 essentially follows from the fact thatBin(n, m/n) approaches Poisson(m) in total
+variation distance asn grows and that the bound(5.2) approaches the bound(5.3) as n grows. Figure 4 illustrates
+that when compared to the RDP bound of Thm. 5.6 for the Poisson distributedK, we can obtain much smaller
+probabilities for small values ofK for the same privacy cost when usingK ∼ Bin(n, m/n) and Thm. 5.7.
+0.0 0.5 1.0 1.5 2.0 2.5
+ϵ
+10 13
+10 11
+10 9
+10 7
+10 5
+10 3
+10 1
+δ
+RDP bound, Thm. 5.6, K ∼ Poisson(m)
+HS bound, Thm. 5.7, K ∼ Bin(n, m/n), n = 15
+HS bound, Thm. 5.7, K ∼ Bin(n, m/n), n = 20
+HS bound, Thm. 5.7, K ∼ Bin(n, m/n), n = 1000
+0 2 4 6 8 10 12
+K
+10 7
+10 6
+10 5
+10 4
+10 3
+10 2
+10 1
+100
+CDF(K)
+CDF of Poisson(m)
+CDF of Bin(n, m/n), n = 15
+CDF of Bin(n, m/n), n = 20
+CDF of Bin(n, m/n), n = 1000
+Figure 4: Top: Comparison of the bound of Thm. 5.7 forK ∼ Bin(n, m/n) for different values ofn, when
+m = 10, and the RDP bound of Thm. 5.6. The base mechanism is the Gaussian mechanism with sensitivity 1
+and σ = 4.0. Bottom: Comparison of the CDFs for different values ofn. When comparing to the RDP bound,
+we see that atδ ≈ 10−6 we get more concentratedK for free by using the binomial distribution and Thm. 5.7.
+6 Applications
+6.1 Hyperparameter tuning for Propose-Test-Release
+Propose-Test-Release (PTR) (Dwork and Lei, 2009) is one of the most versatile recipes for data-adaptive DP
+mechanism design. In its vanilla form, it involves three steps: (1) propose (or guess) a bound of the local
+sensitivity; (2) privately test whether the bound is valid; (3) If it passes the test, calibrate noise proportional to
+the proposed bound; otherwise, refuse to answer. Recently, Redberg et al. (2023) generalized this approach by
+considering data-adaptive privacy losses instead. The biggest challenge to apply the method is to know which
+bound to propose. The data-dependent privacy loss will depend on both the dataset and the hyperparameters of
+the query (as an example, think of the noise scale in additive noise mechanisms). To tune these hyperparameters
+we consider the private selection algorithm with geometrically distributedK. The tricky issue with PTR is
+10
+
+--- PAGE 11 ---
+that PTR does not satisfy Rényi DP, and thus disqualifies the approach from Papernot and Steinke (2022).
+Meanwhile, our methods deal with(ε, δ)-DP and δ-approximate Gaussian DP very naturally. Using our Thm. 5.2
+we can select the best threshold to propose a large number of candidates without resorting to composition. We
+have the following result for Generalized PTR with an(bϵ,bδ)-DP test. We refer to Redberg et al. (2023) for more
+details.
+Theorem 6.1(Redberg et al. 2023). Consider a proposalϕ and a data-dependent functionϵϕ(X) w.r.t. δ > 0.
+Suppose that we have an(bϵ,bδ)-DP testT : X → { 0, 1} such that whenϵϕ(X) > ϵ, T (X) = 1 with probabilityδ′ and
+0 with probability1−δ′. Then the Generalized PTR algorithm (Redberg et al., 2023, Alg. 2) is(ϵ+bϵ, δ+bδ+δ′)-DP.
+Our approach is to wrap the private selection algorithm around Generalized PTR, and tune the parameterϕ.
+We use the point-wise guarantees given by Thm. 6.1 for Gen. PTR and our Thm. 5.1 for the tuning algorithm.
+To illustrate the effectiveness of this approach, we consider a linear regression problem on two UCI benchmark
+data sets (Bache and Lichman, 2013), see Fig. 5. We apply Generalized PTR to the one-posterior sample
+(OPS) algorithm described in (Redberg et al., 2023) which includes privately releasing theL2-norm of the
+non-private solution and also the smallest eigenvalue of the feature covariance matrix. As baselines we have
+the same approach using the privacy bounds of Liu and Talwar (Thm. 3.5, 2019), the output perturbation
+method (Chaudhuri et al., 2011) and the non-adaptive method OPS-Balanced by Wang (2018).
+10 1
+ 100
+ϵ
+10 2
+6 × 10 3
+2 × 10 2
+3 × 10 2
+MSE
+UCI Bike dataset (n = 17379, d = 17)
+non-private
+OutPert
+OPS
+OPS with PTR (Thm. 5.2)
+OPS with PTR (Liu&T alwar)
+10 1
+ 100
+ϵ
+2 × 10 2
+3 × 10 2
+4 × 10 2
+6 × 10 2
+MSE
+UCI Elevator dataset (n = 8752, d = 18)
+non-private
+OutPert
+OPS
+OPS with PTR (Thm. 5.2)
+OPS with PTR (Liu&T alwar)
+Figure 5: Linear regression problem on two UCI benchmark datasets. Tuning OPS-PTR (i.e., generalized PTR
+applied to the one-posterior sample algorithm) via the private selection algorithm outperforms baseline methods
+when the privacy cost of the tuning procedure is calculated using our Thm. 5.2.
+6.2 Private Hyperparameter Tuning of DP-SGD
+Our results enable using numerical accountants for computing the privacy profileδ(ϵ) for the subsampled Gaussian
+mechanism (see, e.g., Koskela et al., 2021; Gopi et al., 2021; Zhu et al., 2022). We consider the simplest case, i.e.,
+the Poisson subsampling and the add/remove neighborhood relation of datasets. We apply the numerical method
+proposed by Koskela et al. (2021) to the dominating pairs given in (Thm. 11, Zhu et al., 2022) to obtain accurate
+privacy profiles for the base mechanism. We remark that Zhu et al. (2022) give privacy profiles for various
+subsampling schemes under both add/remove and substitute neighborhood relations of datasets. With these
+results, one can numerically construct the dominating pair of distributions using the methods of Doroshenko
+et al. (2022) and also obtain upper bounds for compositions as well.
+11
+
+--- PAGE 12 ---
+We find that our bounds are tighter than the RDP bounds across a variety of parameter combinations.
+Figure 6 shows comparisons with parameters taken from an example of (Papernot and Steinke, 2022). RDP
+parameters are evaluated using the Opacus library (Yousefpour et al., 2021). Often, using larger batch sizes and
+noise ratios leads to increased privacy-utility tradeoff (De et al., 2022; Ponomareva et al., 2023). Figure 7 shows
+comparisons in a setting of such a high-accuracy experiment (De et al., 2022).
+0 5 10 15 20 25 30
+m
+4
+6
+8
+10
+12ϵ
+RDP bound (Poisson), Thm. 5.6
+HS bound (Poisson), Cor. 5.8
+RDP bound (Geom.), Thm. 5.1
+HS bound (Geom.), Thm. 5.2
+Figure 6: Comparison of the hockey-stick divergence bounds of Thm. 5.2 and Cor. 5.8, and the RDP bounds of
+Thm. 5.1 and 5.6 for the private selection for a Poisson-subsampled Gaussian mechanism with subsampling ratio
+q = 256/60000, noise parameterσ = 1.1 and number of stepsT = ⌈60/q⌉.
+100 101 102 103 104
+m
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5ϵ
+RDP bound, Thm. 5.1
+HS bound, Thm. 5.2
+Figure 7: Comparison of the bounds, when the base mechanism is a Poisson-subsampled Gaussian mechanism
+with the parametersq = 16384/50000, σ = 21.1 and T = 250 (see Table 18 in De et al., 2022). We see that the
+bound of Thm. 5.2 allows evaluating approximately 3 times as many models as the RDP bound.
+12
+
+--- PAGE 13 ---
+Adjusting Hyperparameters. One important question is, how to adjust the hyperparameters in case we are
+optimizing parameters that affect the privacy guarantees themselves. For example, one may consider tuning the
+noise parameter σ in DP-SGD in which case one may also consider adjusting the length of the training.
+The bound of Thm. 5.2 essentially requires only point-wise information about the privacy profile of the
+base mechanism Q. However, the bound can be optimized w.r.t. the privacy profile ofQ which may affect it
+considerably. For finding ideal point-wise DP thresholds, we consider the following procedure. Suppose the base
+mechanisms all satisfy(ϵQ, δ) for some ϵQ > 0 and δ > 0. As the privacy profiles start to resemble those of the
+Gaussian mechanism for large numbers of compositions (Dong et al., 2022), we carry out the optimization of the
+upper bound of Thm. 5.2 w.r.t. to the privacy profile of a Gaussian mechanism (GM) that is adjusted to be
+(ϵQ, δ)-DP. More specifically, we first adjust the noise scaleσ of the GM such that it is(ϵQ, δ)-DP, to obtain a
+privacy profileδQ(ϵ). Then, in case we are usingK ∼ D η,γ, we carry out the minimization
+ϵ1 = arg min
+ϵ
+log
+
+e ϵ + 1 − γ
+γ δQ(ϵ)
+
+.
+and set δ1 = δQ(ϵ1). This results in the first threshold(ϵ1, δ1). Using the same privacy profile we find anbϵ-value
+where this GM is(bϵ, δ/m)-DP. The following corollary result of Thm. 5.2 then gives theϵ-value for which the
+private selection algorithm is(ϵ, δ)-DP.
+Corollary 6.2. Suppose the base mechanismQ is (ϵ1, δ1)-DP and (bϵ, δ/m)-DP for some ϵ1 ≥ 0 andbϵ ≥ 0.
+Then, the private selection algorithm withK ∼ D η,γ is (ϵ, δ)-DP for
+ϵ =bϵ + (η + 1) log
+
+e ϵ1 + 1 − γ
+γ δ1
+
+.
+Figure 8 shows the upper bound obtained using this procedure, when we are tuning theσ-parameter for
+the Poisson-subsampled Gaussian mechanism. We fixq = 0.01 and set as a thresholdϵQ = 1.5 and δ = 10−6.
+We consider three noise-level candidates:σ = 2.0, σ = 3.0 and σ = 4.0. For each of these three candidates,
+the number of iterationsT is determined to be the maximum such that the privacy profile of the candidate is
+below (ϵ1, δ1)- and (bϵ, δ/m)-thresholds. As a result we can run the candidate models for≈ 4000, 10000 and
+18000 iterations, respectively. We compare the(ϵ, δ)-DP bound given by Cor. 6.2 and the bounds we would
+obtain by optimizing Thm. 5.2 individually for each candidate mechanism and see that there is a very small gap.
+101 102 103
+m
+2.8
+3.0
+3.2
+3.4
+3.6
+3.8
+4.0
+4.2ϵ
+Upper Bound
+Optimized Candidate Bound, σ = 2.0
+Optimized Candidate Bound, σ = 3.0
+Optimized Candidate Bound, σ = 4.0
+Figure 8: Tuning theσ-parameter for the Poisson-subsampled Gaussian mechanism with geometrically-distributed
+K. We fix q = 0.01 and consider threeσ-candidates: 2.0, 3.0 and 4.0. Shown are the(ϵ, δ)-bounds given by
+Cor. 6.2 and the bounds obtained by optimizing Thm. 5.2 individually for each candidate mechanism.
+13
+
+--- PAGE 14 ---
+7 Conclusions
+We have filled a gap in the private selection literature by providing(ϵ, δ)-privacy analysis for various selection
+algorithms that is able to accurately use the privacy profiles of the candidate mechanisms. When compared
+to existing RDP bounds, in DP-SGD tuning, for example, the new bounds allow evaluating approximately 3
+times as many candidate models. The bounds also improve existing point-wise(ϵ, δ)-bounds which translates
+to improved utility in data-adaptive analyses using the generalized PTR framework. We have also shown how
+to use the bounds to adjust parameters of the candidate models when tuning hyperparameters that affect the
+privacy guarantees of the candidate mechanisms.
+Acknowledgments
+The work was partially supported by NSF Award #2048091.
+References
+Abadi, M., Chu, A., Goodfellow, I., McMahan, H. B., Mironov, I., Talwar, K., and Zhang, L. (2016). Deep
+learning with differential privacy. InProceedings of the 2016 ACM SIGSAC Conference on Computer and
+Communications Security, pages 308–318.
+Bache, K. and Lichman, M. (2013). UCI machine learning repository.
+Balle, B., Barthe, G., and Gaboardi, M. (2018). Privacy amplification by subsampling: Tight analyses via
+couplings and divergences.Advances in Neural Information Processing Systems, pages 6277–6287.
+Balle, B. and Wang, Y.-X. (2018). Improving the Gaussian mechanism for differential privacy: Analytical
+calibration and optimal denoising. InInternational Conference on Machine Learning, pages 394–403. PMLR.
+Boyd, S. P. and Vandenberghe, L. (2004).Convex optimization. Cambridge university press.
+Canonne, C. L., Kamath, G., and Steinke, T. (2020). The discrete gaussian for differential privacy.Advances in
+Neural Information Processing Systems, 33:15676–15688.
+Chaudhuri, K., Monteleoni, C., and Sarwate, A. D. (2011). Differentially private empirical risk minimization.J.
+Mach. Learn. Res., 12:1069–1109.
+Chaudhuri, K. and Vinterbo, S. A. (2013). A stability-based validation procedure for differentially private
+machine learning.Advances in Neural Information Processing Systems, 26.
+De, S., Berrada, L., Hayes, J., Smith, S. L., and Balle, B. (2022). Unlocking high-accuracy differentially private
+image classification through scale.arXiv preprint arXiv:2204.13650.
+Dong, J., Roth, A., and Su, W. J. (2022). Gaussian differential privacy.Journal of the Royal Statistical Society
+Series B, 84(1):3–37.
+Doroshenko, V., Ghazi, B., Kamath, P., Kumar, R., and Manurangsi, P. (2022). Connect the dots: Tighter
+discrete approximations of privacy loss distributions.arXiv preprint arXiv:2207.04380.
+Dwork, C. (2006). Differential privacy. InProc. 33rd Int. Colloq. on Automata, Languages and Prog. (ICALP
+2006), Part II, pages 1–12.
+14
+
+--- PAGE 15 ---
+Dwork, C. and Lei, J. (2009). Differential privacy and robust statistics. InProceedings of the forty-first annual
+ACM symposium on Theory of computing, pages 371–380.
+Gopi, S., Lee, Y. T., and Wutschitz, L. (2021). Numerical composition of differential privacy.Advances in Neural
+Information Processing Systems, 34:11631–11642.
+Koskela, A., Jälkö, J., Prediger, L., and Honkela, A. (2021). Tight differential privacy for discrete-valued
+mechanisms and for the subsampled Gaussian mechanism using FFT. InInternational Conference on Artificial
+Intelligence and Statistics, pages 3358–3366. PMLR.
+Liese, F. and Vajda, I. (2006). On divergences and informations in statistics and information theory.IEEE
+Transactions on Information Theory, 52(10):4394–4412.
+Liu, J. and Talwar, K. (2019). Private selection from private candidates. InProceedings of the 51st Annual
+ACM SIGACT Symposium on Theory of Computing, pages 298–309.
+Mironov, I. (2017). Rényi differential privacy. In2017 IEEE 30th Computer Security Foundations Symposium
+(CSF), pages 263–275.
+Mohapatra, S., Sasy, S., He, X., Kamath, G., and Thakkar, O. (2022). The role of adaptive optimizers for honest
+private hyperparameter selection. InProceedings of the AAAI Conference on Artificial Intelligence, volume 36,
+pages 7806–7813.
+Papernot, N. and Steinke, T. (2022). Hyperparameter tuning with renyi differential privacy. InInternational
+Conference on Learning Representations.
+Ponomareva, N., Hazimeh, H., Kurakin, A., Xu, Z., Denison, C., McMahan, H. B., Vassilvitskii, S., Chien, S.,
+and Thakurta, A. G. (2023). How to dp-fy ml: A practical guide to machine learning with differential privacy.
+Journal of Artificial Intelligence Research, 77:1113–1201.
+Redberg, R., Zhu, Y., and Wang, Y.-X. (2023). Generalized ptr: User-friendly recipes for data-adaptive
+algorithms with differential privacy. InInternational Conference on Artificial Intelligence and Statistics, pages
+3977–4005. PMLR.
+Tang, X., Shin, R., Inan, H. A., Manoel, A., Mireshghallah, F., Lin, Z., Gopi, S., Kulkarni, J., and Sim, R.
+(2024). Privacy-preserving in-context learning with differentially private few-shot generation. InInternational
+Conference on Learning Representations.
+Wang, Y.-X. (2018). Revisiting differentially private linear regression: optimal and adaptive prediction &
+estimation in unbounded domain.Uncertainty in Artificial Intelligence (UAI-18).
+Wu, T., Panda, A., Wang, J. T., and Mittal, P. (2024). Privacy-preserving in-context learning for large language
+models. In International Conference on Learning Representations.
+Yousefpour, A., Shilov, I., Sablayrolles, A., Testuggine, D., Prasad, K., Malek, M., Nguyen, J., Ghosh, S.,
+Bharadwaj, A., Zhao, J., et al. (2021). Opacus: User-friendly differential privacy library in pytorch. In
+NeurIPS 2021 Workshop Privacy in Machine Learning.
+Zhu, Y., Dong, J., and Wang, Y.-X. (2022). Optimal accounting of differential privacy via characteristic function.
+In Proceedings of The 25th International Conference on Artificial Intelligence and Statistics.
+Zhu, Y. and Wang, Y.-X. (2022). Adaptive private-k-selection with adaptive k and application to multi-label
+pate. In International Conference on Artificial Intelligence and Statistics, pages 5622–5635. PMLR.
+15
+
+--- PAGE 16 ---
+A Proofs for Section 3
+A.1 Proof of Theorem 3.2 (Privacy Profile of Additive Noise RNM)
+Theorem A.1. Let X ∼ X ′ and ϵ ∈ R. We have
+He ϵ
+
+M(X)||M(X ′)
+
+≤ m · δ(ϵ),
+where δ(ϵ) is the privacy profile of the additive noise mechanism with sensitivity 2.
+Proof. For eachi ∈ [m], denoting the density function ofZi by p(ri), we have that
+Hf
+
+M(X)||M(X ′)
+
+=
+mX
+i=1
+f
+ P(M(X) = i)
+P(M(X ′) = i)
+
+P(M(X ′) = i)
+=
+mX
+i=1
+f
+ R ∞
+−∞ p(ri − 2) · P(fi(X) + ri − 2 > maxj∈[m],j̸=i{fj(X) + rj}) dri
+R ∞
+−∞ p(ri) · P(fi(X ′) + ri > maxj∈[m],j̸=i{fj(X ′) + rj}) dri
+!
+·
+Z ∞
+−∞
+p(ri) · P(fi(X ′) + ri > max
+j∈[m],j̸=i
+{fj(X ′) + rj}) dri,
+(A.1)
+where p(ri)’s are the density functions ofZi’s, respectively, and where the randomness inP(fi(X) + ri >
+maxj∈[m],j̸=i{fj(X) + rj}) is w.r.t. rj’s.
+From the Lipschitz property it follows that for alli ∈ [m],
+P(fi(X) + ri − 2 > maxj∈[m],j̸=i{fj(X) + rj})
+P(fi(X ′) + ri > maxj∈[m],j̸=i{fj(X ′) + rj}) ≤ 1. (A.2)
+For anf divergence determined by a convexf of the RNM of additive noise mechanisms evaluated atX and X ′,
+16
+
+--- PAGE 17 ---
+we have that
+Hf
+
+M(X)||M(X ′)
+
+=
+mX
+i=1
+f
+ P(M(X) = i)
+P(M(X ′) = i)
+
+P(M(X ′) = i)
+=
+mX
+i=1
+f
+ R ∞
+−∞ p(ri − 2) · P(fi(X) + ri − 2 > maxj∈[m],j̸=i{fj(X) + rj}) dri
+R ∞
+−∞ p(ri) · P(fi(X ′) + ri > maxj∈[m],j̸=i{fj(X ′) + rj}) dri
+!
+·
+Z ∞
+−∞
+p(ri) · P(fi(X ′) + ri > max
+j∈[m],j̸=i
+{fj(X ′) + rj}) dri
+≤
+mX
+i=1
+Z ∞
+−∞
+f
+ p(ri − 2) · P(fi(X) + ri − 2 > maxj∈[m],j̸=i{fj(X) + rj})
+p(ri) · P(fi(X ′) + ri > maxj∈[m],j̸=i{fj(X ′) + rj})
+
+· p(ri) · P(fi(X ′) + ri > max
+j∈[m],j̸=i
+{fj(X ′) + rj}) dri
+≤
+mX
+i=1
+Z ∞
+−∞
+f
+ p(ri − 2)
+p(ri)
+
+· p(ri) · P(fi(X ′) + ri > max
+j∈[m],j̸=i
+{fj(X ′) + rj}) dri
+≤
+mX
+i=1
+Z ∞
+−∞
+f
+ p(ri − 2)
+p(ri)
+
+· p(ri) dri
+=
+mX
+i=1
+Hf
+
+p(ri)||p(ri − 2)
+
+= m · δ(ϵ),
+(A.3)
+in case f corresponds to the hockey-stick-divergence and whereδ(ϵ) is the privacy profile of the additive noise
+mechanism with sensitivity 2. In the first inequality we have used Lemma 2.3 and Jensen’s inequality and in the
+second inequality we have used the Lipschitz property and the fact thatf(z) is a non-decreasing function ofz.
+In case of monotonicity, i.e., iffi(X) ≥ fi(X ′) for all i ∈ [m], the condition(A.2) holds with ri − 2 replaced by
+ri − 1 and we have the result withri − 2 replaced by ri − 1.
+A.2 Proof of Theorem 3.3
+Lemma A.2. In case of an adaptive composition ofk mechanisms of the form(3.1), we get the privacy profile
+upper bound mk · δ(ϵ), where δ(ϵ) is the privacy profile of am-wise composition of the additive noise mechanism
+with noise Z and sensitivity 2.
+Proof. We use the proof technique used in (Thm. 27 Zhu et al., 2022) and consider an adaptive composition
+of two mechanisms. The general case follows from the proof. LetX ∼ X ′. Denote the density functions
+of M1(X) and M2
+M1(X), X
+
+by f1(t) and f2(t, s), respectively, and the density functions ofM1(X ′) and
+M2
+M1(X ′), X′
+by f ′
+1(t) and f ′
+2(t, s), respectively. Denote the density function ofZ by p(t). Using the bound
+17
+
+--- PAGE 18 ---
+given by Thm. 3.2, we have:
+He ϵ
+
+(M(X), M(X)
+
+||(M(X), M(X)
+
+=
+Z
+R
+Z
+R
+max{f1(t)f2(t, s) − e ϵf ′
+1(t)f ′
+2(t, s), 0} dsdt
+=
+Z
+R
+f1(t)
+ Z
+R
+max{f2(t, s) − e
+ϵ−log f1(t)
+f ′
+1(t) f ′
+2(t, s), 0} ds
+!
+dt
+≤ m ·
+Z
+R
+f1(t)
+ Z
+R
+max{p(s − 2) − e
+ϵ−log f1(t)
+f ′
+1(t) p(s), 0} ds
+!
+dt
+= m ·
+Z
+R
+p(s − 2)
+ Z
+R
+max{f1(t) − e
+ϵ−log p(s−2)
+p(s) f ′
+1(t), 0} dt
+!
+ds
+≤ m2 ·
+Z
+R
+p(s − 2)
+ Z
+R
+max{p(t − 2) − e
+ϵ−log p(s−2)
+p(s) p(t), 0} dt
+!
+ds
+= m2 ·
+Z
+R
+Z
+R
+max{p(s − 2)p(t − 2) − e ϵp(s)p(t), 0} dtds
+which shows the claim fork = 2. The general case follows by induction.
+A.3 Proof of Corollary 3.4
+Lemma A.3.Consider the mechanismM defined in Eq. 3.1 and supposeZ is normally distributed with variance
+σ2. Let δ > 0. Then M is (ϵ, δ)-DP for
+ϵ = 2
+σ2 + 2
+σ
+r
+2 log m
+δ
+Proof. Let δ > 0. By (Lemma 3, Balle and Wang, 2018) we know that the Gaussian mechanism withL2-sensitivity
+∆ and noise scaleσ is (ϵ, δ)-DP if
+P(ω ≥ ϵ) ≤ δ,
+where
+ω ∼ N
+ ∆2
+2σ2 , ∆2
+σ2
+
+.
+Using a simple Chernoff bound for the Gaussian, we see that for anyϵ ≥ ∆2
+2σ2,
+P(ω ≥ ϵ) ≤ e − eϵ2 σ2
+2 ,
+whereeϵ = ϵ − ∆2
+2σ2. Setting
+ϵ = ∆2
+2σ2 + ∆
+σ
+q
+2 log m
+δ ,
+we see that
+P(ω ≥ ϵ) ≤ 1
+m .
+The claim follows setting∆ = 2 and using Thm. 3.2.
+18
+
+--- PAGE 19 ---
+B Proof of Theorem 4.1 (General Bound for the Privacy Selection)
+Similarly to (Lemma 7, Papernot and Steinke, 2022) we denoteQ(≤ y) =P
+y′≤y Q(y′) and Q(< y) =P
+y′<y Q(y′)
+and formulate our main result for the caseP(K = 0) = 0. The caseP(K = 0) > 0 could be included in the upper
+bound as a small additional term of the formf(0) · P(K = 0). E.g., in case of the hockey stick divergence, it
+does not account for the divergence in caseϵ > 0 so we neglect it.
+Also, φ denotes the probability generating function ofK, i.e.,
+φ(z) =
+∞X
+k=1
+P(K = k) · zk.
+As shown in (Lemma 7, Papernot and Steinke, 2022),
+A(y) =
+∞X
+k=1
+P[K = k] ·
+
+Q(≤ y)k − Q(< y)k
+= φ
+
+Q(≤ y)
+
+− φ
+
+Q(< y)
+
+=
+Z Q(≤y)
+Q(<y)
+φ′(z) dz
+= Q(y) · E
+X←[Q(<y),Q(≤y)]
+[φ′(X)],
+(B.1)
+where X ← [Q(< y), Q(≤ y)] denotes uniformly distributed r.v. on the interval[Q(< y), Q(≤ y)].
+Theorem B.1. Let X ∼ X ′ and let A and A′ be the density functions of the hyperparameter tuning algorithm,
+evaluated on X and X ′, respectively. Let Q and Q′ be the density functions of the quality score of the base
+mechanism, evaluated onX and X ′, respectively. LetK be random variable for the times the base mechanism is
+run and φ(z) the PGF ofK. Let f : [0 , ∞) → R be a convex function. Then,
+Hf(A||A′) ≤
+X
+y∈Y
+f
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y)
+
+· Q′(y)φ′(q′
+y),
+where for eachy ∈ Y, qy and q′
+y are obtained by applying the samey-dependent post-processing function toQ
+and Q′, respectively.
+Proof. For the mechanismA defined in (B.1), we can bound the HS divergence as follows:
+Hf(A||A′) =
+X
+y∈Y
+f
+ A(y)
+A′(y)
+
+· A(y)
+=
+X
+y∈Y
+f
+ Q(y) EX←[Q(<y),Q(≤y)][φ′(X)]
+Q′(y) EX ′←[Q′(<y),Q′(≤y)][φ′(X ′)]
+
+· Q′(y) E
+X ′←[Q′(<y),Q′(≤y)]
+[φ′(X ′)]
+≤
+X
+y∈Y
+E
+X←[Q(<y),Q(≤y)], X ′←[Q′(<y),Q′(≤y)]
+f
+ Q(y)φ′(X)
+Q′(y)φ′(X ′)
+
+· Q′(y)φ′(X ′)
+≤
+X
+y∈Y
+max
+y′ E
+X←[Q(<y′),Q(≤y′)], X ′←[Q′(<y′),Q′(≤y′)]
+f
+ Q(y)φ′(X)
+Q′(y)φ′(X ′)
+
+· Q′(y)φ′(X ′),
+(B.2)
+19
+
+--- PAGE 20 ---
+where in the first inequality we use Lemma 2.3 and Jensen’s inequality. Notice that in the second inequality the
+maximum is taken only over the arguments in the expectation overX and X ′.
+Jensen’s inequality applies in caseX and X ′ are arbitrarily coupled and we use the same coupling between
+X and X ′ as in (Lemma 7, Papernot and Steinke, 2022), i.e., we coupleX and X ′ such that
+X − Q(< y)
+Q(y) = X ′ − Q′(< y)
+Q′(y) . (B.3)
+We see that forX ← [Q(< y ′), Q(≤ y′)] and X ′ ← [Q′(< y ′), Q′(≤ y′)], the expressions(B.3) are between 0 and
+1. Thus, continuing from (B.2), we find that
+Hf(A||A′) ≤
+X
+y∈Y
+max
+y′ E
+X←[Q(<y′),Q(≤y′)], X ′←[Q′(<y′),Q′(≤y′)]
+f
+ Q(y)φ′(X)
+Q′(y)φ′(X ′)
+
+· Q′(y)φ′(X ′)
+≤
+X
+y∈Y
+max
+y′
+max
+(X,X ′)
+f
+ Q(y)φ′(X)
+Q′(y)φ′(X ′)
+
+· Q′(y)φ′(X ′)
+=
+X
+y∈Y
+max
+y′
+f
+ Q(y)φ′(Q(< y ′) + ty · Q(y′))
+Q′(y)φ′(Q′(< y ′) + ty · Q′(y′))
+
+· Q′(y)φ′(Q′(< y ′) + ty · Q′(y′))
+for some {ty}y∈Y, where ty ∈ [0, 1] for all y ∈ Y. Furthermore, taking the maximum overty’s, we get
+Hf(A||A′) ≤
+X
+y∈Y
+max
+y′,ty
+f
+ Q(y)φ′(Q(< y ′) + ty · Q(y′))
+Q′(y)φ′(Q′(< y ′) + ty · Q′(y′))
+
+· Q′(y)φ′(Q′(< y ′) + ty · Q′(y′))
+≤
+X
+y∈Y
+f
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y)
+
+· Q′(y)φ′(q′
+y),
+where for eachy ∈ Y, qy and q′
+y are obtained by applying the samey-dependent post-processing function toQ
+and Q′, respectively. This can be seen using a similar reasoning as in (Lemma 7, Papernot and Steinke, 2022).
+It follows from the fact that for ally ∈ Y, there clearly existy∗, t∗ such that
+(y∗, t∗) = argmax
+y′,ty
+f
+ Q(y)φ′(Q(< y ′) + ty · Q(y′))
+Q′(y)φ′(Q′(< y ′) + ty · Q′(y′))
+
+· Q′(y)φ′(Q′(< y ′) + ty · Q′(y′)).
+The kernel of the post-processing function is then given by
+g(z) =
+
+
+
+1, if z < y ∗,
+t∗, if z = y∗,
+0, else,
+i.e., qy =P
+z∈Y g(z)Q(z) and q′
+y =P
+z∈Y g(z)Q′(z).
+B.1 The Case of Continuous Output Score Function
+In case the ordered output spaceY of the base mechanism is continuous, the proof simplifies considerably.
+20
+
+--- PAGE 21 ---
+Theorem B.2. For continuous output spaceY,
+Hf(A||A′) =
+Z
+Y
+f
+ 
+Q(y) · φ′
+Q(≤ y)
+
+Q′(y) · φ′
+Q′(≤ y)
+
+!
+· Q′(y) · φ′
+Q′(≤ y)
+
+dy, (B.4)
+where where Q(y) and Q(≤ y) denote the density function the CDF of the base mechanismQ, respectively.
+Proof. The CDF of the private selection algorithm aty ∈ Y is given by
+A(≤ y) =
+∞X
+k=1
+P[K = k] · Q(≤ y)k,
+Therefore, differentiating, we see that the density function ofA is given by
+A(y) =
+∞X
+k=1
+k · P[K = k] · Q(y) · Q(≤ y)k−1
+= Q(y)
+∞X
+k=1
+k · P[K = k] · Q(≤ y)k−1
+= Q(y) · φ′
+Q(≤ y)
+
+.
+(B.5)
+We have a similar representation for the densityA′(y), and the claim follows.
+C Proofs for Section 5
+C.1 Proof of Theorem 5.2
+Theorem C.1. Let K ∼ D η,γ and let δ(ϵ1), ϵ1 ∈ R, define the privacy profile of the base mechanismQ. Then,
+for A and A′, the output distributions of the selection algorithm evaluated on neighboring datasetsX and X ′,
+respectively, and for allϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ)
+where
+bϵ = ϵ − (η + 1) log
+
+e ϵ1 + 1 − γ
+γ · δ(ϵ1)
+
+.
+Proof. Let q and q′ be results of applying some post-processing function toQ and Q′, respectively. Then,
+1 − q′ ≤ e ϵ1(1 − q) + δ(ϵ1) (C.1)
+21
+
+--- PAGE 22 ---
+for all ϵ1 ∈ R. Thus, we see that for allϵ1 ≥ 0,
+φ′(q)
+φ′(q′) =
+(γ − 1)q′ + 1
+(γ − 1)q + 1
+η+1
+=
+(1 − γ)(1 − q′) + γ
+(1 − γ)(1 − q) + γ
+η+1
+≤
+(1 − γ)(1 − q)e ϵ1 + δ(ϵ1)(1 − γ) + γ
+(1 − γ)(1 − q) + γ
+η+1
+≤
+(1 − γ)(1 − q) eϵ1 + δ(ϵ1)(1 − γ) + γ e ϵ1
+(1 − γ)(1 − q) + γ
+η+1
+=
+
+e ϵ1 + δ(ϵ1)(1 − γ)
+(1 − γ)(1 − q) + γ
+η+1
+≤
+
+e ϵ1 + 1 − γ
+γ δ(ϵ1)
+η+1
+,
+(C.2)
+where we have used the inequality(C.1) in the first inequality and the inequalityγ ≤ e ϵ1 γ in the second
+inequality. Using Thm. 4.1 for the hockey-stick divergencef(z) = [z − e ϵ]+, we have that for allϵ1 ≥ 0,
+Hf(A||A′) ≤
+X
+y∈Y
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y) − e ϵ
+
++
+· Q′(y) · φ′(q′
+y)
+=
+X
+y∈Y
+"
+1 − e
+ϵ−log Q(y)
+Q′ (y) −log
+φ′ (qy )
+φ′ (q′y )
+#
++
+· Q(y) · E[K] · γη+1
+
+1 − qy(1 − γ)
+η+1
+≤
+X
+y∈Y
+"
+1 − e
+ϵ−log Q(y)
+Q′ (y) −log
+φ′ (qy )
+φ′ (q′y )
+#
++
+· Q(y) · E[K]
+≤
+X
+y∈Y
+
+1 − e ϵ−log Q(y)
+Q′ (y) −(η+1) log(e ϵ1+ 1−γ
+γ δ(ϵ1))
+
++
+· Q(y) · E[K]
+= E[K] · He eϵ
+
+Q||Q′
+,
+(C.3)
+whereeϵ = ϵ − (η + 1)log
+
+e ϵ1 + 1−γ
+γ δ(ϵ1)
+
+. In the third inequality we have used the inequality(C.2) the fact
+that [1 − e ϵ−s]+ is a non-decreasing function ofs for all ϵ ∈ R.
+C.2 Proof of Corollaries 5.3 and 5.4
+Corollary C.2. Let K ∼ D η,γ. If the base mechanismQ is ϵ-DP, then the selection algorithmA is (η + 2)ϵ-DP.
+For η = 1 we get Theorem 1.3 of (Liu and Talwar, 2019).
+Proof. Let ϵ1 be such thatδ(ϵ1) = 0, where
+
+ϵ1, δ(ϵ1)
+
+gives a privacy profile for the base mechanismQ. Then,
+bϵ = ϵ − (η + 1) log
+
+e ϵ1 + 1 − γ
+γ δ(ϵ1)
+
+= ϵ − (η + 1)ϵ1,
+22
+
+--- PAGE 23 ---
+and by Theorem 5.2,He ϵ(A||A′) = 0 if ϵ = (η + 2)ϵ1.
+Corollary C.3. Let K ∼ D η,γ. If the base mechanismQ is (ϵ, δ)-DP, then then the selection algorithmA is
+(η + 2)ϵ + γ−1δ, mδ
+
+-DP.
+Proof. Let
+
+ϵ1, δ(ϵ1)
+
+be a privacy profile for the base mechanismQ and ϵ1 ≥ 0. Then,
+bϵ = ϵ − (η + 1) log
+
+e ϵ1 + 1 − γ
+γ δ(ϵ1)
+
+≥ ϵ − (η + 1) log
+
+e ϵ1
+
+1 + γ−1δ(ϵ1)
+
+≥ ϵ − (η + 1)
+
+ϵ1 + γ−1δ(ϵ1)
+
+and by Thm. 5.2,He ϵ(A||A′) = mδ if ϵ = (η + 2)ϵ1 + γ−1δ.
+C.3 Proof of Corollary 5.5
+Lemma C.4 (ϵ-values when Q is GDP). Let K ∼ D η,γ. Suppose the base mechanism is dominated by the
+Gaussian mechanism with noise parameterσ > 0 and L2-sensitivity 1. Then, for a fixedδ > 0, the private
+selection algorithm A is (ϵ, δ)-DP for
+ϵ = (η + 2)
+ 1
+2σ2 + 1
+σ
+r
+2 log 1
+γ · δ
+
++ δ.
+Proof. By (Lemma 3, Balle and Wang, 2018), we know that for the Gaussian mechanism with sensitivity 1
+and noise scaleσ the privacy loss random variableω is distributed asω ∼ N
+ 1
+2σ2 , 1
+σ2
+
+. Thus, using a simple
+Chernoff bound for the Gaussian, for its privacy profileδ(ϵ1) we have
+δ(ϵ1) ≤ P(ω ≥ ϵ1) ≤ e − eϵ2 σ2
+2 ,
+whereeϵ = ϵ1 − 1
+2σ2. Choosing
+ϵ1 = 1
+2σ2 + 1
+σ
+r
+2 log m
+δ ,
+we see that
+δ(ϵ1) ≤ δ
+m .
+Furthermore, sinceϵ1 ≥ 0, we have the following bound for the additional term in the bound of Thm. 5.2:
+(η + 1) log
+
+e ϵ1 + 1−γ
+γ δ(ϵ1)
+
+≤ (η + 1) log
+
+e ϵ1 + eϵ1 1−γ
+γ δ(ϵ1)
+
+= (η + 1)ϵ1 + log
+
+1 + 1−γ
+γ δ(ϵ1)
+
+≤ (η + 1)ϵ1 + log
+
+1 + γ−1 · δ(ϵ1)
+
+≤ (η + 1)ϵ1 + log
+
+1 + δ
+
+≤ (η + 1)ϵ1 + δ.
+(C.4)
+Setting ϵ = (η + 2)ϵ1 + δ, the inequality (C.4) and Thm. 5.2 show that
+He ϵ(A||A′) ≤m · δ
+
+ϵ − (η + 1)ϵ1 + log
+
+1 + 1−γ
+γ δ(ϵ1)
+
+≤m · δ(ϵ1) ≤ δ.
+23
+
+--- PAGE 24 ---
+C.4 Proof of Theorem 5.7 (Private Selection, Binomial Distribution)
+First, the following auxiliary lemma is needed.
+Lemma C.5. Let a, b, c, d > 0. Then, for x ≥ 0, the function
+f(x) = ax + b
+cx + d
+is non-decreasing if and only ifa
+b ≥ c
+d.
+Proof. The claim follows from the expression
+f ′(x) = ad − cb
+(cx + d)2 .
+Recall that forK ∼ Bin(n, p), the probability generating function is given by
+φ(z) = (1 − p + pz)n. (C.5)
+Theorem C.6. Let K ∼ Bin(n, p) for some n ∈ N and 0 < p < 1, and let δ(ϵ1), ϵ1 ∈ R, define the privacy
+profile of the base mechanismQ. Suppose
+ϵ1 ≥ log
+
+1 + p
+1−p δ(ϵ1)
+
+.
+Then, for A and A′, the output distributions of the selection algorithm evaluated on neighboring datasetsX and
+X ′, respectively, for allϵ > 0 and for all ϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ), (C.6)
+where
+bϵ = ϵ − (n − 1) log
+
+1 + p(e ϵ1 − 1) + pδ(ϵ1)
+
+.
+Proof. Using the PGF of the binomial distribution given in Eq.(C.5) by the auxiliary Lemma C.5, for each
+y ∈ Y,
+φ′(qy)
+φ′(q′y) =
+1 − p + pqy
+1 − p + pq′y
+n−1
+≤
+1 − p + pe ϵ1 q′
+y + pδ(ϵ1)
+1 − p + pq′y
+n−1
+=
+
+1 + p(e ϵ1 − 1)q′
+y + pδ(ϵ1)
+1 − p + pq′y
+n−1
+≤
+
+1 + p(e ϵ1 − 1) + pδ(ϵ1)
+n−1
+,
+(C.7)
+in case
+p(e ϵ1 − 1)
+pδ(ϵ1) ≥ p
+1 − p ,
+24
+
+--- PAGE 25 ---
+i.e., if
+ϵ1 ≥ log
+
+1 + p
+1 − p δ(ϵ1)
+
+.
+Moreover, we see that
+φ′(q) ≤ n · p = m (C.8)
+for all 0 ≤ q ≤ 1. The claim follows from the inequalities (C.7) and (C.8) and from Theorem 4.1.
+C.5 Proof of Corollary 5.8
+Corollary C.7. Let K ∼ Poisson(m) for some m ∈ N, and let δ(ϵ1), ϵ1 ∈ R, define the privacy profile of
+the base mechanismQ. Then, for A and A′, the output distributions of the selection algorithm evaluated on
+neighboring datasets X and X ′, respectively, and for allϵ > 0, and for allϵ1 ≥ 0,
+He ϵ(A||A′) ≤ m · δ(bϵ),
+where
+bϵ = ϵ − m · (e ϵ1 − 1) − m · δ(ϵ1).
+Proof. Let K ∼ Poisson(m) and Kn ∼ Bin(n, m/n) and let A, A′ denote the density functions of the private
+selection algorithm corresponding toK and let An, A′
+n those corresponding toKn, evaluated on neighboring
+datasets X, X′, respectively. Looking at the form ofA given in Eq. (B.1), we have that
+He ϵ
+
+A||A′
+=
+X
+y∈Y
+max{A(y) − e ϵA′(y), 0}
+=
+∞X
+k=1
+max{P[K = k] ·
+
+Q(≤ y)k − Q(< y)k
+− e ϵP[K = k] ·
+
+Q′(≤ y)k − Q′(< y)k
+, 0}
+≤
+∞X
+k=1
+max{P[Kn = k] ·
+
+Q(≤ y)k − Q(< y)k
+− e ϵP[Kn = k] ·
+
+Q′(≤ y)k − Q′(< y)k
+, 0}
++ (1 + eϵ)
+∞X
+k=0
+|P[K = k] − P[Kn = k]|
+= He ϵ
+
+An||A′
+n
+
++ (1 + eϵ)
+∞X
+k=0
+|P[K = k] − P[Kn = k]| ,
+where the inequality follows from the fact thatmax{a + b, 0} ≤ | a| + max{b, 0} for all a, b ∈ R. Since by Le
+Cam’s inequality,Bin(n, m/n) → Poisson(m) in total variation distance asn → ∞, we have that
+He ϵ
+
+A||A′
+= lim
+n→∞
+He ϵ
+
+An||A′
+n
+
+.
+Fixing n · p = m in the bound(5.2) of Thm. 5.7 (bound for the caseK ∼ Bin(n, n/m)), we see that the bound
+approaches the bound (5.3) of Cor. 5.8 (bound for the caseK ∼ Poisson(m)) as p → 0, since then
+(n − 1) log
+
+1 + p(e ϵ1 − 1) + pδ(ϵ1)
+
+→ m · (e ϵ1 − 1) + m · δ(ϵ1).
+This follows from the fact thatlog(1+x)
+x → 1 as x → 0.
+25
+
+--- PAGE 26 ---
+Remark C.8. Wecan alsoget Cor.5.8 directlyusing thePGFof thePoissondistribution. For K ∼ Poisson(m), the
+PGF isφ(z) = e m(z−1), i.e. φ′(z) = m ·e m(z−1). Using Thm. 4.1 for the hockey-stick divergencef(z) = [a −e ϵ]+,
+we get
+Hf(A||A′) ≤
+X
+y∈Y
+f
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y)
+
+· Q′(y) · φ′(q′
+y)
+=
+X
+y∈Y
+ Q(y)φ′(qy)
+Q′(y)φ′(q′y) − e ϵ
+
++
+· Q′(y) · φ′(q′
+y)
+=
+X
+y∈Y
+"
+1 − e
+ϵ−log Q(y)
+Q′ (y) −log
+φ′ (qy )
+φ′ (q′y )
+#
++
+· Q(y) · φ′(qy)
+=
+X
+y∈Y
+
+1 − e ϵ−log Q(y)
+Q′ (y) −m·(qy−q′
+y)
+
++
+· Q(y) · m · e m·(qy−1).
+(C.9)
+As the probabilitiesqy and q′
+y are obtained by applying the same post-processing toQ and Q′, for allϵ1 ≥ 0,
+q′
+y ≤ e ϵ1 qy + δ(ϵ1). Using also the fact that[1 − e ϵ−s]+ is a non-decreasing function ofs for all ϵ ∈ R, we get
+from the inequality (C.9) that for allϵ1 ≥ 0,
+Hf(A||A′) ≤
+X
+y∈Y
+
+1 − e ϵ−log Q(y)
+Q′(y) −m·(qy−q′
+y)
+
++
+· Q(y) · m · e m·(qy−1)
+≤
+X
+y∈Y
+
+1 − e ϵ−log Q(y)
+Q′(y) −m·q′
+y(1−e ϵ1)−m·δ(ϵ1)
+
++
+· Q(y) · m · e m·(qy−1).
+≤
+X
+y∈Y
+
+1 − e ϵ−log Q(y)
+Q′(y) −m·(1−e ϵ1)−m·δ(ϵ1)
+
++
+· Q(y) · m
+(C.10)
+which gives the claim of Cor. 5.8.
+D Converting RDP Bounds to (ϵ, δ)-Bounds
+To convert from Rényi DP to approximate DP we use following formula.
+Lemma D.1(Canonne et al. 2020). Suppose the mechanismM is
+
+α, ϵ′
+-RDP. Then M is also (ϵ, δ(ϵ))-DP
+for arbitrary ϵ ≥ 0 with
+δ(ϵ) = exp
+
+(α − 1)(ϵ′ − ϵ)
+
+α
+
+1 − 1
+α
+α−1
+. (D.1)
+26

@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "run_id": "positive-20260729-001",
+  "created_at_utc": "2026-07-29T23:46:21.629132+00:00",
+  "reference_root": "../../references",
+  "source_count": 5,
+  "sources": [
+    {
+      "source_id": "2402.06701v1-254f04deb11d",
+      "relative_path": "2402.06701v1.pdf",
+      "source_sha256": "254f04deb11d2fcc602bd5dca1da46558ea4e98da93da6eebd3381486741938b",
+      "extracted_text_path": "sources/2402.06701v1-254f04deb11d.txt",
+      "extracted_text_sha256": "0a6cc253e840c13223ff6ba9f2da9646a8b151e8ae5ec3d3b9063eb5cc176c3c",
+      "page_count": 26,
+      "extraction_quality": "high",
+      "detected_metadata": {},
+      "metadata": {}
+    },
+    {
+      "source_id": "2408.06853v3-93f991484996",
+      "relative_path": "2408.06853v3.pdf",
+      "source_sha256": "93f991484996d7c77e9984ae7b1c0b31550c1221cde1df0ea9c3c412175d9dd5",
+      "extracted_text_path": "sources/2408.06853v3-93f991484996.txt",
+      "extracted_text_sha256": "f057095e42fbd6d331ff2f286657670e553297bd1d16394cff964b6cafcf3272",
+      "page_count": 15,
+      "extraction_quality": "high",
+      "detected_metadata": {},
+      "metadata": {}
+    },
+    {
+      "source_id": "2602.06756v2-e2c3a161e6ba",
+      "relative_path": "2602.06756v2.pdf",
+      "source_sha256": "e2c3a161e6ba3ab70ca343d96c3bc3f6098977a4480d074aa54b66a646016289",
+      "extracted_text_path": "sources/2602.06756v2-e2c3a161e6ba.txt",
+      "extracted_text_sha256": "e5bc1b3c104fd1a17f3f1a5c4e8faacbe1aa531d299a33c594343f8a49cb14d7",
+      "page_count": 45,
+      "extraction_quality": "high",
+      "detected_metadata": {
+        "title": "f-Differential Privacy Filters: Validity and Approximate Solutions",
+        "author": "Long Tran; Antti Koskela; Ossi Räisä; Antti Honkela"
+      },
+      "metadata": {}
+    },
+    {
+      "source_id": "NeurIPS-2024-private-geometric-median-Paper-Conference-9183d3cdd56a",
+      "relative_path": "NeurIPS-2024-private-geometric-median-Paper-Conference.pdf",
+      "source_sha256": "9183d3cdd56af1cb68ca4227c57389b025430b8f9fba6beeaace125785e57c4a",
+      "extracted_text_path": "sources/NeurIPS-2024-private-geometric-median-Paper-Conference-9183d3cdd56a.txt",
+      "extracted_text_sha256": "a47c6a447b892d402adca950a05cca1792cee5cd63859de2198769a75b382846",
+      "page_count": 40,
+      "extraction_quality": "high",
+      "detected_metadata": {},
+      "metadata": {}
+    },
+    {
+      "source_id": "joseph25a-1-63074cceccc6",
+      "relative_path": "joseph25a (1).pdf",
+      "source_sha256": "63074cceccc66744c293167faebc07c7a484d26f270d7cbfbb3a49c9dda8fb8c",
+      "extracted_text_path": "sources/joseph25a-1-63074cceccc6.txt",
+      "extracted_text_sha256": "b3a091edd4753355efc8fec28f51a4c1300c8eff5bc1a88ad5a3c608949ad42c",
+      "page_count": 16,
+      "extraction_quality": "high",
+      "detected_metadata": {
+        "title": "Approximate Differential Privacy of the 2 Mechanism",
+        "author": "Matthew Joseph, Alex Kulesza, Alexander Yu"
+      },
+      "metadata": {}
+    }
+  ],
+  "manifest_sha256": "f73624203fea0d49c9eaad5abbbda522c73ceb765cb5784cbc8395e5e1efb8c4"
+}

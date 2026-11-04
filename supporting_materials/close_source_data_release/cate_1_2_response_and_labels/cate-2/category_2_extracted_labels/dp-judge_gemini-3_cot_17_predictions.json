@@ -1,0 +1,877 @@
+[
+  {
+    "question_id": 108,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "PATE"
+  },
+  {
+    "question_id": 109,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "PATE"
+  },
+  {
+    "question_id": 110,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "PATE"
+  },
+  {
+    "question_id": 87,
+    "pred": 0,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "objective perturbation"
+  },
+  {
+    "question_id": 88,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "objective perturbation"
+  },
+  {
+    "question_id": 91,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "output perturbation"
+  },
+  {
+    "question_id": 92,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "output perturbation"
+  },
+  {
+    "question_id": 39,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 40,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 41,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 42,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 94,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 95,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 96,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 97,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 98,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 99,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 100,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 101,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 102,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 103,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 104,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 105,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 106,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 120,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 121,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 122,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 123,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 124,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 125,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 126,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Sequential or Adaptive Composition"
+  },
+  {
+    "question_id": 1,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 2,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 3,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 4,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 5,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 6,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 7,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 13,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 14,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 15,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 16,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 17,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Amplification by Subsampling"
+  },
+  {
+    "question_id": 130,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 131,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 132,
+    "pred": 1,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 133,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 134,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 135,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 72,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 73,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 74,
+    "pred": 0,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 75,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 76,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 77,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 78,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 79,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 80,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 18,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "DP selection: expoMech"
+  },
+  {
+    "question_id": 19,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "DP selection: expoMech"
+  },
+  {
+    "question_id": 26,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 27,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 28,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 29,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 30,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 31,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 32,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 33,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 34,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 35,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 36,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 66,
+    "pred": 0,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 67,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 68,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 69,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 115,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "quantile"
+  },
+  {
+    "question_id": 8,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 9,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 10,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 11,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 12,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Accounting"
+  },
+  {
+    "question_id": 20,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "DP selection: expoMech"
+  },
+  {
+    "question_id": 107,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "Parallel Composition"
+  },
+  {
+    "question_id": 89,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "objective perturbation"
+  },
+  {
+    "question_id": 136,
+    "pred": 0,
+    "label": 0,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 137,
+    "pred": 1,
+    "label": 1,
+    "category": "Accounting and Composition",
+    "topic": "SVT"
+  },
+  {
+    "question_id": 81,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 82,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 83,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 84,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 85,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 86,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "mean estimation"
+  },
+  {
+    "question_id": 21,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "DP selection: expoMech"
+  },
+  {
+    "question_id": 22,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "DP selection: expoMech"
+  },
+  {
+    "question_id": 37,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 38,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-GD"
+  },
+  {
+    "question_id": 70,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 71,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "Hyperparameter-tuning"
+  },
+  {
+    "question_id": 116,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "quantile"
+  },
+  {
+    "question_id": 117,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-statistics",
+    "topic": "quantile"
+  },
+  {
+    "question_id": 43,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 44,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "DP-OLS"
+  },
+  {
+    "question_id": 90,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "objective perturbation"
+  },
+  {
+    "question_id": 45,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 46,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 47,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 48,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 49,
+    "pred": 1,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 50,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 51,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 52,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 53,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-sgd"
+  },
+  {
+    "question_id": 23,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "dp-adam"
+  },
+  {
+    "question_id": 24,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-adam"
+  },
+  {
+    "question_id": 25,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-ML",
+    "topic": "dp-adam"
+  },
+  {
+    "question_id": 118,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "quantile"
+  },
+  {
+    "question_id": 119,
+    "pred": 0,
+    "label": 0,
+    "category": "DP-statistics",
+    "topic": "quantile"
+  },
+  {
+    "question_id": 93,
+    "pred": 1,
+    "label": 1,
+    "category": "DP-ML",
+    "topic": "output perturbation"
+  },
+  {
+    "question_id": 127,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "Smooth_sensitivity"
+  },
+  {
+    "question_id": 128,
+    "pred": 0,
+    "label": 0,
+    "category": "Data-Adaptive",
+    "topic": "Smooth_sensitivity"
+  },
+  {
+    "question_id": 129,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "Smooth_sensitivity"
+  },
+  {
+    "question_id": 111,
+    "pred": 1,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "PTR"
+  },
+  {
+    "question_id": 112,
+    "pred": 0,
+    "label": 0,
+    "category": "Data-Adaptive",
+    "topic": "PTR"
+  },
+  {
+    "question_id": 113,
+    "pred": 0,
+    "label": 1,
+    "category": "Data-Adaptive",
+    "topic": "PTR"
+  },
+  {
+    "question_id": 114,
+    "pred": 0,
+    "label": 0,
+    "category": "Data-Adaptive",
+    "topic": "PTR"
+  }
+]

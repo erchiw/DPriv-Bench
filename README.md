@@ -15,6 +15,23 @@
 ## Changelog
 
 <details>
+<summary><b>2026-11-04</b> — <code>cate_2</code> neighboring-relation annotations (37 questions)</summary>
+
+**Labels and other metadata unchanged.** Added an explicit neighboring relation to `question_tex` for 37 questions.
+
+| Topic | `question_id` | Neighboring relation added |
+| --- | --- | --- |
+| DP-OLS | 39–43 | replace-one |
+| Hyperparameter-tuning | 66–71 | add/remove |
+| Parallel Composition | 99–106 | add/remove |
+| PATE | 108–110 | add/remove |
+| PTR | 111–114 | add/remove |
+| Quantile | 115, 116, 118, 119 | add/remove |
+| SVT | 130–136 | add/remove |
+
+</details>
+
+<details>
 <summary><b>2026-06-12</b> — <code>cate_2</code> corrections (questions 46, 47, 76)</summary>
 
 **Labels unchanged.**
